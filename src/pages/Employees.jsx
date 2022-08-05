@@ -21,7 +21,7 @@ const Employees = () => {
     isFetching,
     refetch,
   } = useQuery('employees', () =>
-    userRequest.get('/user').then((res) => res.json())
+    userRequest.get('/user')
   );
 
   if (isLoading) {
