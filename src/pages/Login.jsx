@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../redux/apiCalls';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';

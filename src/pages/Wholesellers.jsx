@@ -4,7 +4,6 @@ import { Header } from '../components';
 import * as xlsx from 'xlsx';
 import FileSaver from 'file-saver';
 import { useMutation, useQuery } from 'react-query';
-import axios from 'axios';
 import WholesellersTable from './WholesellersTable/WholesellersTable';
 import Loading from './Loading';
 import Select from 'react-select';

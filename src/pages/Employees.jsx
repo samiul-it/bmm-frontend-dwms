@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import WholesellersTable from './WholesellersTable/WholesellersTable';
 import EmployeesTable from './EmployeesTable/EmployeesTable';
 import Loading from './Loading';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { userRequest } from '../requestMethods';
 
@@ -22,7 +21,7 @@ const Employees = () => {
     isFetching,
     refetch,
   } = useQuery('employees', () =>
-    fetch('http://localhost:5000/user/').then((res) => res.json())
+    userRequest('http://localhost:5000/user/').then((res) => res.json())
   );
 
   if (isLoading) {
@@ -145,7 +144,7 @@ const Employees = () => {
         </div>
 
         <EmployeesTable
-          employeesList={employeesList}
+          employeesList={employeesList?.data}
           refetch={refetch}
         ></EmployeesTable>
       </div>

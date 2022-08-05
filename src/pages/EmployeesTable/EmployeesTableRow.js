@@ -1,13 +1,12 @@
 import React from "react";
+import { userRequest } from "../../requestMethods";
 
 const EmployeesTableRow = ({ employee, index, refetch }) => {
   const handleDeleteAdmin = (id) => {
     const confirmDelete = window.confirm("Are you Sure?");
     if (confirmDelete) {
       const url = `http://localhost:5000/user/${id}`;
-      fetch(url, {
-        method: "DELETE",
-      })
+      userRequest.delete(url)
         .then((res) => res.json())
         .then((data) => {
           console.log(data);

@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import axios from 'axios';
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { userRequest } from '../../requestMethods';
