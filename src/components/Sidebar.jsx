@@ -5,7 +5,7 @@ import { MdOutlineCancel } from 'react-icons/md';
 
 import { useStateContext } from '../contexts/ContextProvider';
 import { useSelector } from 'react-redux';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { AiOutlineDashboard, AiOutlineShoppingCart } from 'react-icons/ai';
 import { IoMdContacts } from 'react-icons/io';
 import { FiShoppingBag } from 'react-icons/fi';
 
@@ -14,25 +14,22 @@ const Sidebar = () => {
     useStateContext();
   const user = useSelector((state) => state?.user?.currentUser?.user);
   const links = [
-    // {
-    //   title: 'Dashboard',
-    //   links: [
-    //     {
-    //       name: 'ecommerce',
-    //       icon: <FiShoppingBag />,
-    //     },
-    //   ],
-    // },
-
     {
       title: 'Pages',
       links: [
         {
+          name: 'Dashboard',
+          route: '/',
+          icon: <AiOutlineDashboard />,
+        },
+        {
           name: 'categories',
+          route: '/categories',
           icon: <AiOutlineShoppingCart />,
         },
         {
           name: 'OrdersPage',
+          route: '/OrdersPage',
           icon: <AiOutlineShoppingCart />,
         },
       ],
@@ -43,9 +40,14 @@ const Sidebar = () => {
     links.push({
       title: 'User Management',
       links: [
-        { name: 'wholesellers', icon: <IoMdContacts /> },
+        {
+          name: 'wholesellers',
+          route: '/wholesellers',
+          icon: <IoMdContacts />,
+        },
         {
           name: 'employees',
+          route: '/employees',
           icon: <IoMdContacts />,
         },
       ],
@@ -91,7 +93,7 @@ const Sidebar = () => {
                 </p>
                 {item.links.map((link) => (
                   <NavLink
-                    to={`/${link.name}`}
+                    to={`${link.route}`}
                     key={link.name}
                     onClick={handleCloseSideBar}
                     style={({ isActive }) => ({
