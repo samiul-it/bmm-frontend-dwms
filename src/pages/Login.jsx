@@ -1,50 +1,16 @@
 import React, { useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../redux/apiCalls';
-import { toast } from 'react-toastify';
-import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';
-import { wholesellerlogin } from '../redux/wholesellerLogin';
 import { SiShopware } from 'react-icons/si';
-import { publicRequest } from '../requestMethods';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otpUser, setOtpUser] = useState('');
-  const [otpBackend, setOtpBackend] = useState('123456');
-  const [wholeseller, setWholeseller] = useState([]);
-  const [modalLoading, setModalLoading] = useState(false);
   const dispatch = useDispatch();
-
-  const otpModalRef = useRef();
   const navigate = useNavigate();
-
-  const [role, setRole] = useState('wholeseller');
-
-  const handleRoleChange = (newRole) => {
-    setRole(newRole);
-  };
-
-  const handleOtpSubmission = (e) => {
-    e.preventDefault();
-    // console.log("OTP Submitted Successfully..!");
-    if (otpUser === otpBackend) {
-      toast.success('OTP Verified');
-      otpModalRef.current.checked = false;
-
-      wholesellerlogin(dispatch, {
-        email: wholeseller.email,
-        password: '1234',
-        // Phone
-      });
-
-      // navigate(`/wholesellers-details/${wholeseller._id}`);
-    } else {
-      toast.error('Invelid OTP');
-    }
-  };
+  const {isFetching} = useSelector(state => state.user)
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
@@ -54,30 +20,8 @@ const Login = () => {
     // console.log(email, password,role, "up...");
   };
 
-  if (modalLoading) {
-    return <Loading></Loading>;
-  }
+  console.log('Logion Is Loading ===>', isFetching);
 
-  // const handleWholesellerLogin = (e) => {
-  //   e.preventDefault();
-
-  //   publicRequest
-  //     .get(`http://localhost:5000/wholesellers/phone/${phone}`)
-  //     .then((res) => {
-  //       console.log(res.data);
-  //       setWholeseller(res.data);
-  //       toast.info('A Six Digit OTP Sent');
-  //       otpModalRef.current.checked = true;
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       toast.error('Wholeseller does not exist');
-  //     });
-
-  //   // console.log("Phone", phone);
-  // };
-
-  // console.log(wholeseller);
   return (
     <>
       <div className="min-h-screen bg-base-200 relative flex justify-center items-center">
@@ -120,7 +64,7 @@ const Login = () => {
                 </label> */}
               </div>
               <div className="form-control mt-6">
-                <button className="btn btn-primary">Login</button>
+                <button disabled={isFetching} className={`btn btn-primary ${isFetching && 'loading'}`}>Login</button>
               </div>
             </form>
           </div>
