@@ -26,13 +26,16 @@ const UserProfileDetails = () => {
         userRequest
           .put(`/wholesellers/reset-pass/${user._id}`, {
             password: password,
+            newPassword: newPassword,
           })
           .then(function (response) {
             console.log(response);
             handleModalToggle();
+            toast.success("Password Changed Successfully");
           })
           .catch(function (error) {
             console.log(error);
+            toast.error("Failed to Change Password");
           });
       } else {
         userRequest
@@ -43,14 +46,15 @@ const UserProfileDetails = () => {
           .then(function (response) {
             console.log(response);
             handleModalToggle();
+            toast.success("Password Changed Successfully");
           })
           .catch(function (error) {
             console.log(error);
+            toast.error("Failed to Change Password");
           });
       }
-    }
-    else{
-      toast.error("Password Didnt matched");
+    } else {
+      toast.error("Password Didn't match");
     }
   };
 

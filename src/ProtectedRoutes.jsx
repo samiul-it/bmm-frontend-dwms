@@ -7,7 +7,7 @@ const ProtectedRoutes = ({ isAdminRoute }) => {
   const user = useSelector((state) => state.user.currentUser);
 
   useEffect(() => {
-    console.log(user?.user?.role === 'admin' ? true : false === isAdminRoute);
+    // console.log(user?.user?.role === 'admin' ? true : false === isAdminRoute);
   }, [isAdminRoute]);
 
   if (user?.user?.role === 'admin' ? true : false === isAdminRoute) {
