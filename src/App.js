@@ -1,45 +1,25 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { FiSettings } from "react-icons/fi";
 // import {  } from '@syncfusion/ej2-react-popups';
-import { ToastContainer } from 'react-toastify';
-
-import 'react-toastify/dist/ReactToastify.css';
-
-import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
-import {
-  Ecommerce,
-  Products,
-  Calendar,
-  Employees,
-  Stacked,
-  Pyramid,
-  Customers,
-  Kanban,
-  Line,
-  Area,
-  Bar,
-  Pie,
-  Financial,
-  ColorPicker,
-  ColorMapping,
-  Editor,
-} from './pages';
-import './App.css';
-
-import { useStateContext } from './contexts/ContextProvider';
-import Login from './pages/Login';
-import { useSelector, useDispatch } from 'react-redux';
-import ProtectedRoutes from './ProtectedRoutes';
-import Category from './pages/Category';
-import Wholesellers from './pages/Wholesellers';
-import SignUp from './pages/SignUp/SignUp';
-import WholesellersDetails from './pages/WholesellerDetails/WholesellersDetails';
-
-import ConfirmOrder from './pages/ConfirmOrder/ConfirmOrder';
-import { getUser } from './redux/apiCalls';
-import OrdersPage from './pages/OrdersPage/OrdersPage';
-import Homepage from './pages/Homepage/Homepage';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Navbar, Footer, Sidebar, ThemeSettings } from "./components";
+import { Products, Employees } from "./pages";
+import "./App.css";
+import { useStateContext } from "./contexts/ContextProvider";
+import Login from "./pages/Login";
+import { useSelector, useDispatch } from "react-redux";
+import ProtectedRoutes from "./ProtectedRoutes";
+import Category from "./pages/Category";
+import Wholesellers from "./pages/Wholesellers";
+import SignUp from "./pages/SignUp/SignUp";
+import WholesellersDetails from "./pages/WholesellerDetails/WholesellersDetails";
+import ConfirmOrder from "./pages/ConfirmOrder/ConfirmOrder";
+import { getUser } from "./redux/apiCalls";
+import OrdersPage from "./pages/OrdersPage/OrdersPage";
+import Homepage from "./pages/Homepage/Homepage";
+import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -55,24 +35,24 @@ const App = () => {
   } = useStateContext();
 
   useEffect(() => {
-    const currentThemeColor = localStorage.getItem('colorMode');
-    const currentThemeMode = localStorage.getItem('themeMode');
+    const currentThemeColor = localStorage.getItem("colorMode");
+    const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    user?.token && user?.token !== '' && getUser(dispatch);
+    user?.token && user?.token !== "" && getUser(dispatch);
   }, [user?.token, dispatch]);
 
   return (
-    <div className={currentMode === 'Dark' ? 'dark' : ''}>
+    <div className={currentMode === "Dark" ? "dark" : ""}>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
-          <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
+          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
             <button
               type="button"
               onClick={() => setThemeSettings(true)}
-              style={{ background: currentColor, borderRadius: '50%' }}
+              style={{ background: currentColor, borderRadius: "50%" }}
               className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
             >
               <FiSettings />
@@ -91,13 +71,13 @@ const App = () => {
               )}
             </div>
           ) : (
-            ''
+            ""
           )}
           <div
             className={
               activeMenu && user?.token
-                ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full  '
-                : 'bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 '
+                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full  "
+                : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
             }
           >
             {user?.token ? (
@@ -105,7 +85,7 @@ const App = () => {
                 <Navbar />
               </div>
             ) : (
-              ''
+              ""
             )}
             <>
               {themeSettings && <ThemeSettings />}
@@ -133,11 +113,11 @@ const App = () => {
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
                   <Route path="/home" element={<Homepage />} />
-                  {/* Wholesellers Details  */}
+                  {/* User Profile Details  */}
 
                   <Route
-                    path="/wholesellers-details/:id"
-                    element={<WholesellersDetails></WholesellersDetails>}
+                    path="/user-details"
+                    element={<UserProfileDetails></UserProfileDetails>}
                   />
 
                   {/* pages  */}

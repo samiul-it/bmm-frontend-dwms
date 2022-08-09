@@ -15,7 +15,7 @@ const OrdersPage = () => {
     getAllOrdersApi,
     {
       onSuccess: (data) => {
-        console.log(data);
+        // console.log(data);
       },
     }
   );
@@ -129,12 +129,12 @@ const OrdersPage = () => {
                           {/* <span className="badge badge-accent ">Active</span> */}
 
                           <div class="dropdown">
-                            <label tabindex="0" class="badge badge-accent m-1">
+                            <label tabIndex="0" class="badge badge-accent m-1">
                               Active
                             </label>
                             <ul
                               tabindex="0"
-                              class="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
+                              class="dropdown-content menu p-2 shadow bg-gray-600 rounded-md w-max gap-2 "
                             >
                               {statusOptions.map((status, i) => {
                                 return (
