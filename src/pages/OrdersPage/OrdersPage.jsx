@@ -91,16 +91,19 @@ const OrdersPage = () => {
                   ordersData?.data?.map((order) => {
                     return (
                       <tr key={order._id}>
-                        <th>
-                          <span className="badge">{order._id}</span>
-                        </th>
+                        <td>
+                          <span className="badge">
+                            <span className="select-none">#</span>
+                            {order.orderId}
+                          </span>
+                        </td>
                         <td className="relative group hover:cursor-pointer ">
                           <span className="badge badge-primary">Products</span>
 
-                          <div className="bg-gray-800 rounded-md p-2  flex-col gap-2 hidden group-hover:flex absolute left-1/2 -translate-x-1/2 z-20 mt-2 h-max max-h-72 overflow-y-auto shadow-sm">
+                          <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 flex-col gap-2 hidden group-hover:flex absolute left-1/2 -translate-x-1/2 z-20 mt-2 h-max max-h-72 overflow-y-auto shadow-sm">
                             {order.products.map((p) => {
                               return (
-                                <div className="p-2 bg-gray-700 rounded-md">
+                                <div className="p-2 bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-600 rounded-md">
                                   <span className=" block text-sm font-bold">
                                     {p.product.product_name}
                                   </span>
@@ -131,7 +134,7 @@ const OrdersPage = () => {
                             </label>
                             <ul
                               tabindex="0"
-                              class="dropdown-content menu p-2 shadow bg-gray-600 rounded-md w-max gap-2 "
+                              class="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
                             >
                               {statusOptions.map((status, i) => {
                                 return (

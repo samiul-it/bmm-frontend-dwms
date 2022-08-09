@@ -52,7 +52,7 @@ const Homepage = () => {
     userRequest.get(
       `/orders/getGraphData?startDate=${new Date(
         state[0].startDate
-      ).toISOString()}&endDate=${new Date(state[0].endDate).toISOString()}`
+      ).toUTCString()}&endDate=${new Date(state[0].endDate).toUTCString()}`
     )
   );
 
@@ -102,7 +102,7 @@ const Homepage = () => {
               data={graphData?.data.map((d) => {
                 return {
                   ...d,
-                  date: formatDate(d.date),
+                  _id: formatDate(d._id),
                 };
               })}
               margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
@@ -115,7 +115,7 @@ const Homepage = () => {
               />
               <Area type="monotone" dataKey="totalOrders" />
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={`date`} />
+              <XAxis dataKey={`_id`} />
               <YAxis />
               <Tooltip />
             </AreaChart>
