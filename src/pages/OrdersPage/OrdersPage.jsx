@@ -1,21 +1,21 @@
-import React from 'react';
-import { FiArrowRight } from 'react-icons/fi';
-import { useQuery } from 'react-query';
-import { userRequest } from '../../requestMethods';
-import moment from 'moment';
-import Spinner from '../../components/shared/spinner/Spinner';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { FiArrowRight } from "react-icons/fi";
+import { useQuery } from "react-query";
+import { userRequest } from "../../requestMethods";
+import moment from "moment";
+import Spinner from "../../components/shared/spinner/Spinner";
+import { useNavigate } from "react-router-dom";
 
 const OrdersPage = () => {
   const getAllOrdersApi = async () => {
-    return await userRequest.get('/orders');
+    return await userRequest.get("/orders");
   };
   const { data: ordersData, isLoading: orderDataLoading } = useQuery(
-    'getAllOrders',
+    "getAllOrders",
     getAllOrdersApi,
     {
       onSuccess: (data) => {
-        console.log(data);
+        // console.log(data);
       },
     }
   );
@@ -47,9 +47,9 @@ const OrdersPage = () => {
   });
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending', class: 'badge-secondary' },
-    { value: 'Delevered', label: 'Delevered', class: 'badge-accent' },
-    { value: 'Processing', label: 'Processing', class: 'badge-primary' },
+    { value: "pending", label: "Pending", class: "badge-secondary" },
+    { value: "Delevered", label: "Delevered", class: "badge-accent" },
+    { value: "Processing", label: "Processing", class: "badge-primary" },
   ];
 
   return (
@@ -58,7 +58,7 @@ const OrdersPage = () => {
         <h1 className="text-2xl font-semibold  ">Orders</h1>
         <button
           onClick={() => {
-            navigate('/confirmOrder');
+            navigate("/confirmOrder");
           }}
           className="btn btn-primary btn-sm capitalize"
         >
@@ -121,7 +121,7 @@ const OrdersPage = () => {
                         </td>
                         <td>
                           {moment(order.createdAt).format(
-                            'MMMM Do YYYY, h:mm:ss a'
+                            "MMMM Do YYYY, h:mm:ss a"
                           )}
                         </td>
                         <td>₹{order.total_cost}/-</td>
@@ -129,12 +129,13 @@ const OrdersPage = () => {
                           {/* <span className="badge badge-accent ">Active</span> */}
 
                           <div class="dropdown">
-                            <label tabindex="0" class="badge badge-accent m-1">
+                            <label tabIndex="0" class="badge badge-accent m-1">
                               Active
                             </label>
                             <ul
                               tabindex="0"
                               class="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
+
                             >
                               {statusOptions.map((status, i) => {
                                 return (
