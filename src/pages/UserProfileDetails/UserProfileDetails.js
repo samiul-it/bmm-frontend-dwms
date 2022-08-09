@@ -20,7 +20,7 @@ const UserProfileDetails = () => {
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
-    console.log(password, newPassword, confirmPassword);
+    // console.log(password, newPassword, confirmPassword);
     if (newPassword === confirmPassword) {
       if (user.role == "wholeseller") {
         userRequest

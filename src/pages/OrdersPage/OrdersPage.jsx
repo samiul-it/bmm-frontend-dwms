@@ -15,7 +15,7 @@ const OrdersPage = () => {
     getAllOrdersApi,
     {
       onSuccess: (data) => {
-        console.log(data);
+        // console.log(data);
       },
     }
   );
