@@ -31,12 +31,12 @@ const UserProfileDetails = () => {
             newPassword: newPassword,
           })
           .then(function (response) {
-            console.log(response);
+            // console.log(response);
             handleModalToggle();
             toast.success("Password Changed Successfully");
           })
           .catch(function (error) {
-            console.log(error);
+            // console.log(error);
             toast.error("Failed to Change Password");
           });
       } else {
@@ -46,12 +46,12 @@ const UserProfileDetails = () => {
             newPassword: newPassword,
           })
           .then(function (response) {
-            console.log(response);
+            // console.log(response);
             handleModalToggle();
             toast.success("Password Changed Successfully");
           })
           .catch(function (error) {
-            console.log(error);
+            // console.log(error);
             toast.error("Failed to Change Password");
           });
       }
@@ -62,23 +62,25 @@ const UserProfileDetails = () => {
 
   //   console.log(user);
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto ">
       <Header category="Page" title="My Profile" />
-      <div className="card w-96 bg-base-100 shadow-xl">
-        <div className="avatar placeholder mx-auto pt-5">
-          <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
-            <span className="text-3xl">{user.name.charAt(0)}</span>
+      <div className="flex items-center justify-center">
+        <div className="  card w-96 dark:bg-base-100 bg-gray-200 shadow-xl ">
+          <div className="avatar placeholder mx-auto pt-5">
+            <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
+              <span className="text-3xl">{user.name.charAt(0)}</span>
+            </div>
           </div>
-        </div>
-        <div className="card-body items-center text-center">
-          <h4 className="card-title">User Name: {user.name}</h4>
-          <h4 className="card-title">User Email: {user.email}</h4>
-          <h4 className="card-title">User Role: {user.role}</h4>
+          <div className="card-body items-center text-center">
+            <h4 className="card-title">User Name: {user.name}</h4>
+            <h4 className="card-title">User Email: {user.email}</h4>
+            <h4 className="card-title">User Role: {user.role}</h4>
 
-          <div className="card-actions">
-            <label htmlFor="password-modal" className="btn btn-primary">
-              Chnage Password
-            </label>
+            <div className="card-actions">
+              <label htmlFor="password-modal" className="btn btn-primary">
+                Chnage Password
+              </label>
+            </div>
           </div>
         </div>
       </div>
