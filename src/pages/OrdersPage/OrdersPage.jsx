@@ -134,7 +134,7 @@ const OrdersPage = () => {
                             </label>
                             <ul
                               tabindex="0"
-                              class="dropdown-content menu p-2 shadow bg-gray-600 rounded-md w-max gap-2 "
+                              class="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
                             >
                               {statusOptions.map((status, i) => {
                                 return (
