@@ -18,6 +18,8 @@ const UserProfileDetails = () => {
     setConfirmPassword("");
   };
 
+  //Password Chnage
+
   const handlePasswordChange = (e) => {
     e.preventDefault();
     // console.log(password, newPassword, confirmPassword);
