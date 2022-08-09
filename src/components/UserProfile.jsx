@@ -1,17 +1,24 @@
-import React from 'react';
-import { MdOutlineCancel } from 'react-icons/md';
+import React from "react";
+import { MdOutlineCancel } from "react-icons/md";
 
-import { Button } from '.';
-import { userProfileData } from '../data/dummy';
-import { useStateContext } from '../contexts/ContextProvider';
-import avatar from '../data/avatar.jpg';
-import { useDispatch, useSelector } from 'react-redux';
-import { userLogout } from '../redux/apiCalls';
+import { Button } from ".";
+import { userProfileData } from "../data/dummy";
+import { useStateContext } from "../contexts/ContextProvider";
+import avatar from "../data/avatar.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { userLogout } from "../redux/apiCalls";
+import { BsCurrencyDollar } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
   const { currentColor } = useStateContext();
+  let navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user.currentUser);
+  const navigateToUserProfile = () => {
+    navigate("/user-details");
+    console.log("Clicked");
+  };
 
   return (
     <div className="nav-item absolute right-1 top-16 bg-white dark:bg-[#42464D] p-8 rounded-lg w-96">
@@ -44,8 +51,28 @@ const UserProfile = () => {
         </div>
       </div>
       <div>
-        {userProfileData.map((item, index) => (
+        <div
+          onClick={navigateToUserProfile}
+          className="flex gap-5 border-b-1 border-color p-4 hover:bg-light-gray cursor-pointer  dark:hover:bg-[#42464D]"
+        >
+          <button
+            style={{ color: "#03C9D7", backgroundColor: "#E5FAFB" }}
+            type="button"
+            className=" text-xl rounded-lg p-3 hover:bg-light-gray"
+          >
+            <BsCurrencyDollar />
+          </button>
+
+          <div>
+            <p className="font-semibold dark:text-gray-200 ">My Profile</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">
+              Account Settings
+            </p>
+          </div>
+        </div>
+        {/* {userProfileData.map((item, index) => (
           <div
+            
             key={index}
             className="flex gap-5 border-b-1 border-color p-4 hover:bg-light-gray cursor-pointer  dark:hover:bg-[#42464D]"
           >
@@ -60,12 +87,12 @@ const UserProfile = () => {
             <div>
               <p className="font-semibold dark:text-gray-200 ">{item.title}</p>
               <p className="text-gray-500 text-sm dark:text-gray-400">
-                {' '}
-                {item.desc}{' '}
+                {" "}
+                {item.desc}{" "}
               </p>
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
       <div className="mt-5" onClick={() => userLogout(dispatch)}>
         <Button
@@ -76,7 +103,7 @@ const UserProfile = () => {
           width="full"
           // onClick={()=> userLogout(dispatch)}
         />
-        {/* <button onClick={()=> userLogout(dispatch)}>Logout</button> */}
+        <button onClick={() => userLogout(dispatch)}>Logout</button>
       </div>
     </div>
   );
