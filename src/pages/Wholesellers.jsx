@@ -77,9 +77,6 @@ const Wholesellers = () => {
 
   //Collecting wholesellers Data
 
-  const nameRef = useRef();
-  const phoneRef = useRef();
-  const emailRef = useRef();
   const modalRef = useRef();
 
   //Closing Modal

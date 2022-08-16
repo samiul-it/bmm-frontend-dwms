@@ -4,13 +4,12 @@ import { login } from '../redux/apiCalls';
 import { useNavigate } from 'react-router-dom';
 import { SiShopware } from 'react-icons/si';
 
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {isFetching} = useSelector(state => state.user)
+  const { isFetching } = useSelector((state) => state.user);
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
@@ -19,8 +18,6 @@ const Login = () => {
 
     // console.log(email, password,role, "up...");
   };
-
-  console.log('Logion Is Loading ===>', isFetching);
 
   return (
     <>
@@ -64,7 +61,12 @@ const Login = () => {
                 </label> */}
               </div>
               <div className="form-control mt-6">
-                <button disabled={isFetching} className={`btn btn-primary ${isFetching && 'loading'}`}>Login</button>
+                <button
+                  disabled={isFetching}
+                  className={`btn btn-primary ${isFetching && 'loading'}`}
+                >
+                  Login
+                </button>
               </div>
             </form>
           </div>

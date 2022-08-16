@@ -57,14 +57,14 @@ const Navbar = () => {
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
   return (
-    <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative">
-      <NavButton
-        title="Menu"
-        customFunc={handleActiveMenu}
-        color={currentColor}
-        icon={<AiOutlineMenu />}
-      />
-      <div className="flex">
+    <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative ">
+      <div>
+        <NavButton
+          title="Menu"
+          customFunc={handleActiveMenu}
+          color={currentColor}
+          icon={<AiOutlineMenu />}
+        />
         <NavButton
           title="Cart"
           customFunc={() => handleClick('cart')}
@@ -85,29 +85,40 @@ const Navbar = () => {
           color={currentColor}
           icon={<RiNotification3Line />}
         />
-        <div
-          className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
-          onClick={() => handleClick('userProfile')}
-        >
-          <img
+      </div>
+
+      <div
+        className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
+        onClick={() => handleClick('userProfile')}
+      >
+        {/* <img
             className="rounded-full w-8 h-8"
             src={avatar}
             alt="user-profile"
-          />
-          <p>
-            <span className="text-gray-400 text-14">Hi,</span>{' '}
-            <span className="text-gray-400 font-bold ml-1 text-14">
-              {user?.name ? user?.name : 'User'}
-            </span>
-          </p>
-          <MdKeyboardArrowDown className="text-gray-400 text-14" />
+          /> */}
+        <div className="avatar placeholder">
+          <div
+            style={{
+              background: currentColor,
+            }}
+            className="bg-neutral-focus text-white rounded-full w-8 h-8"
+          >
+            <span className="text">{user?.name.charAt(0)}</span>
+          </div>
         </div>
-
-        {isClicked.cart && <Cart />}
-        {isClicked.chat && <Chat />}
-        {isClicked.notification && <Notification />}
-        {isClicked.userProfile && <UserProfile />}
+        <p>
+          <span className="text-gray-400 text-14">Hi,</span>{' '}
+          <span className="text-gray-400 font-bold ml-1 text-14">
+            {user?.name ? user?.name : 'User'}
+          </span>
+        </p>
+        <MdKeyboardArrowDown className="text-gray-400 text-14" />
       </div>
+
+      {isClicked.cart && <Cart />}
+      {isClicked.chat && <Chat />}
+      {isClicked.notification && <Notification />}
+      {isClicked.userProfile && <UserProfile />}
     </div>
   );
 };

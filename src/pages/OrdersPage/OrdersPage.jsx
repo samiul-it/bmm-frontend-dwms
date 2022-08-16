@@ -92,7 +92,7 @@ const OrdersPage = () => {
                     return (
                       <tr key={order._id}>
                         <td>
-                          <span className="badge">
+                          <span className="badge font-semibold">
                             <span className="select-none">#</span>
                             {order.orderId}
                           </span>
@@ -101,9 +101,12 @@ const OrdersPage = () => {
                           <span className="badge badge-primary">Products</span>
 
                           <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 flex-col gap-2 hidden group-hover:flex absolute left-1/2 -translate-x-1/2 z-20 mt-2 h-max max-h-72 overflow-y-auto shadow-sm">
-                            {order.products.map((p) => {
+                            {order.products.map((p, i) => {
                               return (
-                                <div className="p-2 bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-600 rounded-md">
+                                <div
+                                  key={i}
+                                  className="p-2 bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-600 rounded-md"
+                                >
                                   <span className=" block text-sm font-bold">
                                     {p.product.product_name}
                                   </span>
@@ -120,21 +123,30 @@ const OrdersPage = () => {
                           </div>
                         </td>
                         <td>
-                          {moment(order.createdAt).format(
-                            'MMMM Do YYYY, h:mm:ss a'
-                          )}
+                          {moment(order.createdAt)
+                            .format('MMMM Do YYYY, h:mm:ss a')
+                            .includes('am')
+                            ? moment(order.createdAt)
+                                .format('MMMM Do YYYY, h:mm:ss a')
+                                .replace('am', 'AM')
+                            : moment(order.createdAt)
+                                .format('MMMM Do YYYY, h:mm:ss a')
+                                .replace('pm', 'PM')}
                         </td>
                         <td>₹{order.total_cost}/-</td>
                         <td>
                           {/* <span className="badge badge-accent ">Active</span> */}
 
-                          <div class="dropdown">
-                            <label tabIndex="0" class="badge badge-accent m-1">
+                          <div className="dropdown">
+                            <label
+                              tabIndex="0"
+                              className="badge badge-accent m-1"
+                            >
                               Active
                             </label>
                             <ul
-                              tabindex="0"
-                              class="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
+                              tabIndex="0"
+                              className="dropdown-content menu p-2 shadow bg-gray-200 dark:bg-gray-600 rounded-md w-max gap-2 "
                             >
                               {statusOptions.map((status, i) => {
                                 return (

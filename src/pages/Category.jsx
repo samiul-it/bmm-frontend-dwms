@@ -226,6 +226,7 @@ const Categories = () => {
         uploadFileBtnRef.current.value = null;
       },
       onError: ({ response }) => {
+        uploadFileBtnRef.current.value = null;
         console.log('Upload Error ==>', response.data);
         notifyerorr('uploadError', response.data.message);
       },
@@ -295,69 +296,80 @@ const Categories = () => {
   const handleFile = (f) => {
     f.preventDefault();
     const file = f.target.files[0];
-    // setfilename(file.name);
-    const promise = new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsArrayBuffer(file);
 
-      fileReader.onload = (e) => {
-        const bufferArray = e.target.result;
+    if (file) {
+      if (file && fileType.includes(file.type)) {
+        // setfilename(file.name);
+        const promise = new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.readAsArrayBuffer(file);
 
-        const wb = XLSX.read(bufferArray, { type: 'buffer' });
+          fileReader.onload = (e) => {
+            const bufferArray = e.target.result;
 
-        const wsname = wb.SheetNames[0];
+            const wb = XLSX.read(bufferArray, { type: 'buffer' });
 
-        const ws = wb.Sheets[wsname];
+            const wsname = wb.SheetNames[0];
 
-        const data = XLSX.utils.sheet_to_json(ws);
+            const ws = wb.Sheets[wsname];
 
-        resolve(data);
-      };
+            const data = XLSX.utils.sheet_to_json(ws);
 
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-    promise.then((d) => {
-      console.log(d);
-      // const arr = d.map((e) => e.product_name);
-      // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
-      const dataCsv = [];
-      d.map((da) => {
-        const obj = {
-          _id: da._id,
-          name: da.name,
-          description: da.description,
-          slug: da.slug,
-          imageLink: da.imageLink,
-          metadata: da.attributes,
-        };
-        const arrtri = [{}];
-        for (const key of Object.keys(da)) {
-          if (
-            key !== '_id' &&
-            key != 'name' &&
-            key != 'description' &&
-            key != 'slug' &&
-            key != 'imageLink' &&
-            key != 'metadata'
-          ) {
-            arrtri.push({ name: key, value: da[key] });
-          }
-          // if(key == 'name'){
-          //   arrtri.push({ "name": 'product_name', "value": da[key] })
-          // }
-        }
-        // obj['attributes'] = arrtri;
-        arrtri.shift();
-        obj['metadata'] = arrtri;
+            resolve(data);
+          };
 
-        dataCsv.push(obj);
-      });
-      console.log('excel To JSON ====>', dataCsv);
-      uploadExcel(dataCsv);
-      return;
-    });
+          fileReader.onerror = (error) => {
+            reject(error);
+          };
+        });
+        promise.then((d) => {
+          console.log(d);
+          // const arr = d.map((e) => e.product_name);
+          // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
+          const dataCsv = [];
+          d.map((da) => {
+            const obj = {
+              _id: da._id,
+              name: da.name,
+              description: da.description,
+              slug: da.slug,
+              imageLink: da.imageLink,
+              metadata: da.attributes,
+            };
+            const arrtri = [{}];
+            for (const key of Object.keys(da)) {
+              if (
+                key !== '_id' &&
+                key != 'name' &&
+                key != 'description' &&
+                key != 'slug' &&
+                key != 'imageLink' &&
+                key != 'metadata'
+              ) {
+                arrtri.push({ name: key, value: da[key] });
+              }
+              // if(key == 'name'){
+              //   arrtri.push({ "name": 'product_name', "value": da[key] })
+              // }
+            }
+            // obj['attributes'] = arrtri;
+            arrtri.shift();
+            obj['metadata'] = arrtri;
+
+            dataCsv.push(obj);
+          });
+          console.log('excel To JSON ====>', dataCsv);
+          uploadExcel(dataCsv);
+          return;
+        });
+      } else {
+        uploadFileBtnRef.current.value = null;
+        notifyerorr('uploadError', 'Please Select Excel File');
+      }
+    } else {
+      uploadFileBtnRef.current.value = null;
+      notifyerorr('fileNotSelected', 'Please select a file');
+    }
   };
 
   const passwordConfirmationRef = useRef(null);

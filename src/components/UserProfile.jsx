@@ -1,23 +1,25 @@
-import React from "react";
-import { MdOutlineCancel } from "react-icons/md";
+import React from 'react';
+import { MdOutlineCancel } from 'react-icons/md';
 
-import { Button } from ".";
-import { userProfileData } from "../data/dummy";
-import { useStateContext } from "../contexts/ContextProvider";
-import avatar from "../data/avatar.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import { userLogout } from "../redux/apiCalls";
-import { BsCurrencyDollar } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { Button } from '.';
+import { userProfileData } from '../data/dummy';
+import { useStateContext } from '../contexts/ContextProvider';
+import avatar from '../data/avatar.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { userLogout } from '../redux/apiCalls';
+import { BsCurrencyDollar } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
-  const { currentColor } = useStateContext();
+  const { currentColor, handleClick } = useStateContext();
+
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user.currentUser);
   const navigateToUserProfile = () => {
-    navigate("/user-details");
-    console.log("Clicked");
+    navigate('/user-details');
+    console.log('Clicked');
+    handleClick('userProfile');
   };
 
   return (
@@ -33,11 +35,11 @@ const UserProfile = () => {
         />
       </div>
       <div className="flex gap-5 items-center mt-6 border-color border-b-1 pb-6">
-        <img
-          className="rounded-full h-24 w-24"
-          src={avatar}
-          alt="user-profile"
-        />
+        <div className="avatar placeholder">
+          <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
+            <span className="text-3xl">{user?.name.charAt(0)}</span>
+          </div>
+        </div>
         <div>
           <p className="font-semibold text-xl dark:text-gray-200">
             {user?.name}
@@ -56,7 +58,7 @@ const UserProfile = () => {
           className="flex gap-5 border-b-1 border-color p-4 hover:bg-light-gray cursor-pointer  dark:hover:bg-[#42464D]"
         >
           <button
-            style={{ color: "#03C9D7", backgroundColor: "#E5FAFB" }}
+            style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
             type="button"
             className=" text-xl rounded-lg p-3 hover:bg-light-gray"
           >
@@ -103,7 +105,6 @@ const UserProfile = () => {
           width="full"
           // onClick={()=> userLogout(dispatch)}
         />
-        <button onClick={() => userLogout(dispatch)}>Logout</button>
       </div>
     </div>
   );
