@@ -51,7 +51,7 @@ const Cart = () => {
           {cartData.length > 0 && <h1>Cart Items: {cartData.length}</h1>}
         </div>
         {cartData.length < 1 ? (
-          <div class="alert alert-info shadow-lg text-white">
+          <div class="alert alert-info shadow-lg text-white w-[90%] mx-auto mt-2">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

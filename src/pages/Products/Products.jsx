@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { useParams } from 'react-router-dom';
 import * as FileSaver from 'file-saver';
@@ -34,15 +34,17 @@ const Products = () => {
   const [deleteConfirmation, setDeleteConfirmation] = React.useState('');
   const deleteConfirmationRef = React.useRef();
   const uploadFileBtnRef = React.useRef();
-  const {
-    isLoading: productsLoading,
-    error: productError,
-    data: productList,
-    isFetching,
-    refetch: productRefetch,
-  } = useQuery('productList', () => userRequest.get('/product'));
 
-  const [productArray, setProductAray] = React.useState([]);
+  //? get full products Collection data
+
+  // const {
+  //   isLoading: productsLoading,
+  //   error: productError,
+  //   data: productList,
+  //   isFetching,
+  //   refetch: productRefetch,
+  // } = useQuery('productList', () => userRequest.get('/product'));
+
   const [productFormData, setProductFormData] = React.useState({
     product_name: '',
     product_desc: '',
@@ -67,21 +69,12 @@ const Products = () => {
     });
   };
 
-  const getProductsByCategoryApi = async (id) => {
-    return await userRequest.get(`/product/productsByCategory/${id}`);
-  };
-
-  const { data: products, refetch: refetchProducts } = useQuery(
-    ['products', id],
-    () => getProductsByCategoryApi(id)
-  );
-
-  const [pageLimit, setPageLimit] = useState(15);
+  // const [pageLimit, setPageLimit] = useState(15);
   const [searchQuery, setSearchQuery] = useState('');
 
   const GetPaginationApi = async ({ pageParam = 1 }) => {
     const data = await userRequest.get(
-      `/product/getPagination?categoryId=${id}&page=${pageParam}&limit=${pageLimit}&search=${searchQuery}`
+      `/product/getPagination?categoryId=${id}&page=${pageParam}&limit=${15}&search=${searchQuery}`
     );
     return data;
   };
@@ -95,12 +88,18 @@ const Products = () => {
     isLoading: isLoadingInfiniteProducts,
     isFetching: productsIsFetching,
     isFetchingNextPage,
-    status,
+    remove: removeInfiniteProducts,
   } = useInfiniteQuery(['infiniteProducts'], GetPaginationApi, {
     getNextPageParam: (page) => {
       return page.data.hasNext ? page.data.curruntPage + 1 : undefined;
     },
   });
+
+  useEffect(() => {
+    return () => {
+      removeInfiniteProducts();
+    };
+  }, []);
 
   const addSingleProductApi = async (data) => {
     return await userRequest.post('/product/create', {
@@ -200,18 +199,18 @@ const Products = () => {
         uploadFileBtnRef.current.value = null;
       },
       onError: (res) => {
+        uploadFileBtnRef.current.value = null;
         console.log('Bulk Error ===>', res.data.message);
       },
     });
 
-  const [productData, setProductData] = React.useState([]);
   const fileType = [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-excel',
   ];
 
-  const exportToCSV = () => {
-    const product1 = XLSX.utils.json_to_sheet(productList.data);
+  const exportToCSV = (productData) => {
+    const product1 = XLSX.utils.json_to_sheet(productData);
 
     const wb = {
       Sheets: { product: product1 },
@@ -219,8 +218,21 @@ const Products = () => {
     };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, 'productList' + '.xlsx');
+    FileSaver.saveAs(data, `${category_name}-productList.xlsx`);
   };
+
+  const getProductsByCategoryApi = async (id) => {
+    return await userRequest.get(`/product/productsByCategory/${id}`);
+  };
+
+  const {
+    mutateAsync: getAllProductsByCatId,
+    isLoading: allProductsByCatIdIsLoading,
+  } = useMutation(() => getProductsByCategoryApi(id), {
+    onSuccess: (res) => {
+      exportToCSV(res.data);
+    },
+  });
 
   const handleFormData = (e) => {
     setProductFormData({ ...productFormData, [e.target.name]: e.target.value });
@@ -296,77 +308,88 @@ const Products = () => {
     f.preventDefault();
     const file = f.target.files[0];
     // setfilename(file.name);
-    const promise = new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsArrayBuffer(file);
 
-      fileReader.onload = (e) => {
-        const bufferArray = e.target.result;
+    if (file) {
+      if (file && fileType.includes(file.type)) {
+        const promise = new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.readAsArrayBuffer(file);
 
-        const wb = XLSX.read(bufferArray, { type: 'buffer' });
+          fileReader.onload = (e) => {
+            const bufferArray = e.target.result;
 
-        const wsname = wb.SheetNames[0];
+            const wb = XLSX.read(bufferArray, { type: 'buffer' });
 
-        const ws = wb.Sheets[wsname];
+            const wsname = wb.SheetNames[0];
 
-        const data = XLSX.utils.sheet_to_json(ws);
+            const ws = wb.Sheets[wsname];
 
-        resolve(data);
-      };
+            const data = XLSX.utils.sheet_to_json(ws);
 
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-    promise.then((d) => {
-      console.log(d);
-      // const arr = d.map((e) => e.product_name);
-      // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
-      const dataCsv = [];
-      d.map((da) => {
-        const obj = {
-          _id: da._id,
-          product_name: da.product_name,
-          product_desc: da.product_desc,
-          slug: da.slug,
-          // imageLink: da.imageLink,
-          category: `${id}`,
-          attributes: da.attributes,
-          price_wholesale: da.price_wholesale,
-          price_retail: da.price_retail,
-          mrp: da.mrp,
-        };
-        const arrtri = [{}];
-        for (const key of Object.keys(da)) {
-          if (
-            key !== '_id' &&
-            key != 'product_name' &&
-            key != 'product_desc' &&
-            key != 'slug' &&
-            // key != 'imageLink' &&
-            key != 'category' &&
-            key != 'attributes' &&
-            key != 'price_wholesale' &&
-            key != 'price_retail' &&
-            key != 'mrp'
-          ) {
-            arrtri.push({ name: key, value: da[key] });
-          }
-          // if(key == 'name'){
-          //   arrtri.push({ "name": 'product_name', "value": da[key] })
-          // }
-        }
-        // obj['attributes'] = arrtri;
-        arrtri.shift();
-        obj['attributes'] = arrtri;
+            resolve(data);
+          };
 
-        dataCsv.push(obj);
-        // }
-      });
-      console.log('excel To JSON ====>', dataCsv);
-      addBulkProducts(dataCsv);
-      return;
-    });
+          fileReader.onerror = (error) => {
+            reject(error);
+          };
+        });
+        promise.then((d) => {
+          console.log(d);
+          // const arr = d.map((e) => e.product_name);
+          // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
+          const dataCsv = [];
+          d.map((da) => {
+            const obj = {
+              _id: da._id,
+              product_name: da.product_name,
+              product_desc: da.product_desc,
+              slug: da.slug,
+              // imageLink: da.imageLink,
+              category: `${id}`,
+              attributes: da.attributes,
+              price_wholesale: da.price_wholesale,
+              price_retail: da.price_retail,
+              mrp: da.mrp,
+            };
+            const arrtri = [{}];
+            for (const key of Object.keys(da)) {
+              if (
+                key !== '_id' &&
+                key != 'product_name' &&
+                key != 'product_desc' &&
+                key != 'slug' &&
+                // key != 'imageLink' &&
+                key != 'category' &&
+                key != 'attributes' &&
+                key != 'price_wholesale' &&
+                key != 'price_retail' &&
+                key != 'mrp'
+              ) {
+                arrtri.push({ name: key, value: da[key] });
+              }
+              // if(key == 'name'){
+              //   arrtri.push({ "name": 'product_name', "value": da[key] })
+              // }
+            }
+            // obj['attributes'] = arrtri;
+            arrtri.shift();
+            obj['attributes'] = arrtri;
+
+            dataCsv.push(obj);
+            // }
+          });
+          // console.log('excel To JSON ====>', dataCsv);
+          addBulkProducts(dataCsv);
+          return;
+        });
+      } else {
+        uploadFileBtnRef.current.value = null;
+        notifyerorr('uploadError', 'Please Select Excel File');
+      }
+    } else {
+      uploadFileBtnRef.current.value = null;
+      notifyerorr('fileNotSelected', 'Please select a file');
+    }
   };
 
   // const GetPaginationApi = async (page, pageLimit, searchQuery) => {
@@ -401,10 +424,10 @@ const Products = () => {
     // console.log(Math.ceil(scrollTopValue) + innerHeight, offsetHeight);
 
     if (innerHeight + Math.ceil(scrollTopValue) >= offsetHeight) {
-      console.log(
-        ' Reached at bottom ====>',
-        innerHeight + Math.ceil(scrollTopValue) === offsetHeight
-      );
+      // console.log(
+      //   ' Reached at bottom ====>',
+      //   innerHeight + Math.ceil(scrollTopValue) === offsetHeight
+      // );
       // setPage(page + 1);
 
       fetchNextPage();
@@ -575,12 +598,15 @@ const Products = () => {
             </div>
 
             <button
-              onClick={exportToCSV}
+              onClick={getAllProductsByCatId}
               style={{
                 background: currentColor,
               }}
+              disabled={allProductsByCatIdIsLoading}
               type="button"
-              className={`text-white bg-[${currentColor}] btn border-0 mx-2 btn-sm `}
+              className={`text-white bg-[${currentColor}] btn border-0 mx-2 btn-sm ${
+                allProductsByCatIdIsLoading && 'loading'
+              } `}
             >
               <svg className="fill-current w-4 h-4 mr-2" viewBox="0 0 20 20">
                 <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />

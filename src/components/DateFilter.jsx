@@ -81,10 +81,10 @@ function DateFilter({ state, setState }) {
                       <DateRangePicker
                         editableDateInputs={true}
                         onChange={(item) => {
-                          console.log(
-                            'date picker ===>',
-                            item.selection.endDate
-                          );
+                          // console.log(
+                          //   'date picker ===>',
+                          //   item.selection.endDate
+                          // );
                           const _item = new Date(item.selection.endDate);
                           _item.setHours(23);
                           _item.setMinutes(59);

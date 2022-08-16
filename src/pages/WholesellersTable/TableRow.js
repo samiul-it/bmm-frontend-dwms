@@ -15,7 +15,7 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
 
   return (
     <>
-      <tr>
+      <tr key={wholeseller._id}>
         <th>{index + 1}</th>
         <td>{wholeseller.name}</td>
         <td>{wholeseller.phone}</td>
@@ -53,8 +53,10 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
           </button>
         </td>
         <td>
-          {wholeseller?.catagories.map((category) => (
-            <span className="badge mr-1">{category.categoryName}</span>
+          {wholeseller?.catagories.map((category, i) => (
+            <span key={i} className="badge mr-1">
+              {category.categoryName}
+            </span>
           ))}
         </td>
       </tr>
