@@ -8,7 +8,7 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
   const handleDeleteItem = (id) => {
     const confirmDelete = window.confirm('Are you Sure?');
     if (confirmDelete) {
-      const url = `http://localhost:5000/wholesellers/${id}`;
+      const url = `/wholesellers/${id}`;
       userRequest.delete(url);
     }
   };

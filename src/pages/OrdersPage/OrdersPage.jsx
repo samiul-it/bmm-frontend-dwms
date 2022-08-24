@@ -52,6 +52,11 @@ const OrdersPage = () => {
     { value: 'Processing', label: 'Processing', class: 'badge-primary' },
   ];
 
+  const [details, setDetails] = React.useState();
+
+  const modalRef = React.useRef();
+  console.log('ordersData ===>', ordersData);
+
   return (
     <div className="container mx-auto h-max px-6">
       <div className="flex justify-between mb-4">
@@ -62,12 +67,95 @@ const OrdersPage = () => {
           }}
           className="btn btn-primary btn-sm capitalize"
         >
-          Proceed To Checkout
+          Go to Cart
           <span className="mx-2 text-lg">
             <FiArrowRight />
           </span>
         </button>
       </div>
+
+      <input
+        ref={modalRef}
+        type="checkbox"
+        id="my-modal-4"
+        className="modal-toggle"
+      />
+      <label for="my-modal-4" class="modal cursor-pointer">
+        <label class="modal-box relative" for="">
+          <div>
+            <h1>
+              <span className="font-semibold">Order Id: </span>
+              <span className="badge">
+                <span className="select-none">#</span>
+                {details?.orderId}
+              </span>
+            </h1>
+
+            <h1>
+              <span className="font-semibold">Order Id: </span>
+              <span className="badge">
+                {details?.status ? details?.status : 'Placed'}
+              </span>
+            </h1>
+
+            <h1>
+              <span className="font-semibold">Created At:{'   '}</span>
+              <span>
+                {moment(details?.createdAt)
+                  .format('Do MMM YYYY, h:mm:ss a')
+                  .includes('am')
+                  ? moment(details?.createdAt)
+                      .format('Do MMM YYYY, h:mm:ss a')
+                      .replace('am', 'AM')
+                  : moment(details?.createdAt)
+                      .format('Do MMM YYYY, h:mm:ss a')
+                      .replace('pm', 'PM')}
+              </span>
+            </h1>
+            <div className="my-2">
+              <span className="font-semibold">Product List:</span>
+              <div className="rounded-md p-2 flex flex-col gap-2 mt-2 h-max max-h-72 overflow-y-auto">
+                {details?.products?.map((p, i) => {
+                  return (
+                    <div
+                      key={i}
+                      className="p-2 bg-gray-300 dark:bg-gray-700 dark:text-gray-300 text-gray-600 rounded-md"
+                    >
+                      <span className=" block text-sm font-bold">
+                        Product Name: {p.product.product_name}
+                      </span>
+                      <span className=" block text-sm font-semibold">
+                        Wholesell price: ₹{p.product.price_wholesale}/-
+                      </span>
+                      <span className=" block text-sm font-semibold">
+                        Retail price: ₹{p.product.price_retail}/-
+                      </span>
+                      <span className=" block text-sm font-semibold">
+                        MRP: ₹{p.product.mrp}/-
+                      </span>
+                      <span className=" block text-sm">
+                        Quantity: {p.quantity}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <h1 className="ml-auto">
+              <span className="font-semibold">Order Total:</span>
+              <span>
+                ₹ <span className="underline">{details?.total_cost}</span> /-
+              </span>
+            </h1>
+          </div>
+          <div className="modal-action">
+            <label for="my-modal-4" className="btn">
+              Close
+            </label>
+          </div>
+        </label>
+      </label>
 
       {orderDataLoading ? (
         <div className="flex justify-center items-center w-full h-[70vh]">
@@ -90,7 +178,14 @@ const OrdersPage = () => {
                 {!orderDataLoading &&
                   ordersData?.data?.map((order) => {
                     return (
-                      <tr key={order._id}>
+                      <tr
+                        onClick={() => {
+                          modalRef.current.checked = true;
+                          setDetails(order);
+                        }}
+                        className="hover"
+                        key={order._id}
+                      >
                         <td>
                           <span className="badge font-semibold">
                             <span className="select-none">#</span>
