@@ -51,7 +51,7 @@ const App = () => {
 
   useEffect(() => {
     if (user?.token) {
-      const newSocket = io('http://localhost:5001', {
+      const newSocket = io(process.env.REACT_APP_BASE_URL, {
         transportOptions: {
           polling: {
             extraHeaders: {
