@@ -287,12 +287,12 @@ const UserProfileDetails = () => {
         />
         <div className="modal">
           <div className="modal-box ">
-            <h3 class="font-bold text-lg">Update Your Details</h3>
+            <h3 className="font-bold text-lg">Update Your Details</h3>
 
             <form className="my-2" onSubmit={updateUserDetailsHandler}>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Username</span>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Username</span>
                 </label>
                 <input
                   type="username"
@@ -305,9 +305,9 @@ const UserProfileDetails = () => {
                 />
               </div>
 
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Email</span>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Email</span>
                 </label>
                 <input
                   type="email"
@@ -319,9 +319,9 @@ const UserProfileDetails = () => {
                   required
                 />
               </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Phone</span>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Phone</span>
                 </label>
                 <input
                   type="tel"

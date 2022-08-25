@@ -1,17 +1,18 @@
-import React from 'react';
-import { FiArrowRight } from 'react-icons/fi';
-import { useQuery } from 'react-query';
-import { userRequest } from '../../requestMethods';
-import moment from 'moment';
-import Spinner from '../../components/shared/spinner/Spinner';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { FiArrowRight } from "react-icons/fi";
+import { useQuery } from "react-query";
+import { userRequest } from "../../requestMethods";
+import moment from "moment";
+import Spinner from "../../components/shared/spinner/Spinner";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const OrdersPage = () => {
   const getAllOrdersApi = async () => {
-    return await userRequest.get('/orders');
+    return await userRequest.get("/orders");
   };
   const { data: ordersData, isLoading: orderDataLoading } = useQuery(
-    'getAllOrders',
+    "getAllOrders",
     getAllOrdersApi,
     {
       onSuccess: (data) => {
@@ -47,15 +48,31 @@ const OrdersPage = () => {
   });
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending', class: 'badge-secondary' },
-    { value: 'Delevered', label: 'Delevered', class: 'badge-accent' },
-    { value: 'Processing', label: 'Processing', class: 'badge-primary' },
+    { value: "pending", label: "Pending", class: "badge-secondary" },
+    { value: "Delevered", label: "Delevered", class: "badge-accent" },
+    { value: "Processing", label: "Processing", class: "badge-primary" },
   ];
+
+  const handleStatusUpdate = (orderId, status) => {
+    console.log("Status Update", orderId, status);
+    userRequest
+      .put(`/orders/${orderId}?status=${status.value}`, {})
+      .then(function (response) {
+        // console.log(response);
+        toast.success("Status Updated");
+        // setIsLoading(false);
+      })
+      .catch(function (error) {
+        // console.log(error);
+        toast.error("Failed to Update Status");
+        // setIsLoading(false);
+      });
+  };
 
   const [details, setDetails] = React.useState();
 
   const modalRef = React.useRef();
-  console.log('ordersData ===>', ordersData);
+  // console.log('ordersData ===>', ordersData);
 
   return (
     <div className="container mx-auto h-max px-6">
@@ -63,7 +80,7 @@ const OrdersPage = () => {
         <h1 className="text-2xl font-semibold  ">Orders</h1>
         <button
           onClick={() => {
-            navigate('/confirmOrder');
+            navigate("/confirmOrder");
           }}
           className="btn btn-primary btn-sm capitalize"
         >
@@ -80,8 +97,8 @@ const OrdersPage = () => {
         id="my-modal-4"
         className="modal-toggle"
       />
-      <label for="my-modal-4" class="modal cursor-pointer">
-        <label class="modal-box relative" for="">
+      <label htmlFor="my-modal-4" className="modal cursor-pointer">
+        <label className="modal-box relative" htmlFor="">
           <div>
             <h1>
               <span className="font-semibold">Order Id: </span>
@@ -94,22 +111,22 @@ const OrdersPage = () => {
             <h1>
               <span className="font-semibold">Order Id: </span>
               <span className="badge">
-                {details?.status ? details?.status : 'Placed'}
+                {details?.status ? details?.status : "Placed"}
               </span>
             </h1>
 
             <h1>
-              <span className="font-semibold">Created At:{'   '}</span>
+              <span className="font-semibold">Created At:{"   "}</span>
               <span>
                 {moment(details?.createdAt)
-                  .format('Do MMM YYYY, h:mm:ss a')
-                  .includes('am')
+                  .format("Do MMM YYYY, h:mm:ss a")
+                  .includes("am")
                   ? moment(details?.createdAt)
-                      .format('Do MMM YYYY, h:mm:ss a')
-                      .replace('am', 'AM')
+                      .format("Do MMM YYYY, h:mm:ss a")
+                      .replace("am", "AM")
                   : moment(details?.createdAt)
-                      .format('Do MMM YYYY, h:mm:ss a')
-                      .replace('pm', 'PM')}
+                      .format("Do MMM YYYY, h:mm:ss a")
+                      .replace("pm", "PM")}
               </span>
             </h1>
             <div className="my-2">
@@ -179,15 +196,21 @@ const OrdersPage = () => {
                   ordersData?.data?.map((order) => {
                     return (
                       <tr
-                        onClick={() => {
-                          modalRef.current.checked = true;
-                          setDetails(order);
-                        }}
+                        // onClick={() => {
+                        //   modalRef.current.checked = true;
+                        //   setDetails(order);
+                        // }}
                         className="hover"
                         key={order._id}
                       >
                         <td>
-                          <span className="badge font-semibold">
+                          <span
+                            className="badge font-semibold"
+                            // onClick={() => {
+                            //   modalRef.current.checked = true;
+                            //   setDetails(order);
+                            // }}
+                          >
                             <span className="select-none">#</span>
                             {order.orderId}
                           </span>
@@ -219,14 +242,14 @@ const OrdersPage = () => {
                         </td>
                         <td>
                           {moment(order.createdAt)
-                            .format('MMMM Do YYYY, h:mm:ss a')
-                            .includes('am')
+                            .format("MMMM Do YYYY, h:mm:ss a")
+                            .includes("am")
                             ? moment(order.createdAt)
-                                .format('MMMM Do YYYY, h:mm:ss a')
-                                .replace('am', 'AM')
+                                .format("MMMM Do YYYY, h:mm:ss a")
+                                .replace("am", "AM")
                             : moment(order.createdAt)
-                                .format('MMMM Do YYYY, h:mm:ss a')
-                                .replace('pm', 'PM')}
+                                .format("MMMM Do YYYY, h:mm:ss a")
+                                .replace("pm", "PM")}
                         </td>
                         <td>₹{order.total_cost}/-</td>
                         <td>
@@ -237,7 +260,7 @@ const OrdersPage = () => {
                               tabIndex="0"
                               className="badge badge-accent m-1"
                             >
-                              Active
+                              {order?.status[order?.status.length-1]?.status}
                             </label>
                             <ul
                               tabIndex="0"
@@ -245,7 +268,12 @@ const OrdersPage = () => {
                             >
                               {statusOptions.map((status, i) => {
                                 return (
-                                  <li key={i}>
+                                  <li
+                                    onClick={() =>
+                                      handleStatusUpdate(order._id, status)
+                                    }
+                                    key={i}
+                                  >
                                     <a
                                       className={`badge ${
                                         status?.class && status?.class

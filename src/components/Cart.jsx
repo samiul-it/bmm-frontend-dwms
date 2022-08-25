@@ -51,13 +51,13 @@ const Cart = () => {
           {cartData.length > 0 && <h1>Cart Items: {cartData.length}</h1>}
         </div>
         {cartData.length < 1 ? (
-          <div class="alert alert-info shadow-lg text-white w-[90%] mx-auto mt-2">
+          <div className="alert alert-info shadow-lg text-white w-[90%] mx-auto mt-2">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                class="stroke-current flex-shrink-0 w-6 h-6"
+                className="stroke-current flex-shrink-0 w-6 h-6"
               >
                 <path
                   strokeLnecap="round"
