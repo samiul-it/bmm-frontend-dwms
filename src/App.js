@@ -21,6 +21,9 @@ import OrdersPage from './pages/OrdersPage/OrdersPage';
 import Homepage from './pages/Homepage/Homepage';
 import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
 import io from 'socket.io-client';
+import { useQuery } from 'react-query';
+import { userRequest } from './requestMethods';
+import { setNotifications } from './Reducers/NotificationSlice';
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -58,8 +61,10 @@ const App = () => {
         },
       });
       setSocket(newSocket);
+
+      return () => newSocket.disconnect();
     }
-  }, [setSocket]);
+  }, [user]);
 
   // console.log(
   //   'isCategoryExist',
@@ -68,14 +73,29 @@ const App = () => {
   //   )
   // );
 
+  const {
+    data: notificationData,
+    refetch: refetchNotifications,
+    isFetching,
+  } = useQuery('notificationList', () => userRequest.get('/notification'), {
+    onSuccess: (res) => {
+      // dispatch(setNotifications(res?.data));
+    },
+    onError: (err) => {
+      console.error(err.response);
+    },
+  });
+
   const messageListener = (message) => {
     // console.log('Notification DATA ===>', message);
-    const isCategoryExist = user?.user?.catagories.some(
-      (cat) => cat.categoryId === message.data.category
-    );
-    if (isCategoryExist) {
-      toast?.success(message?.message);
-    }
+    // const isCategoryExist = user?.user?.catagories.some(
+    //   (cat) => cat.categoryId === message.data.category
+    // );
+    // if (isCategoryExist) {
+    refetchNotifications();
+    console.log('isFetching ===>', isFetching);
+    toast?.success(message?.message);
+    // }
   };
 
   useEffect(() => {
@@ -126,7 +146,7 @@ const App = () => {
           >
             {user?.token ? (
               <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-                <Navbar />
+                <Navbar notificationData={notificationData} />
               </div>
             ) : (
               ''

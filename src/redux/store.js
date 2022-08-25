@@ -12,6 +12,7 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import OrdersSlice from '../Reducers/OrdersSlice';
+import NotificationsSlice from '../Reducers/NotificationSlice';
 
 const persistConfig = {
   key: 'BMM',
@@ -22,6 +23,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   user: userReducer,
   ordersState: OrdersSlice,
+  notificationsState: NotificationsSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
