@@ -28,7 +28,7 @@ const OrdersSlice = createSlice({
 
     incrementOrderQuantity: (state, action) => {
       const { orders } = JSON.parse(JSON.stringify(state));
-      console.log(orders);
+      // console.log(orders);
       const temp = [...orders];
       const product = action.payload;
       const index = temp.findIndex((item) => item.product._id === product._id);
@@ -36,13 +36,13 @@ const OrdersSlice = createSlice({
         temp[index].quantity += 1;
       }
 
-      console.log(temp[index]);
+      // console.log(temp[index]);
       state.orders = temp;
     },
 
     decrementOrderQuantity: (state, action) => {
       const { orders } = JSON.parse(JSON.stringify(state));
-      console.log(orders);
+      // console.log(orders);
       const product = action.payload;
       const index = orders.findIndex(
         (item) => item.product._id === product._id

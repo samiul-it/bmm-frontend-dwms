@@ -125,6 +125,7 @@ const Products = () => {
     },
     onError: ({ response }) => {
       console.log('error', response.data.message);
+      toast.error(response.data.message);
     },
   });
 
@@ -695,10 +696,13 @@ const Products = () => {
                 Cancel
               </label>
               <button
+                disabled={
+                  addSingleProductIsLoading || updateSingleProductIsLoading
+                }
                 type="submit"
                 className={`btn btn-primary w-[48%] ${
-                  (addSingleProductIsLoading && 'loading',
-                  updateSingleProductIsLoading && 'loading')
+                  (addSingleProductIsLoading && 'loading') ||
+                  (updateSingleProductIsLoading && 'loading')
                 }`}
               >
                 {productFormData._id ? 'Update' : 'submit'}

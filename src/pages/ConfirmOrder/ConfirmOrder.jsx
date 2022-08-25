@@ -92,8 +92,6 @@ const ConfirmOrder = () => {
     });
   }, [orders, wholesalers, user]);
 
-  console.log(order);
-
   const createOrderApi = async (odr) => {
     return await userRequest.post('/orders/create', odr);
   };
