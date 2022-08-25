@@ -525,7 +525,7 @@ const Products = () => {
   return (
     <div className="container mx-auto relative overflow-hidden px-6">
       <ToastContainer />
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex justify-between items-center ">
         <Header category="Products" title={category_name} />
         <form
           onSubmit={(e) => {

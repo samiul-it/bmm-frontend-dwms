@@ -10,22 +10,37 @@ import { Cart, Chat, Notification, UserProfile } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import { useSelector } from 'react-redux';
 
-const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
+const NavButton = ({
+  title,
+  customFunc,
+  icon,
+  color,
+  dotColor,
+  dotCount,
+  isDotVisible,
+}) => (
   <button
     type="button"
     onClick={() => customFunc()}
     style={{ color }}
     className="relative text-xl rounded-full p-3 hover:bg-light-gray"
   >
-    <span
-      style={{ background: dotColor }}
-      className="absolute inline-flex rounded-full h-2 w-2 right-2 top-2"
-    />
+    {isDotVisible && (
+      <span
+        style={{ background: dotColor }}
+        className="absolute rounded-full h-5 w-5 right-0 top-0  text-center flex justify-center items-center"
+      >
+        <h1 className="text-xs text-gray-800 font-bold">
+          {dotCount > 0 ? dotCount : 0}
+        </h1>
+      </span>
+    )}
+
     {icon}
   </button>
 );
 
-const Navbar = () => {
+const Navbar = ({ notificationData }) => {
   const {
     currentColor,
     activeMenu,
@@ -36,6 +51,7 @@ const Navbar = () => {
     screenSize,
   } = useStateContext();
   const { user } = useSelector((state) => state.user.currentUser);
+  const notifications = notificationData?.data;
   useEffect(() => {
     const handleResize = () => setScreenSize(window.innerWidth);
 
@@ -55,6 +71,10 @@ const Navbar = () => {
   }, [screenSize]);
 
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
+
+  const unseenMsgCount = notifications?.messages?.filter(
+    (m) => m.isSeen === false
+  ).length;
 
   return (
     <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative ">
@@ -79,8 +99,10 @@ const Navbar = () => {
           icon={<BsChatLeft />}
         /> */}
         <NavButton
+          isDotVisible={true}
           title="Notification"
-          dotColor="rgb(254, 201, 15)"
+          dotCount={unseenMsgCount}
+          dotColor={unseenMsgCount > 0 ? 'rgb(254, 201, 15)' : '#87ff8a'}
           customFunc={() => handleClick('notification')}
           color={currentColor}
           icon={<RiNotification3Line />}
@@ -117,7 +139,7 @@ const Navbar = () => {
 
       {isClicked.cart && <Cart />}
       {isClicked.chat && <Chat />}
-      {isClicked.notification && <Notification />}
+      {isClicked.notification && <Notification notifications={notifications} />}
       {isClicked.userProfile && <UserProfile />}
     </div>
   );
