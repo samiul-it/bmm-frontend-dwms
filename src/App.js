@@ -23,7 +23,6 @@ import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
 import io from 'socket.io-client';
 import { useQuery } from 'react-query';
 import { userRequest } from './requestMethods';
-import { setNotifications } from './Reducers/NotificationSlice';
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);

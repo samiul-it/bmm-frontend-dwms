@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { userRequest } from '../../requestMethods';
-import { FiEdit } from 'react-icons/fi';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 
 const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
   const handleDeleteItem = (id) => {
@@ -15,35 +15,26 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
 
   return (
     <>
-      <tr key={wholeseller._id}>
+      <tr key={wholeseller?._id}>
         <th>{index + 1}</th>
-        <td>{wholeseller.name}</td>
-        <td>{wholeseller.phone}</td>
-        <td>{wholeseller.email}</td>
+        <td>{wholeseller?.name}</td>
+        <td>{wholeseller?.phone}</td>
+        <td>{wholeseller?.email}</td>
+        <td>{wholeseller?.place}</td>
         <td>
           <button
             onClick={() => handleDeleteItem(wholeseller._id)}
-            className="btn btn-xs btn-circle btn-outline"
+            className="flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <span className="flex">
+              Delete &nbsp;
+              <FiTrash2 />
+            </span>
           </button>
         </td>
         <td>
           <button
-            className="btn btn-sm flex items-center"
+            className="flex items-center w-max btn btn-sm modal-button bg-gray-800 text-blue-500 shadow-lg mx-2"
             onClick={() => updateHandler(wholeseller)}
           >
             <span className="mx-1">

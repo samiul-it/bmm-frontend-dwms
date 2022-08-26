@@ -171,6 +171,19 @@ const UserProfileDetails = () => {
               <strong>Phone:</strong> +91 {user.phone}
             </h4>
 
+            {user?.role !== 'admin' && (
+              <>
+                <h4 className=" my-2 w-max">
+                  {' '}
+                  <strong>Place:</strong> {user?.place}
+                </h4>
+                <h4 className=" my-2 w-max">
+                  {' '}
+                  <strong>Address:</strong> {user?.address}
+                </h4>
+              </>
+            )}
+
             <div className="flex items-center my-2 w-max">
               <strong>Categories:</strong>
               <div className="max-w-80">
@@ -304,7 +317,6 @@ const UserProfileDetails = () => {
                   required
                 />
               </div>
-
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
@@ -333,7 +345,33 @@ const UserProfileDetails = () => {
                   required
                 />
               </div>
-
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Place*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Place*"
+                  className="input input-bordered w-full"
+                  name="place"
+                  onChange={userDetailsChangeHandler}
+                  value={userDetails.place}
+                  required
+                />
+              </div>{' '}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Address</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Address*"
+                  className="input input-bordered w-full"
+                  name="address"
+                  onChange={userDetailsChangeHandler}
+                  value={userDetails.address}
+                />
+              </div>
               <div className="modal-action">
                 <label
                   onClick={closeUserDetailsModal}
