@@ -35,7 +35,7 @@ const ConfirmOrder = () => {
   const [wholesalers, setWholesalers] = useState([]);
 
   const [order, setOrder] = useState({
-    buyers: [],
+    buyersId: [],
     createdBy: user?.currentUser?.user._id,
   });
 
@@ -83,7 +83,7 @@ const ConfirmOrder = () => {
           quantity: item.quantity,
         };
       }),
-      buyers:
+      buyersId:
         user?.currentUser?.user.role !== 'admin'
           ? [user?.currentUser?.user._id]
           : wholesalers.map((item) => item.value),

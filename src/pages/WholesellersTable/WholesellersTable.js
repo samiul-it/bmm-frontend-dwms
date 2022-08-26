@@ -12,6 +12,7 @@ const WholesellersTable = ({ wholesellersList, refetch, updateHandler }) => {
               <th>Name</th>
               <th>Phone</th>
               <th>Email</th>
+              <th>Place</th>
               <th>Action</th>
               <th>Update</th>
               <th>Category</th>
