@@ -525,13 +525,13 @@ const Products = () => {
   return (
     <div className="container mx-auto relative overflow-hidden px-6">
       <ToastContainer />
-      <div className="w-full flex justify-between items-center ">
+      <div className="w-full flex justify-between flex-wrap items-center ">
         <Header category="Products" title={category_name} />
         <form
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className="w-1/2 mx-2"
+          className=" mx-2 md:w-auto w-full"
         >
           <label
             htmlFor="default-search"
@@ -579,7 +579,7 @@ const Products = () => {
 
         {user.role == 'admin' && (
           <>
-            <div className="h-max relative max-w-[230px]">
+            <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px]">
               <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
                 {!uploadProductsIsLoading ? (
                   'Upload excel sheet'
