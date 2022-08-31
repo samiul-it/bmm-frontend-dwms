@@ -167,7 +167,7 @@ const OrdersPage = () => {
             </h1>
           </div>
           <div className="modal-action">
-            <label for="my-modal-4" className="btn">
+            <label htmlFor="my-modal-4" className="btn">
               Close
             </label>
           </div>
