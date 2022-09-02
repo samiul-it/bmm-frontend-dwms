@@ -348,9 +348,9 @@ const Products = () => {
               // imageLink: da.imageLink,
               category: `${id}`,
               attributes: da.attributes,
-              price_wholesale: da.price_wholesale,
-              price_retail: da.price_retail,
-              mrp: da.mrp,
+              price_wholesale: da.price_wholesale.toFixed(2),
+              price_retail: da.price_retail.toFixed(2),
+              mrp: da.mrp.toFixed(2),
             };
             const arrtri = [{}];
             for (const key of Object.keys(da)) {
@@ -436,28 +436,6 @@ const Products = () => {
   };
 
   const temp = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-  // const LoadingCards = temp.map((e, i) => {
-  //   return (
-  //     <div
-  //       key={i}
-  //       className="w-[200px] flex-grow flex-shrink bg-white group rounded-lg overflow-hidden relative dark:bg-gray-700 border-1 dark:border-gray-600"
-  //     >
-  //       <div className="mx-auto overflow-hidden">
-  //         <img
-  //           className="max-h-[220px] w-full object-cover group-hover:scale-[120%] transition duration-200 ease-out dark:opacity-60 "
-  //           src={emptyImage}
-  //           alt="loading"
-  //         />
-  //       </div>
-  //       <div className="flex flex-col p-2 h-[60%]">
-  //         <span className=" h-5 w-1/2 my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-3/4 my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-full  my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-full my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //       </div>
-  //     </div>
-  //   );
-  // });
 
   const LoadingCards = temp.map((e, i) => {
     return (
@@ -577,7 +555,7 @@ const Products = () => {
           </div>
         </form>
 
-        {user.role == 'admin' && (
+        {user?.role == 'admin' && (
           <>
             <div className="h-max relative max-w-[230px]">
               <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
@@ -765,7 +743,7 @@ const Products = () => {
           <div
             ref={divRef}
             onScrollCapture={(e) => handleScroll(e)}
-            className="max-h-[650px] overflow-auto rounded-lg "
+            className="max-h-[650px] overflow-auto rounded-lg"
           >
             <table ref={tableRef} className="table w-full">
               <thead className="sticky top-0 left-0">
@@ -806,23 +784,23 @@ const Products = () => {
                             </label>
                           </td>
                           <th>{item.product_name}</th>
-                          <td>{item.price_wholesale}</td>
-                          <td>{item.price_retail}</td>
-                          <td>{item.mrp}</td>
+                          <td>₹{item.price_wholesale}/-</td>
+                          <td>₹{item.price_retail}/-</td>
+                          <td>₹{item.mrp}/-</td>
                           <td>
                             <div className="flex justify-end">
-                              {user.role === 'admin' && (
+                              {user?.role === 'admin' && (
                                 <label
                                   htmlFor="my-modal-3"
                                   onClick={(e) => {
                                     setProductFormData({
-                                      product_name: item.product_name,
-                                      product_desc: item.product_desc,
-                                      slug: item.slug,
-                                      price_wholesale: item.price_wholesale,
-                                      price_retail: item.price_retail,
-                                      mrp: item.mrp,
-                                      _id: item._id,
+                                      product_name: item?.product_name,
+                                      product_desc: item?.product_desc,
+                                      slug: item?.slug,
+                                      price_wholesale: item?.price_wholesale,
+                                      price_retail: item?.price_retail,
+                                      mrp: item?.mrp,
+                                      _id: item?._id,
                                     });
                                     // e.preventDefault();
                                     // setDeleteConfirmation(item);
@@ -836,7 +814,7 @@ const Products = () => {
                                   {!updateSingleProductIsLoading && <FiEdit />}
                                 </label>
                               )}
-                              {user.role == 'admin' && (
+                              {user?.role == 'admin' && (
                                 <label
                                   htmlFor="my-modal"
                                   onClick={(e) => {
@@ -845,14 +823,14 @@ const Products = () => {
                                   }}
                                   className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
                                     deleteProductIsLoading &&
-                                    deleteConfirmation?._id === item._id &&
+                                    deleteConfirmation?._id === item?._id &&
                                     'loading'
                                   }`}
                                 >
                                   &nbsp;
                                   {deleteProductIsLoading &&
                                   deleteConfirmation?._id ===
-                                    item._id ? null : (
+                                    item?._id ? null : (
                                     <span className="flex">
                                       Delete &nbsp;
                                       <FiTrash2 />

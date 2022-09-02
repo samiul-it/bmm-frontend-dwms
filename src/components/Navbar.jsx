@@ -50,7 +50,8 @@ const Navbar = ({ notificationData }) => {
     setScreenSize,
     screenSize,
   } = useStateContext();
-  const { user } = useSelector((state) => state.user.currentUser);
+  const { user } = useSelector((state) => state?.user?.currentUser);
+  const cartItems = useSelector((state) => state?.ordersState?.orders);
   const notifications = notificationData?.data;
   useEffect(() => {
     const handleResize = () => setScreenSize(window.innerWidth);
@@ -90,6 +91,9 @@ const Navbar = ({ notificationData }) => {
           customFunc={() => handleClick('cart')}
           color={currentColor}
           icon={<FiShoppingCart />}
+          isDotVisible={true}
+          dotCount={cartItems?.length}
+          dotColor={cartItems?.length > 0 ? 'rgb(254, 201, 15)' : '#87ff8a'}
         />
         {/* <NavButton
           title="Chat"

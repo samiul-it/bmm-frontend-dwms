@@ -52,7 +52,7 @@ const ConfirmOrder = () => {
   };
 
   const {
-    isLoading,
+    isLoading: isWholesellersListLoading,
     isError,
     error,
     data: wholesellersData,
@@ -254,17 +254,15 @@ const ConfirmOrder = () => {
               }}
             >
               {user?.currentUser?.user.role === 'admin' && (
-                <div>
-                  <label className="font-medium inline-block mb-3 text-sm uppercase">
-                    Wholesaler's
-                  </label>
-
+                <>
                   <Select
                     isMulti
                     defaultValue={wholesalers}
                     onChange={setWholesalers}
                     options={options}
                     required
+                    isDisabled={isWholesellersListLoading}
+                    isLoading={isWholesellersListLoading}
                   />
 
                   {user?.currentUser?.user.role === 'admin' &&
@@ -273,7 +271,7 @@ const ConfirmOrder = () => {
                         Select a Wholesaler
                       </h3>
                     )}
-                </div>
+                </>
               )}
 
               <div className="border-t mt-8">

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
 // import {  } from '@syncfusion/ej2-react-popups';
@@ -23,8 +23,12 @@ import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
 import io from 'socket.io-client';
 import { useQuery } from 'react-query';
 import { userRequest } from './requestMethods';
+import PageNotFound from './pages/PageNotFound/PageNotFound';
+import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
+// import { SocketContext } from './contexts/socketContext';
 
 const App = () => {
+  // const socketIO = useContext(SocketContext);
   const user = useSelector((state) => state.user.currentUser);
   const dispatch = useDispatch();
   const {
@@ -50,61 +54,46 @@ const App = () => {
 
   useEffect(() => {
     if (user?.token) {
+      console.log('new user LOG =======>', user);
       const newSocket = io(process.env.REACT_APP_BASE_URL, {
-        transportOptions: {
-          polling: {
-            extraHeaders: {
-              Authorization: `Bearer ${user?.token}`,
-            },
-          },
-        },
+        // transportOptions: {
+        //   polling: {
+        //     extraHeaders: {
+        //       Authorization: `Bearer ${user?.token}`,
+        //     },
+        //   },
+        // },
       });
       setSocket(newSocket);
 
-      return () => newSocket.disconnect();
+      return () => newSocket?.disconnect();
     }
-  }, [user]);
-
-  // console.log(
-  //   'isCategoryExist',
-  //   user?.user?.catagories.some(
-  //     (cat) => cat.categoryId === '62fc9275ed7b47abd5af55b2'
-  //   )
-  // );
+  }, [user?.user?._id]);
 
   const {
     data: notificationData,
     refetch: refetchNotifications,
     isFetching,
   } = useQuery('notificationList', () => userRequest.get('/notification'), {
-    onSuccess: (res) => {
-      // dispatch(setNotifications(res?.data));
-    },
+    enabled:
+      user?.token !== undefined && user?.token !== null && user?.token !== '',
+
     onError: (err) => {
       console.error(err.response);
     },
   });
 
   const messageListener = (message) => {
-    // console.log('Notification DATA ===>', message);
-    // const isCategoryExist = user?.user?.catagories.some(
-    //   (cat) => cat.categoryId === message.data.category
-    // );
-    // if (isCategoryExist) {
     refetchNotifications();
     console.log('isFetching ===>', isFetching);
     toast?.success(message?.message);
-    // }
   };
 
   useEffect(() => {
+    socket?.emit('connection', user?.user);
     socket?.on('notification', messageListener);
 
-    socket?.emit('connection', user?.user);
-
-    // return () => {
-    //   socket?.off();
-    // };
+    return () => socket?.disconnect();
   }, [socket]);
 
   return (
@@ -164,26 +153,18 @@ const App = () => {
 
                 <Route path="/signup" element={<SignUp></SignUp>}></Route>
 
-                {/* Protected Routes Normal */}
+                {/* -------------Protected Routes Normal------------- */}
                 <Route element={<ProtectedRoutes isAdminRoute={false} />}>
                   {/* dashboard  */}
-                  {/* <Route path="/" element={<h1>Ecommerce</h1>} /> */}
-                  <Route path="/ecommerce" element={<h1>Ecommerce</h1>} />
-
                   {/* Wholeseller  */}
                   <Route path="/wholesellers" element={<Wholesellers />} />
-
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
-                  <Route path="/home" element={<Homepage />} />
                   {/* User Profile Details  */}
-
                   <Route
                     path="/user-details"
                     element={<UserProfileDetails></UserProfileDetails>}
                   />
-
-                  {/* pages  */}
                   <Route path="/categories/" element={<Category />} />
                   <Route
                     path="/categories/:category_name/:id"
@@ -191,10 +172,13 @@ const App = () => {
                   />
                   <Route path="/confirmOrder" element={<ConfirmOrder />} />
                   <Route path="/OrdersPage" element={<OrdersPage />} />
-                  <Route path="/" element={<h1>Home Page </h1>} />
+                  <Route
+                    path="/OrderDetails/:orderId"
+                    element={<OrderDetails />}
+                  />
                 </Route>
 
-                {/* Admin Routes */}
+                {/* ---------------------Admin Routes--------------------- */}
                 <Route element={<ProtectedRoutes isAdminRoute={true} />}>
                   <Route
                     path="/wholesellers"
@@ -208,6 +192,8 @@ const App = () => {
                     element={<WholesellersDetails></WholesellersDetails>}
                   />
                 </Route>
+
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </>
             {/* {user ? <Footer /> : ''} */}
