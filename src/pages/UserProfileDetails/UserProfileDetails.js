@@ -131,7 +131,7 @@ const UserProfileDetails = () => {
         categories: categoryIds,
       })
       .then(function (response) {
-        console.log(response);
+        // console.log(response);
         categoryRefetch();
         handleModalClose();
         toast.success("New Category Request Sent");
@@ -149,7 +149,7 @@ const UserProfileDetails = () => {
 
   const updateUserDetailsHandler = (e) => {
     e.preventDefault();
-    console.log(userDetails);
+    // console.log(userDetails);
     if (userDetails.role == "wholeseller") {
       setIsLoading(true);
       userRequest
@@ -244,12 +244,14 @@ const UserProfileDetails = () => {
                 )}
               </div>
 
-              <label
-                htmlFor="my-modal-3"
-                className="btn modal-button btn-warning btn-xs my-4 mr-auto"
-              >
-                Request Category
-              </label>
+              {user?.role == "wholeseller" && (
+                <label
+                  htmlFor="my-modal-3"
+                  className="btn modal-button btn-warning btn-xs my-4 mr-auto"
+                >
+                  Request Category
+                </label>
+              )}
 
               {/* <button
                 onClick={handleCategoryRequest}

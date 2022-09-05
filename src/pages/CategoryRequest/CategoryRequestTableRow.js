@@ -17,7 +17,7 @@ const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
     userRequest.get(`/wholesellers/id/${requestItem.wholesellerId}`)
   );
 
-  console.log(wholesellerDetails?.data?.name);
+  // console.log(wholesellerDetails?.data?.name);
 
   const handleDeleteCategoryReq = (id) => {
     const confirmDelete = window.confirm("Are you Sure?");
@@ -39,6 +39,7 @@ const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
         handleDeleteCategoryReq(elementId);
         toast.success("Categories Updated!");
         refetch();
+        wholesellerDetailsRefetch();
       })
       .catch(function (error) {
         console.log(error);

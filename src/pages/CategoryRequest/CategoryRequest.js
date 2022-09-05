@@ -24,6 +24,16 @@ const CategoryRequest = () => {
     userRequest.get(`/categoryrequest/wholeseller/${user?._id}`)
   );
 
+  //Delete Category Request Wholeseller 
+  const handleDeleteCategoryReq = (id) => {
+    const confirmDelete = window.confirm("Are you Sure?");
+    if (confirmDelete) {
+      const url = `/categoryrequest/${id}`;
+      userRequest.delete(url);
+    }
+    refetch();
+  };
+
   // console.log(wholesellerRequests);
 
   if (isLoading) {
@@ -92,7 +102,12 @@ const CategoryRequest = () => {
                     </td>
                     <td>{wholesellerRequests?.data?.status}</td>
                     <td>
-                      <button className="btn btn-primary btn-sm">Delete</button>
+                      <button
+                        onClick={()=>handleDeleteCategoryReq(wholesellerRequests?.data?._id)}
+                        className="btn btn-primary btn-sm"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ) : (
