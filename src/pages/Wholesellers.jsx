@@ -169,10 +169,10 @@ const Wholesellers = () => {
 
   const exportToCSV = () => {
     const wholesellers1 = xlsx.utils.json_to_sheet(
-      wholesellersList?.data.map((w) => {
+      wholesellersList?.data?.map((w) => {
         return {
           ...w,
-          catagories: w.catagories.map((c) => c.categoryName).toString(),
+          catagories: w?.catagories?.map((c) => c?.categoryName).toString(),
         };
       })
     );

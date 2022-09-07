@@ -384,7 +384,7 @@ const Categories = () => {
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className="w-1/2 mx-2"
+          className="mx-2 md:w-auto w-full"
         >
           <label
             htmlFor="default-search"
@@ -429,7 +429,7 @@ const Categories = () => {
 
         {user?.role == 'admin' && (
           <>
-            <div className="h-max relative max-w-[230px] ">
+            <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px] ">
               <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
                 {!uploadCategoriesIsLoading ? (
                   'Upload excel sheet'

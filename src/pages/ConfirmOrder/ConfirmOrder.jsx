@@ -51,16 +51,21 @@ const ConfirmOrder = () => {
     return await userRequest.get('/wholesellers');
   };
 
-  const {
-    isLoading: isWholesellersListLoading,
-    isError,
-    error,
-    data: wholesellersData,
-    isFetching,
-    isPreviousData,
-  } = useQuery('getAllWholesalers', getAllWholesalersApi, {
-    enabled: user?.currentUser?.user.role === 'admin',
-  });
+  const isUserAllowed = () => {
+    if (
+      user?.currentUser?.user.role === 'admin' ||
+      user?.currentUser?.user.role === 'employee'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const { isLoading: isWholesellersListLoading, data: wholesellersData } =
+    useQuery('getAllWholesalers', getAllWholesalersApi, {
+      enabled: isUserAllowed(),
+    });
 
   const options = wholesellersData?.data?.map((item) => {
     return {
@@ -83,10 +88,9 @@ const ConfirmOrder = () => {
           quantity: item.quantity,
         };
       }),
-      buyersId:
-        user?.currentUser?.user.role !== 'admin'
-          ? [user?.currentUser?.user._id]
-          : wholesalers.map((item) => item.value),
+      buyersId: isUserAllowed()
+        ? wholesalers.map((item) => item.value)
+        : [user?.currentUser?.user._id],
 
       createdBy: user?.currentUser?.user._id,
     });
@@ -117,7 +121,7 @@ const ConfirmOrder = () => {
           <div className="w-3/4 px-10 pb-10">
             <div className="flex justify-between border-b pb-8">
               <h1 className="font-semibold text-2xl">Shopping Cart</h1>
-              <h2 className="font-semibold text-2xl">{orders.length} Items</h2>
+              <h2 className="font-semibold text-2xl">{orders?.length} Items</h2>
             </div>
             <div className="flex mt-10 mb-5">
               <h3 className="font-semibold text-gray-600 text-xs uppercase w-2/5">
@@ -245,15 +249,14 @@ const ConfirmOrder = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                user?.currentUser?.user.role === 'admin' &&
-                wholesalers.length < 1
+                isUserAllowed() && wholesalers.length < 1
                   ? notifyerorr('selectWholselerErr', 'Select a Wholesaler')
                   : orders.length > 0
                   ? createOrder(order)
                   : notifyerorr('orderErr', 'Add Items to Cart');
               }}
             >
-              {user?.currentUser?.user.role === 'admin' && (
+              {isUserAllowed() && (
                 <>
                   <Select
                     isMulti
@@ -261,16 +264,15 @@ const ConfirmOrder = () => {
                     onChange={setWholesalers}
                     options={options}
                     required
-                    isDisabled={isWholesellersListLoading}
+                    isDisabled={isWholesellersListLoading || orders?.length < 1}
                     isLoading={isWholesellersListLoading}
                   />
 
-                  {user?.currentUser?.user.role === 'admin' &&
-                    wholesalers.length < 1 && (
-                      <h3 className="text-sm text-red-500">
-                        Select a Wholesaler
-                      </h3>
-                    )}
+                  {isUserAllowed() && wholesalers.length < 1 && (
+                    <h3 className="text-sm text-red-500">
+                      Select a Wholesaler
+                    </h3>
+                  )}
                 </>
               )}
 
@@ -298,31 +300,3 @@ const ConfirmOrder = () => {
 };
 
 export default ConfirmOrder;
-
-//Todo Order Shcema
-// {
-//   products: [{
-//     price_wholesale: "10.00",
-//     price_retail: "20.00",
-//     name: "Product 1",
-//     _id: "1",
-//     qty: 2
-//   }],
-//   Wholesaler: ["5e9f8f8f8f8f8f8f8f8f8f8f","5e9f8f8f8f8f8f8f8f8f8f8f"],
-//   createdBy: "5e9f8f8f8f8f8f8f8f8f8f8f",
-//   total: "20.00",
-
-// }
-
-// {
-//   products: [{
-//     price_wholesale: "10.00",
-//     price_retail: "20.00",
-//     name: "Product 1",
-//     _id: "1",
-//     qty: 2
-//   }],
-//   Wholesaler: ["5e9f8f8f8f8f8f8f8f8f8f8f"],
-//   createdBy: "5e9f8f8f8f8f8f8f8f8f8f8f",
-//   total: "20.00",
-// }

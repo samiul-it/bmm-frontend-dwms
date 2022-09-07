@@ -54,7 +54,6 @@ const App = () => {
 
   useEffect(() => {
     if (user?.token) {
-      console.log('new user LOG =======>', user);
       const newSocket = io(process.env.REACT_APP_BASE_URL, {
         // transportOptions: {
         //   polling: {
@@ -196,7 +195,7 @@ const App = () => {
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </>
-            {/* {user ? <Footer /> : ''} */}
+            {/* {user?.token ? <Footer /> : ''} */}
           </div>
         </div>
       </BrowserRouter>
