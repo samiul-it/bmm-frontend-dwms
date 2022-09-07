@@ -7,13 +7,14 @@ import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import emptyImage from '../../assets/empty.jpg';
 import { userRequest } from '../../requestMethods';
 import { useStateContext } from '../../contexts/ContextProvider';
 import { Header } from '../../components';
 import { addAndRemoveOrder } from '../../Reducers/OrdersSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../components/shared/spinner/Spinner';
+import CreateSelect from '../../components/shared/CreateSelect/CreateSelect';
+
 const Products = () => {
   const { category_name, id } = useParams();
   const { currentColor } = useStateContext();
@@ -34,6 +35,10 @@ const Products = () => {
   const [deleteConfirmation, setDeleteConfirmation] = React.useState('');
   const deleteConfirmationRef = React.useRef();
   const uploadFileBtnRef = React.useRef();
+  const [tags, setTags] = useState({
+    inputValue: '',
+    value: [],
+  });
 
   //? get full products Collection data
 
@@ -67,6 +72,10 @@ const Products = () => {
       mrp: null,
       _id: '',
     });
+    setTags({
+      inputValue: '',
+      value: [],
+    });
   };
 
   // const [pageLimit, setPageLimit] = useState(15);
@@ -81,13 +90,11 @@ const Products = () => {
 
   const {
     data: infiniteProducts,
-    error,
     fetchNextPage,
     refetch: refetchInfiniteProducts,
     hasNextPage,
     isLoading: isLoadingInfiniteProducts,
     isFetching: productsIsFetching,
-    isFetchingNextPage,
     remove: removeInfiniteProducts,
   } = useInfiniteQuery(['infiniteProducts'], GetPaginationApi, {
     getNextPageParam: (page) => {
@@ -98,6 +105,10 @@ const Products = () => {
   useEffect(() => {
     return () => {
       removeInfiniteProducts();
+      setTags({
+        inputValue: '',
+        value: [],
+      });
     };
   }, []);
 
@@ -110,6 +121,7 @@ const Products = () => {
       price_wholesale: data.price_wholesale,
       price_retail: data.price_retail,
       mrp: data.mrp,
+      metadata: tags?.value?.map((t) => t.value),
     });
   };
   const {
@@ -138,6 +150,7 @@ const Products = () => {
       price_wholesale: data.price_wholesale,
       price_retail: data.price_retail,
       mrp: data.mrp,
+      metadata: tags?.value?.map((t) => t.value),
     });
   };
   const {
@@ -211,7 +224,14 @@ const Products = () => {
   ];
 
   const exportToCSV = (productData) => {
-    const product1 = XLSX.utils.json_to_sheet(productData);
+    const product1 = XLSX.utils.json_to_sheet(
+      productData?.map((p) => {
+        return {
+          ...p,
+          metadata: p?.metadata?.toString(),
+        };
+      })
+    );
 
     const wb = {
       Sheets: { product: product1 },
@@ -335,7 +355,7 @@ const Products = () => {
           };
         });
         promise.then((d) => {
-          console.log(d);
+          console.log(d[0]);
           // const arr = d.map((e) => e.product_name);
           // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
           const dataCsv = [];
@@ -348,9 +368,10 @@ const Products = () => {
               // imageLink: da.imageLink,
               category: `${id}`,
               attributes: da.attributes,
-              price_wholesale: da.price_wholesale,
-              price_retail: da.price_retail,
-              mrp: da.mrp,
+              price_wholesale: da.price_wholesale.toFixed(2),
+              price_retail: da.price_retail.toFixed(2),
+              mrp: da.mrp.toFixed(2),
+              metadata: da?.metadata ? da?.metadata.split(',') : [],
             };
             const arrtri = [{}];
             for (const key of Object.keys(da)) {
@@ -364,7 +385,8 @@ const Products = () => {
                 key != 'attributes' &&
                 key != 'price_wholesale' &&
                 key != 'price_retail' &&
-                key != 'mrp'
+                key != 'mrp' &&
+                key != 'metadata'
               ) {
                 arrtri.push({ name: key, value: da[key] });
               }
@@ -379,7 +401,7 @@ const Products = () => {
             dataCsv.push(obj);
             // }
           });
-          // console.log('excel To JSON ====>', dataCsv);
+          console.log('excel To JSON ====>', dataCsv[0]);
           addBulkProducts(dataCsv);
           return;
         });
@@ -392,27 +414,6 @@ const Products = () => {
       notifyerorr('fileNotSelected', 'Please select a file');
     }
   };
-
-  // const GetPaginationApi = async (page, pageLimit, searchQuery) => {
-  //   return await userRequest.get(
-  //     `/product/getPagination?categoryId=${id}&page=${page}&limit=${pageLimit}&search=${searchQuery}`
-  //   );
-  // };
-
-  // const {
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   data: paginatedProducts,
-  //   isFetching,
-  //   isPreviousData,
-  // } = useQuery(
-  //   ['projects', page, pageLimit, searchQuery],
-  //   () => GetPaginationApi(page, pageLimit, searchQuery),
-  //   {
-  //     keepPreviousData: true,
-  //   }
-  // );
 
   const divRef = React.useRef();
   const tableRef = React.useRef();
@@ -436,28 +437,6 @@ const Products = () => {
   };
 
   const temp = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-  // const LoadingCards = temp.map((e, i) => {
-  //   return (
-  //     <div
-  //       key={i}
-  //       className="w-[200px] flex-grow flex-shrink bg-white group rounded-lg overflow-hidden relative dark:bg-gray-700 border-1 dark:border-gray-600"
-  //     >
-  //       <div className="mx-auto overflow-hidden">
-  //         <img
-  //           className="max-h-[220px] w-full object-cover group-hover:scale-[120%] transition duration-200 ease-out dark:opacity-60 "
-  //           src={emptyImage}
-  //           alt="loading"
-  //         />
-  //       </div>
-  //       <div className="flex flex-col p-2 h-[60%]">
-  //         <span className=" h-5 w-1/2 my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-3/4 my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-full  my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //         <span className=" h-5 w-full my-2  bg-gray-300 dark:bg-gray-600 rounded-md"></span>
-  //       </div>
-  //     </div>
-  //   );
-  // });
 
   const LoadingCards = temp.map((e, i) => {
     return (
@@ -519,9 +498,6 @@ const Products = () => {
   const { orders } = useSelector((state) => state.ordersState);
   const user = useSelector((state) => state.user.currentUser.user);
 
-  // React.useEffect(() => {
-  //   console.log(orders);
-  // }, [orders]);
   return (
     <div className="container mx-auto relative overflow-hidden px-6">
       <ToastContainer />
@@ -531,7 +507,7 @@ const Products = () => {
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className=" mx-2 md:w-auto w-full"
+          className="md:w-auto w-full mx-2"
         >
           <label
             htmlFor="default-search"
@@ -577,7 +553,7 @@ const Products = () => {
           </div>
         </form>
 
-        {user.role == 'admin' && (
+        {user?.role == 'admin' && (
           <>
             <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px]">
               <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
@@ -667,9 +643,18 @@ const Products = () => {
                   placeholder={item.placeholder}
                   className="input input-bordered"
                   value={productFormData[item.name] || ''}
+                  required
                 />
               </div>
             ))}
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Metadata</span>
+              </label>
+              <CreateSelect setTags={setTags} tags={tags} />
+            </div>
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Description</span>
@@ -765,7 +750,7 @@ const Products = () => {
           <div
             ref={divRef}
             onScrollCapture={(e) => handleScroll(e)}
-            className="max-h-[650px] overflow-auto rounded-lg "
+            className="max-h-[650px] overflow-auto rounded-lg"
           >
             <table ref={tableRef} className="table w-full">
               <thead className="sticky top-0 left-0">
@@ -806,23 +791,32 @@ const Products = () => {
                             </label>
                           </td>
                           <th>{item.product_name}</th>
-                          <td>{item.price_wholesale}</td>
-                          <td>{item.price_retail}</td>
-                          <td>{item.mrp}</td>
+                          <td>₹{item.price_wholesale}/-</td>
+                          <td>₹{item.price_retail}/-</td>
+                          <td>₹{item.mrp}/-</td>
                           <td>
                             <div className="flex justify-end">
-                              {user.role === 'admin' && (
+                              {user?.role === 'admin' && (
                                 <label
                                   htmlFor="my-modal-3"
                                   onClick={(e) => {
+                                    // console.log(item);
                                     setProductFormData({
-                                      product_name: item.product_name,
-                                      product_desc: item.product_desc,
-                                      slug: item.slug,
-                                      price_wholesale: item.price_wholesale,
-                                      price_retail: item.price_retail,
-                                      mrp: item.mrp,
-                                      _id: item._id,
+                                      product_name: item?.product_name,
+                                      product_desc: item?.product_desc,
+                                      slug: item?.slug,
+                                      price_wholesale: item?.price_wholesale,
+                                      price_retail: item?.price_retail,
+                                      mrp: item?.mrp,
+                                      _id: item?._id,
+                                    });
+                                    setTags({
+                                      ...tags,
+                                      value: item?.metadata
+                                        ? item?.metadata?.map((t) => {
+                                            return { label: t, value: t };
+                                          })
+                                        : [],
                                     });
                                     // e.preventDefault();
                                     // setDeleteConfirmation(item);
@@ -836,7 +830,7 @@ const Products = () => {
                                   {!updateSingleProductIsLoading && <FiEdit />}
                                 </label>
                               )}
-                              {user.role == 'admin' && (
+                              {user?.role == 'admin' && (
                                 <label
                                   htmlFor="my-modal"
                                   onClick={(e) => {
@@ -845,14 +839,14 @@ const Products = () => {
                                   }}
                                   className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
                                     deleteProductIsLoading &&
-                                    deleteConfirmation?._id === item._id &&
+                                    deleteConfirmation?._id === item?._id &&
                                     'loading'
                                   }`}
                                 >
                                   &nbsp;
                                   {deleteProductIsLoading &&
                                   deleteConfirmation?._id ===
-                                    item._id ? null : (
+                                    item?._id ? null : (
                                     <span className="flex">
                                       Delete &nbsp;
                                       <FiTrash2 />
@@ -920,116 +914,3 @@ const Products = () => {
   );
 };
 export default Products;
-
-// <div ref={tableRef} className="flex flex-wrap mx-auto p-6 gap-4">
-//   {/* {products ? ( */}
-//   {infiniteProducts?.pages?.length > 0 &&
-//     infiniteProducts?.pages?.map(
-//       (page, i) =>
-//         page?.data?.itemList?.length > 0 &&
-//         page?.data?.itemList?.map((item, index) => (
-//           <div
-//             key={item._id}
-//             className="w-[200px] flex-grow flex-shrink bg-gray-100 dark:bg-gray-700 group rounded-lg overflow-hidden relative border-1 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
-//           >
-
-//             <input
-//               type="checkbox"
-//               checked={
-//                 orders?.findIndex((odr) => odr?.product?._id === item?._id) !==
-//                 -1
-//                   ? true
-//                   : false
-//               }
-//               onChange={(e) => handleCheckbox(e, item)}
-//               value={item}
-//               style={{
-//                 borderColor: currentColor,
-//               }}
-//               className="checkbox absolute top-2 left-2 z-10 checkbox-accent border-gray-300 border-2 m-2 cursor-pointer p-3"
-//             />
-//             <label
-//               htmlFor="my-modal"
-//               onClick={(e) => {
-//                 // e.preventDefault();
-//                 setDeleteConfirmation(item);
-//               }}
-//               className={`z-10 flex btn btn-circle modal-button bg-gray-800 text-red-500 text-lg shadow-lg absolute top-2 right-2 ${
-//                 deleteProductIsLoading && 'loading'
-//               }`}
-//             >
-//               {!deleteProductIsLoading && <FiTrash2 />}
-//             </label>
-//             <div className="mx-auto overflow-hidden ">
-//               <img
-//                 className="max-h-[200px] w-full object-cover group-hover:scale-[120%] transition duration-200 ease-out"
-//                 src={item.imageLink}
-//                 alt={item.product_name}
-//               />
-//             </div>
-//             <div className="flex flex-col justify-center p-2 border-t-1 dark:border-gray-200 dark:text-gray-100 text-gray-800 relative">
-//               <h3 className="font-semibold truncate w-full">
-//                 {item.product_name}
-//               </h3>
-//               <h3 className="text-sm">Wholesale: {item.price_wholesale}</h3>
-//               <h3 className=" text-sm">Retail: {item.price_retail}</h3>
-//               <h3 className=" text-sm">
-//                 Mrp: {item.mrp}{' '}
-//               </h3>
-//             </div>
-//           </div>
-//         ))
-//     )}
-//   {productsIsFetching && hasNextPage && LoadingCards}
-//   {/* Dummy Cards */}
-//   <div className="w-[200px] h-[1px] flex-grow opacity-0" />
-//   <div className="w-[200px] h-[1px] flex-grow opacity-0" />
-//   <div className="w-[200px] h-[1px] flex-grow opacity-0" />
-//   <div className="w-[200px] h-[1px] flex-grow opacity-0" />
-//   <div className="w-[200px] h-[1px] flex-grow opacity-0" />
-//   {!hasNextPage &&
-//     !productsIsFetching &&
-//     (infiniteProducts?.pages[0]?.data.itemList.length > 1 ? (
-//       <div className="flex justify-center h-max w-full">
-//         <div className="alert alert-success shadow-lg w-max ">
-//           <div>
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               className="stroke-current flex-shrink-0 h-6 w-6"
-//               fill="none"
-//               viewBox="0 0 24 24"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth="2"
-//                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-//               />
-//             </svg>
-//             <span>You have Scrolled through all the data!</span>
-//           </div>
-//         </div>
-//       </div>
-//     ) : (
-//       <div className="flex justify-center h-max w-full">
-//         <div className="alert alert-info shadow-lg w-max">
-//           <div>
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="none"
-//               viewBox="0 0 24 24"
-//               className="stroke-current flex-shrink-0 w-6 h-6"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth="2"
-//                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-//               ></path>
-//             </svg>
-//             <span>!Items Not Found</span>
-//           </div>
-//         </div>
-//       </div>
-//     ))}
-// </div>;

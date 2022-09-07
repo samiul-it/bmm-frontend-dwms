@@ -384,7 +384,7 @@ const Categories = () => {
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className="md:w-auto w-full mx-2"
+          className="mx-2 md:w-auto w-full"
         >
           <label
             htmlFor="default-search"
