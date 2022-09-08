@@ -24,6 +24,8 @@ const UserProfileDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
+  console.log(selectedOption);
+
   // Available Categories Fetch
   const {
     isLoading: categoryLoading,
@@ -118,6 +120,7 @@ const UserProfileDetails = () => {
   });
 
   //New Category Request
+  console.log(categoryIds);
 
   const handleCategoryRequest = (e) => {
     e.preventDefault();
@@ -398,7 +401,6 @@ const UserProfileDetails = () => {
                 <button
                   disabled={isLoading}
                   type="submit"
-                  // htmlFor="password-model"
                   className={
                     "btn bg-blue-600 text-white hover:bg-blue-500 border-0"
                   }

@@ -13,9 +13,10 @@ import { useSelector } from "react-redux";
 import { useStateContext } from "../contexts/ContextProvider";
 import Spinner from "../components/shared/spinner/Spinner";
 import { AiFillLock } from "react-icons/ai";
+import Select from "react-select";
 
 const Categories = () => {
-  const [deleteConfirmation, setDeleteConfirmation] = React.useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [password, setPassword] = useState("");
   const [categoriesFormData, setCategoriesFormData] = React.useState({
     name: "",
@@ -24,8 +25,12 @@ const Categories = () => {
     imageLink: "",
     _id: "",
   });
+
+  // Using at Category Selection
+  const [selectedOption, setSelectedOption] = useState();
+  const categoryModalRef = useRef();
   const { currentColor } = useStateContext();
-  const deleteConfirmationRef = React.useRef();
+  const deleteConfirmationRef = useRef();
   const categoryFormModelRef = useRef();
   const navigateToProfile = useNavigate();
   const notifyerorr = (id, msg) => {
@@ -105,6 +110,12 @@ const Categories = () => {
     return data;
   };
 
+  const {
+    data: categoryData,
+    isLoading: categoryIsLoading,
+    refetch: categoryRefetch,
+  } = useQuery(["categories"], () => userRequest.get("/category"));
+
   //Locked Categories for wholeseller api
   const lockedCategories = async ({ pageParam = 1 }) => {
     const data = await userRequest.get(
@@ -112,6 +123,57 @@ const Categories = () => {
     );
     return data;
   };
+
+  //Request Category Access
+
+  //User Categories
+
+  const userCatagories = user?.catagories?.map((cd) => {
+    return { value: cd.categoryId, label: cd.categoryName };
+  });
+
+  //Available Categoires
+
+  const availableCatagories = categoryData?.data?.map((cd) => {
+    return { value: cd._id, label: cd.name };
+  });
+
+  const categoryIds = selectedOption?.map((e) => {
+    return { categoryId: e.value, categoryName: e.label };
+  });
+
+  const handleModalClose = () => {
+    categoryModalRef.current.checked = false;
+  };
+
+  //New Category Request
+
+  const handleCategoryRequest = (e) => {
+    e.preventDefault();
+    // console.log("Form Submitted");
+    // console.log(user._id);
+    // console.log(selectedOption);
+
+    userRequest
+      .put(`categoryrequest/create`, {
+        wholesellerId: user._id,
+        categories: categoryIds,
+      })
+      .then(function (response) {
+        // console.log(response);
+        categoryRefetch();
+        handleModalClose();
+        toast.success("New Category Request Sent");
+        toast.info("Waiting for Admin Approval");
+        // modalRef.current.checked = false;
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error("Faild to Send Category Request");
+      });
+  };
+
+  //End Of Request Category Access
 
   const {
     data: infiniteCategories,
@@ -198,17 +260,11 @@ const Categories = () => {
     refetchInfiniteCategories();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (searchQuery === "") {
       refetchInfiniteCategories();
     }
   }, [searchQuery]);
-
-  const {
-    data: categoryData,
-    isLoading: categoryIsLoading,
-    refetch: categoryRefetch,
-  } = useQuery(["categories"], () => userRequest.get("/category"));
 
   const deleteCategoryApiCall = async (data) => {
     return await userRequest.post(`/category/deleteOne`, data);
@@ -263,9 +319,15 @@ const Categories = () => {
 
   // Category Unlock
 
-  const handleCategoryUnlock = () => {
-    console.log("Clicked");
-    navigateToProfile('/user-details');
+  // console.log(userCatagories);
+
+  const handleCategoryUnlock = (categoryId, categoryName) => {
+    const test = [...userCatagories, { categoryId, categoryName }];
+
+    // console.log("Category ID", categoryId, categoryName);
+    // console.log("Category Name",categoryName);
+
+    // navigateToProfile("/user-details");
   };
   const fileType = [
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -869,10 +931,14 @@ const Categories = () => {
 
                             <div
                               className="opacity-0 hover:opacity-100 duration-300 absolute inset-0 z-10 flex justify-center items-center text-8xl text-rose-600 font-semibold"
-                              onClick={handleCategoryUnlock}
+                              onClick={() =>
+                                handleCategoryUnlock(item?._id, item?.name)
+                              }
                             >
-                              <AiFillLock />
                               {/* Locked */}
+                              <label htmlFor="request-category-modal">
+                                <AiFillLock />
+                              </label>
                             </div>
 
                             <div className="flex flex-col justify-center p-2 items-center border-t-1 dark:border-gray-200 dark:text-gray-100 text-gray-800">
@@ -924,6 +990,42 @@ const Categories = () => {
           )}
         </>
       )}
+
+      {/* Category Request Modal */}
+
+      <input
+        type="checkbox"
+        ref={categoryModalRef}
+        id="request-category-modal"
+        className="modal-toggle"
+      />
+      <div className="modal">
+        <div className="modal-box relative">
+          <label
+            htmlFor="request-category-modal"
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+          >
+            ✕
+          </label>
+          <h3 className="text-lg font-bold">Request Categories</h3>
+          <form onSubmit={handleCategoryRequest}>
+            <div className="py-4">
+              <Select
+                className="block w-full input input-bordered    px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                isMulti
+                onChange={setSelectedOption}
+                defaultValue={userCatagories}
+                options={availableCatagories}
+                name="catagory"
+                classNamePrefix="select"
+              />
+            </div>
+            <button className="btn btn-active btn-accent btn-xs">
+              Request Categories
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
