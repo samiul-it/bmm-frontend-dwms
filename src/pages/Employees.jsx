@@ -1,28 +1,32 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Header from './../components/Header';
 import { useQuery } from 'react-query';
-import WholesellersTable from './WholesellersTable/WholesellersTable';
 import EmployeesTable from './EmployeesTable/EmployeesTable';
 import Loading from './Loading';
 import { toast } from 'react-toastify';
 import { userRequest } from '../requestMethods';
+import Select from 'react-select';
 
 const Employees = () => {
-  const nameRef = useRef();
-  const phoneRef = useRef();
-  const emailRef = useRef();
   const modalRef = useRef();
-  // All Backend Users
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+  });
+  const [role, setRole] = useState('');
 
+  const FormDataHandler = (e) => {
+    console.log(formData);
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // All Backend Users
   const {
     isLoading,
-    error,
     data: employeesList,
-    isFetching,
     refetch,
-  } = useQuery('employees', () =>
-    userRequest.get('/user')
-  );
+  } = useQuery('employees', () => userRequest.get('/user'));
 
   if (isLoading) {
     return <Loading></Loading>;
@@ -30,22 +34,22 @@ const Employees = () => {
 
   const handleModalClose = () => {
     modalRef.current.checked = false;
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+    });
+    setRole('');
+    setRole('');
   };
 
   const handleAdminCreation = (e) => {
     e.preventDefault();
-    // console.log("form Submitted!");
-    const name = nameRef.current.value;
-    const phone = phoneRef.current.value;
-    // const catagory = catagoryRef.current.value;
-    const email = emailRef.current.value;
-    // console.log(name, phone, email);
 
     userRequest
       .post('/user/create', {
-        name: name,
-        phone: phone,
-        email: email,
+        ...formData,
+        role: role?.value,
         password: '1234',
       })
       .then(function (response) {
@@ -53,12 +57,36 @@ const Employees = () => {
         refetch();
         toast.success('Employee Created!');
         modalRef.current.checked = false;
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+        });
+        setRole('');
       })
       .catch(function (error) {
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+        });
+        setRole('');
         // console.log(error);
         toast.error('Faild to Create Employee');
       });
   };
+
+  const options = [
+    {
+      value: 'admin',
+      label: 'Admin',
+    },
+    {
+      value: 'employee',
+      label: 'Employee',
+    },
+  ];
+
   return (
     <div>
       <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
@@ -80,7 +108,7 @@ const Employees = () => {
         <div className="modal">
           <div className="modal-box relative">
             <label
-              htmlFor="my-modal-3"
+              onClick={handleModalClose}
               className="btn btn-sm btn-circle absolute right-2 top-2"
             >
               ✕
@@ -94,7 +122,9 @@ const Employees = () => {
                     <span className="label-text">Employees Name</span>
                   </label>
                   <input
-                    ref={nameRef}
+                    name="name"
+                    onChange={FormDataHandler}
+                    value={formData?.name}
                     type="text"
                     placeholder="Name"
                     className="input input-bordered"
@@ -105,7 +135,9 @@ const Employees = () => {
                     <span className="label-text">Email</span>
                   </label>
                   <input
-                    ref={emailRef}
+                    name="email"
+                    onChange={FormDataHandler}
+                    value={formData?.email}
                     type="email"
                     placeholder="Email"
                     className="input input-bordered"
@@ -116,10 +148,25 @@ const Employees = () => {
                     <span className="label-text">Contact</span>
                   </label>
                   <input
-                    ref={phoneRef}
+                    name="phone"
+                    onChange={FormDataHandler}
+                    value={formData?.phone}
                     type="number"
                     placeholder="Phone"
                     className="input input-bordered"
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Role</span>
+                  </label>
+
+                  <Select
+                    value={role}
+                    onChange={setRole}
+                    options={options}
+                    required
                   />
                 </div>
 

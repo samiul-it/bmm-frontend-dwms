@@ -10,38 +10,65 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import { userRequest } from "../requestMethods";
 
-const Wholesellers = () => {
-  const toolbarOptions = ["Search"];
+export const DropDown = (props) => {
+  const options = props?.options?.length > 0 && [
+    { label: 'Select All', value: 'all' },
+    ...props?.options,
+  ];
 
-  const editing = { allowDeleting: true, allowEditing: true };
+  return (
+    <div className={`react-select-wrapper ${props?.multi ? 'multi' : ''}`}>
+      <Select
+        classNamePrefix="select"
+        name="catagory"
+        options={options}
+        isMulti
+        value={props?.value ? props?.value : null}
+        onChange={(selected) => {
+          props?.multi &&
+          selected.length &&
+          selected.find((option) => option.value === 'all')
+            ? props.handleChange(options.slice(1))
+            : !props.multi
+            ? props.handleChange((selected && selected.value) || null)
+            : props.handleChange(selected);
+        }}
+      />
+    </div>
+  );
+};
+
+const Wholesellers = () => {
   const [wholesellerFormData, setWholesellerFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    password: "",
+    name: '',
+    phone: '',
+    email: '',
+    password: '',
     catagories: [],
-    _id: "",
+    _id: '',
+    place: '',
+    address: '',
   });
   const [fileData, setFileData] = useState([]);
   const [selectedOption, setSelectedOption] = useState();
 
+  const modalRef = useRef();
+
   useEffect(() => {
-    setSelectedOption(
-      wholesellerFormData._id
-        ? wholesellerFormData.catagories.map((e) => {
-            return { label: e.categoryName, value: e.categoryId };
-          })
-        : []
-    );
+    if (wholesellerFormData._id) {
+      setSelectedOption(
+        wholesellerFormData.catagories.map((e) => {
+          return { label: e.categoryName, value: e.categoryId };
+        })
+      );
+    }
   }, [wholesellerFormData]);
 
   // Fetching Wholesellers Data
 
   const {
     isLoading,
-    error,
     data: wholesellersList,
-    isFetching,
     refetch,
   } = useQuery("wholesellers", () => userRequest.get("/wholesellers/"));
 
@@ -51,12 +78,15 @@ const Wholesellers = () => {
     data: categoryData,
     isFetching: categoryFetching,
     refetch: categoryRefetch,
-  } = useQuery("category", () => userRequest.get("/category"));
+  } = useQuery('category', () => userRequest.get('/category'));
 
-  const categoryIds = selectedOption?.map((e) => {
-    return { categoryId: e.value, categoryName: e.label };
-  });
-  // console.log(selectedOption);
+  const categoryIds =
+    typeof selectedOption === 'object' &&
+    selectedOption?.map((e) => {
+      return { categoryId: e.value, categoryName: e.label };
+    });
+  // console.log('categoryIds ==>', categoryIds);
+  // console.log('selectedOption ==>', selectedOption);
 
   // Setting React Select Options
 
@@ -67,7 +97,9 @@ const Wholesellers = () => {
       email: "",
       password: "",
       catagories: [],
-      _id: "",
+      _id: '',
+      place: '',
+      address: '',
     });
   };
 
@@ -76,8 +108,6 @@ const Wholesellers = () => {
   });
 
   //Collecting wholesellers Data
-
-  const modalRef = useRef();
 
   //Closing Modal
 
@@ -132,31 +162,24 @@ const Wholesellers = () => {
 
   //Exporting or Dowloading Data
 
-  const exportToCSV = () => {
-    // finalDataDetail.map((item, index) => {
-    //   // console.log("item", item)
-    //   item['json'] = XLSX.utils.json_to_sheet(item.data);
-    // });
-    // const obj = {
-    //   Sheets: {},
-    //   SheetNames: [],
-    // };
-    // finalDataDetail.map((item, key) => {
-    //   return (
-    //     (obj.Sheets[item.category] = item.json),
-    //     obj.SheetNames.push(item.category)
-    //   );
-    // });
-    // console.log('obj', obj);
-    // const test = { ...obj };
-    // const excelBuffer = XLSX.write(test, {
-    //   bookType: 'xlsx',
-    //   type: 'array',
-    // });
-    // const data = new Blob([excelBuffer], { type: fileType });
-    // FileSaver.saveAs(data, 'myfile' + '.xlsx');
+  // console.log(
+  //   wholesellersList?.data.map((w) => {
+  //     return {
+  //       ...w,
+  //       catagories: w.catagories.map((c) => c.categoryName),
+  //     };
+  //   })
+  // );
 
-    const wholesellers1 = xlsx.utils.json_to_sheet(wholesellersList?.data);
+  const exportToCSV = () => {
+    const wholesellers1 = xlsx.utils.json_to_sheet(
+      wholesellersList?.data?.map((w) => {
+        return {
+          ...w,
+          catagories: w?.catagories?.map((c) => c?.categoryName).toString(),
+        };
+      })
+    );
 
     const wb = {
       Sheets: { wholesellers: wholesellers1 },
@@ -171,13 +194,7 @@ const Wholesellers = () => {
 
   const handleWholesellerInfo = (e) => {
     e.preventDefault();
-    // // console.log("form Submitted!");
-    // const name = nameRef.current.value;
-    // const phone = phoneRef.current.value;
-    // // const catagory = catagoryRef.current.value;
-    // const email = emailRef.current.value;
-    const { name, phone, email } = wholesellerFormData;
-    console.log(name, phone, email);
+    const { name, phone, email, place, address } = wholesellerFormData;
 
     userRequest
       .post("/wholesellers/create", {
@@ -186,6 +203,8 @@ const Wholesellers = () => {
         email: email,
         password: "1234",
         catagories: categoryIds,
+        place,
+        address,
       })
       .then(function (response) {
         console.log(response);
@@ -204,6 +223,8 @@ const Wholesellers = () => {
       .put(`/wholesellers/${wholesellerFormData._id}`, {
         name: wholesellerFormData.name,
         catagories: categoryIds,
+        place: wholesellerFormData.place,
+        address: wholesellerFormData.address,
       })
       .then(function (response) {
         console.log(response);
@@ -227,8 +248,14 @@ const Wholesellers = () => {
       password: item.password,
       catagories: item.catagories,
       _id: item._id,
+      place: item.place,
+      address: item.address,
     });
   };
+
+  function handleChange(values) {
+    setSelectedOption(values);
+  }
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
@@ -342,19 +369,61 @@ const Wholesellers = () => {
                     className="input input-bordered"
                   />
                 </div>
+                {/* <div className="form-control"> */}
+                <label className="label">
+                  <span className="label-text">Catagory</span>
+                </label>
+                {/* <Select
+                  className="block w-full rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                  value={selectedOption}
+                  isMulti
+                  onChange={setSelectedOption}
+                  name="catagory"
+                  options={catagories}
+                  classNamePrefix="select"
+                /> */}
+                <DropDown
+                  value={selectedOption}
+                  options={catagories}
+                  handleChange={handleChange}
+                  multi={true}
+                />
+                {/* </div> */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Catagory</span>
+                    <span className="label-text">Place</span>
                   </label>
-
-                  <Select
-                    className="block w-full input input-bordered    px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                    value={selectedOption}
-                    isMulti
-                    onChange={setSelectedOption}
-                    name="catagory"
-                    options={catagories}
-                    classNamePrefix="select"
+                  <input
+                    // ref={phoneRef}
+                    onChange={(e) => {
+                      setWholesellerFormData({
+                        ...wholesellerFormData,
+                        place: e.target.value,
+                      });
+                    }}
+                    value={wholesellerFormData.place}
+                    type="text"
+                    // disabled={wholesellerFormData._id ? true : false}
+                    placeholder="Place"
+                    className="input input-bordered"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Address</span>
+                  </label>
+                  <textarea
+                    onChange={(e) => {
+                      setWholesellerFormData({
+                        ...wholesellerFormData,
+                        address: e.target.value,
+                      });
+                    }}
+                    value={wholesellerFormData.address}
+                    type="address"
+                    // disabled={wholesellerFormData._id ? true : false}
+                    placeholder="Address"
+                    className="textarea textarea-bordered"
                   />
                 </div>
 

@@ -1,29 +1,35 @@
-import React, { useEffect, useRef, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { FiSettings } from "react-icons/fi";
+import React, { useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { FiSettings } from 'react-icons/fi';
 // import {  } from '@syncfusion/ej2-react-popups';
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { Navbar, Footer, Sidebar, ThemeSettings } from "./components";
-import { Products, Employees } from "./pages";
-import "./App.css";
-import { useStateContext } from "./contexts/ContextProvider";
-import Login from "./pages/Login";
-import { useSelector, useDispatch } from "react-redux";
-import ProtectedRoutes from "./ProtectedRoutes";
-import Category from "./pages/Category";
-import Wholesellers from "./pages/Wholesellers";
-import SignUp from "./pages/SignUp/SignUp";
-import WholesellersDetails from "./pages/WholesellerDetails/WholesellersDetails";
-import ConfirmOrder from "./pages/ConfirmOrder/ConfirmOrder";
-import { getUser } from "./redux/apiCalls";
-import OrdersPage from "./pages/OrdersPage/OrdersPage";
-import Homepage from "./pages/Homepage/Homepage";
-import UserProfileDetails from "./pages/UserProfileDetails/UserProfileDetails";
-import io from "socket.io-client";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
+import { Products, Employees } from './pages';
+import './App.css';
+import { useStateContext } from './contexts/ContextProvider';
+import Login from './pages/Login';
+import { useSelector, useDispatch } from 'react-redux';
+import ProtectedRoutes from './ProtectedRoutes';
+import Category from './pages/Category';
+import Wholesellers from './pages/Wholesellers';
+import SignUp from './pages/SignUp/SignUp';
+import WholesellersDetails from './pages/WholesellerDetails/WholesellersDetails';
+import ConfirmOrder from './pages/ConfirmOrder/ConfirmOrder';
+import { getUser } from './redux/apiCalls';
+import OrdersPage from './pages/OrdersPage/OrdersPage';
+import Homepage from './pages/Homepage/Homepage';
+import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
+import io from 'socket.io-client';
+import { useQuery } from 'react-query';
+import { userRequest } from './requestMethods';
+import PageNotFound from './pages/PageNotFound/PageNotFound';
+import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
+// import { SocketContext } from './contexts/socketContext';
 import CategoryRequest from "./pages/CategoryRequest/CategoryRequest";
 
 const App = () => {
+  // const socketIO = useContext(SocketContext);
   const user = useSelector((state) => state.user.currentUser);
   const dispatch = useDispatch();
   const {
@@ -49,51 +55,52 @@ const App = () => {
 
   useEffect(() => {
     if (user?.token) {
-      const newSocket = io("http://localhost:5001", {
-        transportOptions: {
-          polling: {
-            extraHeaders: {
-              Authorization: `Bearer ${user?.token}`,
-            },
-          },
-        },
+      const newSocket = io(process.env.REACT_APP_BASE_URL, {
+        // transportOptions: {
+        //   polling: {
+        //     extraHeaders: {
+        //       Authorization: `Bearer ${user?.token}`,
+        //     },
+        //   },
+        // },
       });
       setSocket(newSocket);
-    }
-  }, [setSocket]);
 
-  // console.log(
-  //   'isCategoryExist',
-  //   user?.user?.catagories.some(
-  //     (cat) => cat.categoryId === '62fc9275ed7b47abd5af55b2'
-  //   )
-  // );
+      return () => newSocket?.disconnect();
+    }
+  }, [user?.user?._id]);
+
+  const {
+    data: notificationData,
+    refetch: refetchNotifications,
+    isFetching,
+  } = useQuery('notificationList', () => userRequest.get('/notification'), {
+    enabled:
+      user?.token !== undefined && user?.token !== null && user?.token !== '',
+
+    onError: (err) => {
+      console.error(err.response);
+    },
+  });
 
   const messageListener = (message) => {
-    // console.log('Notification DATA ===>', message);
-    const isCategoryExist = user?.user?.catagories.some(
-      (cat) => cat.categoryId === message.data.category
-    );
-    if (isCategoryExist) {
-      toast?.success(message?.message);
-    }
+    refetchNotifications();
+    console.log('isFetching ===>', isFetching);
+    toast?.success(message?.message);
   };
 
   useEffect(() => {
-    socket?.on("notification", messageListener);
+    socket?.emit('connection', user?.user);
+    socket?.on('notification', messageListener);
 
-    socket?.emit("connection", user?.user);
-
-    // return () => {
-    //   socket?.off();
-    // };
+    return () => socket?.disconnect();
   }, [socket]);
 
   return (
-    <div className={currentMode === "Dark" ? "dark" : ""}>
+    <div className={currentMode === 'Dark' ? 'dark' : ''}>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
-          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
+          <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
             <button
               type="button"
               onClick={() => setThemeSettings(true)}
@@ -127,7 +134,7 @@ const App = () => {
           >
             {user?.token ? (
               <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-                <Navbar />
+                <Navbar notificationData={notificationData} />
               </div>
             ) : (
               ""
@@ -146,20 +153,14 @@ const App = () => {
 
                 <Route path="/signup" element={<SignUp></SignUp>}></Route>
 
-                {/* Protected Routes Normal */}
+                {/* -------------Protected Routes Normal------------- */}
                 <Route element={<ProtectedRoutes isAdminRoute={false} />}>
                   {/* dashboard  */}
-                  {/* <Route path="/" element={<h1>Ecommerce</h1>} /> */}
-                  <Route path="/ecommerce" element={<h1>Ecommerce</h1>} />
-
                   {/* Wholeseller  */}
                   <Route path="/wholesellers" element={<Wholesellers />} />
-
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
-                  <Route path="/home" element={<Homepage />} />
                   {/* User Profile Details  */}
-
                   <Route
                     path="/category-request"
                     element={<CategoryRequest></CategoryRequest>}
@@ -171,8 +172,6 @@ const App = () => {
                     path="/user-details"
                     element={<UserProfileDetails></UserProfileDetails>}
                   />
-
-                  {/* pages  */}
                   <Route path="/categories/" element={<Category />} />
                   <Route
                     path="/categories/:category_name/:id"
@@ -180,10 +179,13 @@ const App = () => {
                   />
                   <Route path="/confirmOrder" element={<ConfirmOrder />} />
                   <Route path="/OrdersPage" element={<OrdersPage />} />
-                  <Route path="/" element={<h1>Home Page </h1>} />
+                  <Route
+                    path="/OrderDetails/:orderId"
+                    element={<OrderDetails />}
+                  />
                 </Route>
 
-                {/* Admin Routes */}
+                {/* ---------------------Admin Routes--------------------- */}
                 <Route element={<ProtectedRoutes isAdminRoute={true} />}>
                   <Route
                     path="/wholesellers"
@@ -197,9 +199,11 @@ const App = () => {
                     element={<WholesellersDetails></WholesellersDetails>}
                   />
                 </Route>
+
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </>
-            {/* {user ? <Footer /> : ''} */}
+            {/* {user?.token ? <Footer /> : ''} */}
           </div>
         </div>
       </BrowserRouter>
