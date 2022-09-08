@@ -1,13 +1,15 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { SiShopware } from 'react-icons/si';
-import { MdOutlineCancel } from 'react-icons/md';
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+import { SiShopware } from "react-icons/si";
+import { MdOutlineCancel } from "react-icons/md";
 
-import { useStateContext } from '../contexts/ContextProvider';
-import { useSelector } from 'react-redux';
-import { AiOutlineDashboard, AiOutlineShoppingCart } from 'react-icons/ai';
-import { IoMdContacts } from 'react-icons/io';
-import { FiShoppingBag } from 'react-icons/fi';
+import { useStateContext } from "../contexts/ContextProvider";
+import { useSelector } from "react-redux";
+import { AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
+import { IoMdContacts } from "react-icons/io";
+
+import { AiFillDiff } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
 
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
@@ -15,39 +17,44 @@ const Sidebar = () => {
   const user = useSelector((state) => state?.user?.currentUser?.user);
   const links = [
     {
-      title: 'Pages',
+      title: "Pages",
       links: [
         {
-          name: 'Dashboard',
-          route: '/',
+          name: "Dashboard",
+          route: "/",
           icon: <AiOutlineDashboard />,
         },
         {
-          name: 'categories',
-          route: '/categories',
+          name: "categories",
+          route: "/categories",
+          icon: <BiCategory />,
+        },
+        {
+          name: "OrdersPage",
+          route: "/OrdersPage",
           icon: <AiOutlineShoppingCart />,
         },
         {
-          name: 'OrdersPage',
-          route: '/OrdersPage',
-          icon: <AiOutlineShoppingCart />,
+          name: "category requests",
+          route: "/category-request",
+          icon: <AiFillDiff />,
         },
       ],
     },
   ];
 
-  user?.role === 'admin' &&
+  user?.role === "admin" &&
     links.push({
-      title: 'User Management',
+      title: "User Management",
       links: [
         {
-          name: 'wholesellers',
-          route: '/wholesellers',
+          name: "wholesellers",
+          route: "/wholesellers",
           icon: <IoMdContacts />,
         },
         {
-          name: 'employees',
-          route: '/employees',
+          name: "employees",
+          route: "/employees",
           icon: <IoMdContacts />,
         },
       ],
@@ -60,9 +67,9 @@ const Sidebar = () => {
   };
 
   const activeLink =
-    'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg  text-white  text-md m-2';
+    "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg  text-white  text-md m-2";
   const normalLink =
-    'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2';
+    "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2";
 
   return (
     <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10">
@@ -97,7 +104,7 @@ const Sidebar = () => {
                     key={link.name}
                     onClick={handleCloseSideBar}
                     style={({ isActive }) => ({
-                      backgroundColor: isActive ? currentColor : '',
+                      backgroundColor: isActive ? currentColor : "",
                     })}
                     className={({ isActive }) =>
                       isActive ? activeLink : normalLink

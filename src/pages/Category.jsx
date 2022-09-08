@@ -1,31 +1,38 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as XLSX from 'xlsx';
-import { Link, useNavigate } from 'react-router-dom';
-import * as FileSaver from 'file-saver';
-import { Header } from '../components';
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { userRequest } from '../requestMethods';
-import emptyImage from '../assets/empty.jpg';
-import { useSelector } from 'react-redux';
-import { useStateContext } from '../contexts/ContextProvider';
-import Spinner from '../components/shared/spinner/Spinner';
+import React, { useEffect, useRef, useState } from "react";
+import * as XLSX from "xlsx";
+import { Link, useNavigate } from "react-router-dom";
+import * as FileSaver from "file-saver";
+import { Header } from "../components";
+import { useInfiniteQuery, useMutation, useQuery } from "react-query";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { userRequest } from "../requestMethods";
+import emptyImage from "../assets/empty.jpg";
+import { useSelector } from "react-redux";
+import { useStateContext } from "../contexts/ContextProvider";
+import Spinner from "../components/shared/spinner/Spinner";
+import { AiFillLock } from "react-icons/ai";
+import Select from "react-select";
 
 const Categories = () => {
-  const [deleteConfirmation, setDeleteConfirmation] = React.useState('');
-  const [password, setPassword] = useState('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [password, setPassword] = useState("");
   const [categoriesFormData, setCategoriesFormData] = React.useState({
-    name: '',
-    description: '',
-    slug: '',
-    imageLink: '',
-    _id: '',
+    name: "",
+    description: "",
+    slug: "",
+    imageLink: "",
+    _id: "",
   });
+
+  // Using at Category Selection
+  const [selectedOption, setSelectedOption] = useState();
+  const categoryModalRef = useRef();
   const { currentColor } = useStateContext();
-  const deleteConfirmationRef = React.useRef();
+  const deleteConfirmationRef = useRef();
   const categoryFormModelRef = useRef();
+  const navigateToProfile = useNavigate();
   const notifyerorr = (id, msg) => {
     toast.error(`${msg}!`, {
       position: toast.POSITION.TOP_RIGHT,
@@ -47,22 +54,22 @@ const Categories = () => {
   const user = useSelector((state) => state.user.currentUser.user);
   const resetFormData = () => {
     setCategoriesFormData({
-      name: '',
-      description: '',
-      slug: '',
-      imageLink: '',
-      _id: '',
+      name: "",
+      description: "",
+      slug: "",
+      imageLink: "",
+      _id: "",
     });
   };
 
   const addCategoryApiCall = async (data) => {
-    return await userRequest.post('/category', data);
+    return await userRequest.post("/category", data);
   };
 
   const { mutateAsync: addCategory, isLoading: addCategoryIsLoading } =
     useMutation(addCategoryApiCall, {
       onSuccess: () => {
-        notifysucc('addCategorySuccess', 'Category Added Successfully');
+        notifysucc("addCategorySuccess", "Category Added Successfully");
         refetchInfiniteCategories();
         // categoryRefetch();
         categoryFormModelRef.current.checked = false;
@@ -82,7 +89,7 @@ const Categories = () => {
   const { mutateAsync: updateCategory, isLoading: updateCategoryIsLoading } =
     useMutation(updateCategoryApiCall, {
       onSuccess: () => {
-        notifysucc('updateCategorySuccess', 'Category Updated Successfully');
+        notifysucc("updateCategorySuccess", "Category Updated Successfully");
         refetchInfiniteCategories();
         // categoryRefetch();
         categoryFormModelRef.current.checked = false;
@@ -91,7 +98,7 @@ const Categories = () => {
     });
 
   const [pageLimit, setPageLimit] = useState(15);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const divRef = useRef();
   const tableRef = useRef();
   const uploadFileBtnRef = useRef();
@@ -104,6 +111,71 @@ const Categories = () => {
   };
 
   const {
+    data: categoryData,
+    isLoading: categoryIsLoading,
+    refetch: categoryRefetch,
+  } = useQuery(["categories"], () => userRequest.get("/category"));
+
+  //Locked Categories for wholeseller api
+  const lockedCategories = async ({ pageParam = 1 }) => {
+    const data = await userRequest.get(
+      `/category/lockedcategories?&page=${pageParam}&limit=${pageLimit}&search=${searchQuery}`
+    );
+    return data;
+  };
+
+  //Request Category Access
+
+  //User Categories
+
+  const userCatagories = user?.catagories?.map((cd) => {
+    return { value: cd.categoryId, label: cd.categoryName };
+  });
+
+  //Available Categoires
+
+  const availableCatagories = categoryData?.data?.map((cd) => {
+    return { value: cd._id, label: cd.name };
+  });
+
+  const categoryIds = selectedOption?.map((e) => {
+    return { categoryId: e.value, categoryName: e.label };
+  });
+
+  const handleModalClose = () => {
+    categoryModalRef.current.checked = false;
+  };
+
+  //New Category Request
+
+  const handleCategoryRequest = (e) => {
+    e.preventDefault();
+    // console.log("Form Submitted");
+    // console.log(user._id);
+    // console.log(selectedOption);
+
+    userRequest
+      .put(`categoryrequest/create`, {
+        wholesellerId: user._id,
+        categories: categoryIds,
+      })
+      .then(function (response) {
+        // console.log(response);
+        categoryRefetch();
+        handleModalClose();
+        toast.success("New Category Request Sent");
+        toast.info("Waiting for Admin Approval");
+        // modalRef.current.checked = false;
+      })
+      .catch(function (error) {
+        console.log(error);
+        toast.error("Faild to Send Category Request");
+      });
+  };
+
+  //End Of Request Category Access
+
+  const {
     data: infiniteCategories,
     error,
     fetchNextPage,
@@ -111,13 +183,32 @@ const Categories = () => {
     hasNextPage,
     isLoading: isLoadingInfiniteCategories,
     isFetching: InfiniteCategoriesIsFetching,
-  } = useInfiniteQuery(['infiniteCategories'], GetPaginationApi, {
+  } = useInfiniteQuery(["infiniteCategories"], GetPaginationApi, {
     getNextPageParam: (page) => {
       return page.data.hasNext ? page.data.curruntPage + 1 : undefined;
     },
     onError: ({ response }) => {
-      console.log('Pagination Error ==>', response.data);
-      notifyerorr('PaginationError', response.data.message);
+      console.log("Pagination Error ==>", response.data);
+      notifyerorr("PaginationError", response.data.message);
+    },
+  });
+
+  // Locked Categories Infinite Scroll
+  const {
+    data: lockedInfiniteCategories,
+
+    fetchNextPage: lockedFetchNext,
+    refetch: lockedInfiniteCategoriesRefetch,
+    hasNextPage: lockedHasNext,
+    isLoading: lockedInfiniteCategoriesLoading,
+    isFetching: lockedInfiniteCategoriesFetching,
+  } = useInfiniteQuery(["lockedCategories"], lockedCategories, {
+    getNextPageParam: (page) => {
+      return page.data.hasNext ? page.data.curruntPage + 1 : undefined;
+    },
+    onError: ({ response }) => {
+      console.log("Pagination Error ==>", response.data);
+      notifyerorr("PaginationError", response.data.message);
     },
   });
 
@@ -130,7 +221,7 @@ const Categories = () => {
 
     if (innerHeight + Math.ceil(scrollTopValue) >= offsetHeight) {
       console.log(
-        ' Reached at bottom ====>',
+        " Reached at bottom ====>",
         innerHeight + Math.ceil(scrollTopValue) === offsetHeight
       );
       // setPage(page + 1);
@@ -169,17 +260,11 @@ const Categories = () => {
     refetchInfiniteCategories();
   };
 
-  React.useEffect(() => {
-    if (searchQuery === '') {
+  useEffect(() => {
+    if (searchQuery === "") {
       refetchInfiniteCategories();
     }
   }, [searchQuery]);
-
-  const {
-    data: categoryData,
-    isLoading: categoryIsLoading,
-    refetch: categoryRefetch,
-  } = useQuery(['categories'], () => userRequest.get('/category'));
 
   const deleteCategoryApiCall = async (data) => {
     return await userRequest.post(`/category/deleteOne`, data);
@@ -190,51 +275,63 @@ const Categories = () => {
     isLoading: deleteCategoryIsLoading,
   } = useMutation(deleteCategoryApiCall, {
     onSuccess: () => {
-      notifysucc('deleteCategorySuccess', 'Category Deleted Successfully');
+      notifysucc("deleteCategorySuccess", "Category Deleted Successfully");
       deleteConfirmationRef.current.checked = false;
       refetchInfiniteCategories();
       // categoryRefetch();
-      setPassword('');
-      setDeleteConfirmation('');
+      setPassword("");
+      setDeleteConfirmation("");
       deleteConfirmationRef.current.checked = false;
       passwordConfirmationRef.current.checked = false;
     },
     onError: ({ response }) => {
       // setPassword('');
       // setDeleteConfirmation('');
-      console.log('Delete Error ==>', response.data);
+      console.log("Delete Error ==>", response.data);
       // deleteConfirmationRef.current.checked = false;
-      notifyerorr('DeleteError', response.data.message);
+      notifyerorr("DeleteError", response.data.message);
     },
   });
 
   const addBulkCategoryApiCall = async (data) => {
-    return await userRequest.post('/category/upload', data);
+    return await userRequest.post("/category/upload", data);
   };
   const { mutateAsync: uploadExcel, isLoading: uploadCategoriesIsLoading } =
     useMutation(addBulkCategoryApiCall, {
       onSuccess: (res) => {
         if (res?.data?.warnings?.length > 0) {
           res?.data?.warnings?.map((e) => {
-            notifyWarn('uploadExcelWarning', e);
+            notifyWarn("uploadExcelWarning", e);
           });
         }
-        console.log('upload bulk success ==>', res);
-        notifysucc('uploadExcelSuccess', 'Category Uploaded Successfully');
+        console.log("upload bulk success ==>", res);
+        notifysucc("uploadExcelSuccess", "Category Uploaded Successfully");
         refetchInfiniteCategories();
         // categoryRefetch();
         uploadFileBtnRef.current.value = null;
       },
       onError: ({ response }) => {
         uploadFileBtnRef.current.value = null;
-        console.log('Upload Error ==>', response.data);
-        notifyerorr('uploadError', response.data.message);
+        console.log("Upload Error ==>", response.data);
+        notifyerorr("uploadError", response.data.message);
       },
     });
 
+  // Category Unlock
+
+  // console.log(userCatagories);
+
+  const handleCategoryUnlock = (categoryId, categoryName) => {
+    const test = [...userCatagories, { categoryId, categoryName }];
+
+    // console.log("Category ID", categoryId, categoryName);
+    // console.log("Category Name",categoryName);
+
+    // navigateToProfile("/user-details");
+  };
   const fileType = [
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.ms-excel',
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
   ];
 
   const exportToCSV = () => {
@@ -242,11 +339,11 @@ const Categories = () => {
 
     const wb = {
       Sheets: { category: category1 },
-      SheetNames: ['category'],
+      SheetNames: ["category"],
     };
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, 'Category' + '.xlsx');
+    FileSaver.saveAs(data, "Category" + ".xlsx");
   };
 
   const handleFormData = (e) => {
@@ -270,25 +367,25 @@ const Categories = () => {
 
   const formOptions = [
     {
-      name: 'name',
-      label: 'Name',
-      type: 'text',
-      placeholder: 'Enter Category Name',
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter Category Name",
       value: categoriesFormData.category_name,
     },
 
     {
-      name: 'slug',
-      label: 'Slug',
-      type: 'text',
-      placeholder: 'Enter Unique Slug',
+      name: "slug",
+      label: "Slug",
+      type: "text",
+      placeholder: "Enter Unique Slug",
       value: categoriesFormData.slug,
     },
     {
-      name: 'imageLink',
-      label: 'Image Link',
-      type: 'text',
-      placeholder: 'Enter Image Link',
+      name: "imageLink",
+      label: "Image Link",
+      type: "text",
+      placeholder: "Enter Image Link",
       value: categoriesFormData.imageLink,
     },
   ];
@@ -307,7 +404,7 @@ const Categories = () => {
           fileReader.onload = (e) => {
             const bufferArray = e.target.result;
 
-            const wb = XLSX.read(bufferArray, { type: 'buffer' });
+            const wb = XLSX.read(bufferArray, { type: "buffer" });
 
             const wsname = wb.SheetNames[0];
 
@@ -339,12 +436,12 @@ const Categories = () => {
             const arrtri = [{}];
             for (const key of Object.keys(da)) {
               if (
-                key !== '_id' &&
-                key != 'name' &&
-                key != 'description' &&
-                key != 'slug' &&
-                key != 'imageLink' &&
-                key != 'metadata'
+                key !== "_id" &&
+                key != "name" &&
+                key != "description" &&
+                key != "slug" &&
+                key != "imageLink" &&
+                key != "metadata"
               ) {
                 arrtri.push({ name: key, value: da[key] });
               }
@@ -354,21 +451,21 @@ const Categories = () => {
             }
             // obj['attributes'] = arrtri;
             arrtri.shift();
-            obj['metadata'] = arrtri;
+            obj["metadata"] = arrtri;
 
             dataCsv.push(obj);
           });
-          console.log('excel To JSON ====>', dataCsv);
+          console.log("excel To JSON ====>", dataCsv);
           uploadExcel(dataCsv);
           return;
         });
       } else {
         uploadFileBtnRef.current.value = null;
-        notifyerorr('uploadError', 'Please Select Excel File');
+        notifyerorr("uploadError", "Please Select Excel File");
       }
     } else {
       uploadFileBtnRef.current.value = null;
-      notifyerorr('fileNotSelected', 'Please select a file');
+      notifyerorr("fileNotSelected", "Please select a file");
     }
   };
 
@@ -427,12 +524,12 @@ const Categories = () => {
           </div>
         </form>
 
-        {user?.role == 'admin' && (
+        {user?.role == "admin" && (
           <>
             <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px] ">
               <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
                 {!uploadCategoriesIsLoading ? (
-                  'Upload excel sheet'
+                  "Upload excel sheet"
                 ) : (
                   <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
                     Uploading File...
@@ -506,10 +603,10 @@ const Categories = () => {
                   <input
                     name={item.name}
                     onChange={(e) => handleFormData(e)}
-                    type={item.type ? item.type : 'text'}
+                    type={item.type ? item.type : "text"}
                     placeholder={item.placeholder}
                     className="input input-bordered"
-                    value={categoriesFormData[item.name] || ''}
+                    value={categoriesFormData[item.name] || ""}
                   />
                 </div>
               ))}
@@ -538,11 +635,11 @@ const Categories = () => {
                   disabled={addCategoryIsLoading || updateCategoryIsLoading}
                   type="submit"
                   className={`btn btn-primary w-[48%] ${
-                    (addCategoryIsLoading && 'loading',
-                    updateCategoryIsLoading && 'loading')
+                    (addCategoryIsLoading && "loading",
+                    updateCategoryIsLoading && "loading")
                   }`}
                 >
-                  {categoriesFormData._id ? 'Update' : 'Add'}
+                  {categoriesFormData._id ? "Update" : "Add"}
                 </button>
               </div>
             </div>
@@ -570,8 +667,8 @@ const Categories = () => {
           <div className="modal-action">
             <label
               onClick={() => {
-                setDeleteConfirmation('');
-                setPassword('');
+                setDeleteConfirmation("");
+                setPassword("");
               }}
               htmlFor="my-modal"
               className="btn bg-red-600 text-white hover:bg-red-500 border-0"
@@ -604,7 +701,7 @@ const Categories = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              console.log('deleted');
+              console.log("deleted");
               deleteConfirmation &&
                 deleteSingleCategory({
                   id: deleteConfirmation._id,
@@ -627,8 +724,8 @@ const Categories = () => {
               <label
                 onClick={(e) => {
                   e.preventDefault();
-                  setDeleteConfirmation('');
-                  setPassword('');
+                  setDeleteConfirmation("");
+                  setPassword("");
                   deleteConfirmationRef.current.checked = false;
                   passwordConfirmationRef.current.checked = false;
                 }}
@@ -640,11 +737,11 @@ const Categories = () => {
                 type="submit"
                 // htmlFor="password-model"
                 className={`btn bg-blue-600 text-white hover:bg-blue-500 border-0 ${
-                  deleteCategoryIsLoading && 'loading'
+                  deleteCategoryIsLoading && "loading"
                 }`}
                 disabled={deleteCategoryIsLoading}
               >
-                {!deleteCategoryIsLoading && 'Submit'}
+                {!deleteCategoryIsLoading && "Submit"}
               </button>
             </div>
           </form>
@@ -679,7 +776,7 @@ const Categories = () => {
                         key={item._id}
                         className="w-[200px] flex-grow flex-shrink bg-gray-100 dark:bg-gray-700 group rounded-lg overflow-hidden relative border-1 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
                       >
-                        {user.role === 'admin' && (
+                        {user.role === "admin" && (
                           <>
                             <label
                               htmlFor="my-modal-3"
@@ -709,7 +806,7 @@ const Categories = () => {
                               className={`z-10 flex btn btn-circle modal-button bg-gray-800 text-red-500 text-lg shadow-lg absolute top-2 right-2 ${
                                 deleteCategoryIsLoading &&
                                 deleteConfirmation._id === item._id &&
-                                'loading'
+                                "loading"
                               }`}
                             >
                               {deleteCategoryIsLoading &&
@@ -732,6 +829,7 @@ const Categories = () => {
                       </Link>
                     ))
                 )}
+
               {InfiniteCategoriesIsFetching && hasNextPage && LoadingCards}
               {/* Dummy Cards */}
               <div className="w-[200px] h-[1px] flex-grow opacity-0" />
@@ -758,7 +856,8 @@ const Categories = () => {
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        <span>You have Scrolled through all the data!</span>
+
+                        <span>Your Categories Loaded</span>
                       </div>
                     </div>
                   </div>
@@ -788,6 +887,145 @@ const Categories = () => {
           </div>
         </>
       )}
+      {/* Locked Categories  */}
+      {lockedInfiniteCategoriesLoading && user.role === "wholeseller" ? (
+        <div className="flex justify-center items-center w-full h-[70vh]">
+          <Spinner />
+        </div>
+      ) : (
+        <>
+          {user.role === "wholeseller" && (
+            <>
+              <h1 className="ml-6">
+                <span className="font-bold">Other Categories: </span>
+                {lockedInfiniteCategories?.pages[0]?.data?.totalDocuments}
+              </h1>
+
+              <div
+                ref={divRef}
+                onScrollCapture={(e) => handleScroll(e)}
+                className="max-h-[650px] overflow-y-auto "
+              >
+                <div
+                  ref={tableRef}
+                  className="flex flex-wrap mx-auto p-6 gap-4 "
+                >
+                  {/* {products ? ( */}
+                  {lockedInfiniteCategories?.pages.length > 0 &&
+                    lockedInfiniteCategories?.pages.map(
+                      (page, i) =>
+                        page?.data?.itemList?.length > 0 &&
+                        page?.data?.itemList?.map((item, index) => (
+                          <div
+                            // to={`/categories/${item.name}/${item._id}`}
+                            key={item._id}
+                            className="w-[200px] flex-grow flex-shrink bg-gray-100 dark:bg-gray-700 group rounded-lg overflow-hidden relative border-1 dark:border-gray-600 hover:shadow-lg transition-all duration-200 "
+                          >
+                            <div className="mx-auto overflow-hidden  blur-sm">
+                              <img
+                                className="h-[200px] max-h-[70%] w-full object-cover "
+                                src={item.imageLink}
+                                alt="img"
+                              />
+                            </div>
+
+                            <div
+                              className="opacity-0 hover:opacity-100 duration-300 absolute inset-0 z-10 flex justify-center items-center text-8xl text-rose-600 font-semibold"
+                              onClick={() =>
+                                handleCategoryUnlock(item?._id, item?.name)
+                              }
+                            >
+                              {/* Locked */}
+                              <label htmlFor="request-category-modal">
+                                <AiFillLock />
+                              </label>
+                            </div>
+
+                            <div className="flex flex-col justify-center p-2 items-center border-t-1 dark:border-gray-200 dark:text-gray-100 text-gray-800">
+                              <h3 className="font-semibold">{item.name}</h3>
+                            </div>
+                          </div>
+                        ))
+                    )}
+
+                  {lockedInfiniteCategoriesFetching &&
+                    lockedHasNext &&
+                    LoadingCards}
+                  {/* Dummy Cards */}
+                  <div className="w-[200px] h-[1px] flex-grow opacity-0" />
+                  <div className="w-[200px] h-[1px] flex-grow opacity-0" />
+                  <div className="w-[200px] h-[1px] flex-grow opacity-0" />
+                  <div className="w-[200px] h-[1px] flex-grow opacity-0" />
+                  <div className="w-[200px] h-[1px] flex-grow opacity-0" />
+                  {!lockedHasNext &&
+                    !lockedInfiniteCategoriesFetching &&
+                    (lockedInfiniteCategories?.pages[0]?.data.itemList.length >
+                    1 ? (
+                      <div className="flex justify-center h-max w-full"></div>
+                    ) : (
+                      <div className="flex justify-center h-max w-full">
+                        <div className="alert alert-info shadow-lg w-max">
+                          <div>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              className="stroke-current flex-shrink-0 w-6 h-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              ></path>
+                            </svg>
+                            <span>!Items Not Found</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* Category Request Modal */}
+
+      <input
+        type="checkbox"
+        ref={categoryModalRef}
+        id="request-category-modal"
+        className="modal-toggle"
+      />
+      <div className="modal">
+        <div className="modal-box relative">
+          <label
+            htmlFor="request-category-modal"
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+          >
+            ✕
+          </label>
+          <h3 className="text-lg font-bold">Request Categories</h3>
+          <form onSubmit={handleCategoryRequest}>
+            <div className="py-4">
+              <Select
+                className="block w-full input input-bordered    px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                isMulti
+                onChange={setSelectedOption}
+                defaultValue={userCatagories}
+                options={availableCatagories}
+                name="catagory"
+                classNamePrefix="select"
+              />
+            </div>
+            <button className="btn btn-active btn-accent btn-xs">
+              Request Categories
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

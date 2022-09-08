@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
 // import {  } from '@syncfusion/ej2-react-popups';
@@ -26,6 +26,7 @@ import { userRequest } from './requestMethods';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
 import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
 // import { SocketContext } from './contexts/socketContext';
+import CategoryRequest from "./pages/CategoryRequest/CategoryRequest";
 
 const App = () => {
   // const socketIO = useContext(SocketContext);
@@ -43,13 +44,13 @@ const App = () => {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    const currentThemeColor = localStorage.getItem('colorMode');
-    const currentThemeMode = localStorage.getItem('themeMode');
+    const currentThemeColor = localStorage.getItem("colorMode");
+    const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    user?.token && user?.token !== '' && getUser(dispatch);
+    user?.token && user?.token !== "" && getUser(dispatch);
   }, [user?.token, dispatch]);
 
   useEffect(() => {
@@ -103,7 +104,7 @@ const App = () => {
             <button
               type="button"
               onClick={() => setThemeSettings(true)}
-              style={{ background: currentColor, borderRadius: '50%' }}
+              style={{ background: currentColor, borderRadius: "50%" }}
               className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
             >
               <FiSettings />
@@ -122,13 +123,13 @@ const App = () => {
               )}
             </div>
           ) : (
-            ''
+            ""
           )}
           <div
             className={
               activeMenu && user?.token
-                ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full  '
-                : 'bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 '
+                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full  "
+                : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
             }
           >
             {user?.token ? (
@@ -136,7 +137,7 @@ const App = () => {
                 <Navbar notificationData={notificationData} />
               </div>
             ) : (
-              ''
+              ""
             )}
             <>
               {themeSettings && <ThemeSettings />}
@@ -160,6 +161,13 @@ const App = () => {
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
                   {/* User Profile Details  */}
+                  <Route
+                    path="/category-request"
+                    element={<CategoryRequest></CategoryRequest>}
+                  >
+                    {" "}
+                  </Route>
+
                   <Route
                     path="/user-details"
                     element={<UserProfileDetails></UserProfileDetails>}
