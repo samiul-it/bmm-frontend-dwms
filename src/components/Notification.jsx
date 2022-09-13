@@ -3,28 +3,10 @@ import { MdOutlineCancel } from 'react-icons/md';
 
 import { Button } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
-import { useMutation } from 'react-query';
-import { userRequest } from '../requestMethods';
+import moment from 'moment';
 
 const Notification = ({ notifications }) => {
   const { currentColor } = useStateContext();
-
-  // const { mutateAsync: updateIsSeen } = useMutation(
-  //   () => userRequest.put('/notification/updateIsSeen'),
-  //   {
-  //     onSuccess: (res) => {
-  //       console.log(res.data);
-  //     },
-  //     onError: ({ response }) => {
-  //       console.log('error', response.data.message);
-  //     },
-  //   }
-  // );
-
-  // useEffect(() => {
-  //   updateIsSeen();
-  //   console.log('notification update is Seen useEffect');
-  // }, []);
 
   const unseenMsgCount = notifications?.messages?.filter(
     (m) => m.isSeen === false
@@ -57,30 +39,28 @@ const Notification = ({ notifications }) => {
           ?.map((item, index) => (
             <div
               key={index}
-              className="flex items-center leading-8 gap-5 border-b-1 border-color p-3"
+              className="flex items-center leading-8 gap-5 p-3 relative border-b border-color"
             >
-              {/* <img
-              className="rounded-full h-10 w-10"
-              src={item.image}
-              alt={item.message}
-            /> */}
               <div>
-                <p className="text-gray-500  dark:text-gray-400">
-                  {item.message}
+                <p className="text-gray-500 dark:text-gray-400 font-semibold">
+                  {item?.message}
+                </p>
+                <p className="absolute right-1 bottom-1 text-gray-400 font-bold text-xs">
+                  {moment(item?.cretedAt).format('DD MMM YYYY, h:mm A')}
                 </p>
               </div>
             </div>
           ))
           ?.reverse()}
-        <div className="mt-5">
-          <Button
-            color="white"
-            bgColor={currentColor}
-            text="See all notifications"
-            borderRadius="10px"
-            width="full"
-          />
-        </div>
+      </div>
+      <div className="mt-5">
+        <Button
+          color="white"
+          bgColor={currentColor}
+          text="See all notifications"
+          borderRadius="10px"
+          width="full"
+        />
       </div>
     </div>
   );

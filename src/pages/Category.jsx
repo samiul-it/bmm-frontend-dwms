@@ -1,29 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as XLSX from "xlsx";
-import { Link, useNavigate } from "react-router-dom";
-import * as FileSaver from "file-saver";
-import { Header } from "../components";
-import { useInfiniteQuery, useMutation, useQuery } from "react-query";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { userRequest } from "../requestMethods";
-import emptyImage from "../assets/empty.jpg";
-import { useSelector } from "react-redux";
-import { useStateContext } from "../contexts/ContextProvider";
-import Spinner from "../components/shared/spinner/Spinner";
-import { AiFillLock } from "react-icons/ai";
-import Select from "react-select";
+import React, { useEffect, useRef, useState } from 'react';
+import * as XLSX from 'xlsx';
+import { Link, useNavigate } from 'react-router-dom';
+import * as FileSaver from 'file-saver';
+import { Header } from '../components';
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { userRequest } from '../requestMethods';
+import emptyImage from '../assets/empty.jpg';
+import { useSelector } from 'react-redux';
+import { useStateContext } from '../contexts/ContextProvider';
+import Spinner from '../components/shared/spinner/Spinner';
+import { AiFillLock } from 'react-icons/ai';
+import Select from 'react-select';
 
 const Categories = () => {
-  const [deleteConfirmation, setDeleteConfirmation] = useState("");
-  const [password, setPassword] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [password, setPassword] = useState('');
   const [categoriesFormData, setCategoriesFormData] = React.useState({
-    name: "",
-    description: "",
-    slug: "",
-    imageLink: "",
-    _id: "",
+    name: '',
+    description: '',
+    slug: '',
+    imageLink: '',
+    _id: '',
   });
 
   // Using at Category Selection
@@ -54,22 +54,22 @@ const Categories = () => {
   const user = useSelector((state) => state.user.currentUser.user);
   const resetFormData = () => {
     setCategoriesFormData({
-      name: "",
-      description: "",
-      slug: "",
-      imageLink: "",
-      _id: "",
+      name: '',
+      description: '',
+      slug: '',
+      imageLink: '',
+      _id: '',
     });
   };
 
   const addCategoryApiCall = async (data) => {
-    return await userRequest.post("/category", data);
+    return await userRequest.post('/category', data);
   };
 
   const { mutateAsync: addCategory, isLoading: addCategoryIsLoading } =
     useMutation(addCategoryApiCall, {
       onSuccess: () => {
-        notifysucc("addCategorySuccess", "Category Added Successfully");
+        notifysucc('addCategorySuccess', 'Category Added Successfully');
         refetchInfiniteCategories();
         // categoryRefetch();
         categoryFormModelRef.current.checked = false;
@@ -89,7 +89,7 @@ const Categories = () => {
   const { mutateAsync: updateCategory, isLoading: updateCategoryIsLoading } =
     useMutation(updateCategoryApiCall, {
       onSuccess: () => {
-        notifysucc("updateCategorySuccess", "Category Updated Successfully");
+        notifysucc('updateCategorySuccess', 'Category Updated Successfully');
         refetchInfiniteCategories();
         // categoryRefetch();
         categoryFormModelRef.current.checked = false;
@@ -98,7 +98,7 @@ const Categories = () => {
     });
 
   const [pageLimit, setPageLimit] = useState(15);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const divRef = useRef();
   const tableRef = useRef();
   const uploadFileBtnRef = useRef();
@@ -114,7 +114,7 @@ const Categories = () => {
     data: categoryData,
     isLoading: categoryIsLoading,
     refetch: categoryRefetch,
-  } = useQuery(["categories"], () => userRequest.get("/category"));
+  } = useQuery(['categories'], () => userRequest.get('/category'));
 
   //Locked Categories for wholeseller api
   const lockedCategories = async ({ pageParam = 1 }) => {
@@ -163,13 +163,13 @@ const Categories = () => {
         // console.log(response);
         categoryRefetch();
         handleModalClose();
-        toast.success("New Category Request Sent");
-        toast.info("Waiting for Admin Approval");
+        toast.success('New Category Request Sent');
+        toast.info('Waiting for Admin Approval');
         // modalRef.current.checked = false;
       })
       .catch(function (error) {
         console.log(error);
-        toast.error("Faild to Send Category Request");
+        toast.error('Faild to Send Category Request');
       });
   };
 
@@ -183,13 +183,13 @@ const Categories = () => {
     hasNextPage,
     isLoading: isLoadingInfiniteCategories,
     isFetching: InfiniteCategoriesIsFetching,
-  } = useInfiniteQuery(["infiniteCategories"], GetPaginationApi, {
+  } = useInfiniteQuery(['infiniteCategories'], GetPaginationApi, {
     getNextPageParam: (page) => {
       return page.data.hasNext ? page.data.curruntPage + 1 : undefined;
     },
     onError: ({ response }) => {
-      console.log("Pagination Error ==>", response.data);
-      notifyerorr("PaginationError", response.data.message);
+      console.log('Pagination Error ==>', response.data);
+      notifyerorr('PaginationError', response.data.message);
     },
   });
 
@@ -202,13 +202,13 @@ const Categories = () => {
     hasNextPage: lockedHasNext,
     isLoading: lockedInfiniteCategoriesLoading,
     isFetching: lockedInfiniteCategoriesFetching,
-  } = useInfiniteQuery(["lockedCategories"], lockedCategories, {
+  } = useInfiniteQuery(['lockedCategories'], lockedCategories, {
     getNextPageParam: (page) => {
       return page.data.hasNext ? page.data.curruntPage + 1 : undefined;
     },
     onError: ({ response }) => {
-      console.log("Pagination Error ==>", response.data);
-      notifyerorr("PaginationError", response.data.message);
+      console.log('Pagination Error ==>', response.data);
+      notifyerorr('PaginationError', response.data.message);
     },
   });
 
@@ -221,7 +221,7 @@ const Categories = () => {
 
     if (innerHeight + Math.ceil(scrollTopValue) >= offsetHeight) {
       console.log(
-        " Reached at bottom ====>",
+        ' Reached at bottom ====>',
         innerHeight + Math.ceil(scrollTopValue) === offsetHeight
       );
       // setPage(page + 1);
@@ -261,7 +261,7 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    if (searchQuery === "") {
+    if (searchQuery === '') {
       refetchInfiniteCategories();
     }
   }, [searchQuery]);
@@ -275,45 +275,45 @@ const Categories = () => {
     isLoading: deleteCategoryIsLoading,
   } = useMutation(deleteCategoryApiCall, {
     onSuccess: () => {
-      notifysucc("deleteCategorySuccess", "Category Deleted Successfully");
+      notifysucc('deleteCategorySuccess', 'Category Deleted Successfully');
       deleteConfirmationRef.current.checked = false;
       refetchInfiniteCategories();
       // categoryRefetch();
-      setPassword("");
-      setDeleteConfirmation("");
+      setPassword('');
+      setDeleteConfirmation('');
       deleteConfirmationRef.current.checked = false;
       passwordConfirmationRef.current.checked = false;
     },
     onError: ({ response }) => {
       // setPassword('');
       // setDeleteConfirmation('');
-      console.log("Delete Error ==>", response.data);
+      console.log('Delete Error ==>', response.data);
       // deleteConfirmationRef.current.checked = false;
-      notifyerorr("DeleteError", response.data.message);
+      notifyerorr('DeleteError', response.data.message);
     },
   });
 
   const addBulkCategoryApiCall = async (data) => {
-    return await userRequest.post("/category/upload", data);
+    return await userRequest.post('/category/upload', data);
   };
   const { mutateAsync: uploadExcel, isLoading: uploadCategoriesIsLoading } =
     useMutation(addBulkCategoryApiCall, {
       onSuccess: (res) => {
         if (res?.data?.warnings?.length > 0) {
           res?.data?.warnings?.map((e) => {
-            notifyWarn("uploadExcelWarning", e);
+            notifyWarn('uploadExcelWarning', e);
           });
         }
-        console.log("upload bulk success ==>", res);
-        notifysucc("uploadExcelSuccess", "Category Uploaded Successfully");
+        console.log('upload bulk success ==>', res);
+        notifysucc('uploadExcelSuccess', 'Category Uploaded Successfully');
         refetchInfiniteCategories();
         // categoryRefetch();
         uploadFileBtnRef.current.value = null;
       },
       onError: ({ response }) => {
         uploadFileBtnRef.current.value = null;
-        console.log("Upload Error ==>", response.data);
-        notifyerorr("uploadError", response.data.message);
+        console.log('Upload Error ==>', response.data);
+        notifyerorr('uploadError', response.data.message);
       },
     });
 
@@ -330,8 +330,8 @@ const Categories = () => {
     // navigateToProfile("/user-details");
   };
   const fileType = [
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-excel",
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
   ];
 
   const exportToCSV = () => {
@@ -339,11 +339,11 @@ const Categories = () => {
 
     const wb = {
       Sheets: { category: category1 },
-      SheetNames: ["category"],
+      SheetNames: ['category'],
     };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, "Category" + ".xlsx");
+    FileSaver.saveAs(data, 'Category' + '.xlsx');
   };
 
   const handleFormData = (e) => {
@@ -367,25 +367,25 @@ const Categories = () => {
 
   const formOptions = [
     {
-      name: "name",
-      label: "Name",
-      type: "text",
-      placeholder: "Enter Category Name",
+      name: 'name',
+      label: 'Name',
+      type: 'text',
+      placeholder: 'Enter Category Name',
       value: categoriesFormData.category_name,
     },
 
     {
-      name: "slug",
-      label: "Slug",
-      type: "text",
-      placeholder: "Enter Unique Slug",
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      placeholder: 'Enter Unique Slug',
       value: categoriesFormData.slug,
     },
     {
-      name: "imageLink",
-      label: "Image Link",
-      type: "text",
-      placeholder: "Enter Image Link",
+      name: 'imageLink',
+      label: 'Image Link',
+      type: 'text',
+      placeholder: 'Enter Image Link',
       value: categoriesFormData.imageLink,
     },
   ];
@@ -404,7 +404,7 @@ const Categories = () => {
           fileReader.onload = (e) => {
             const bufferArray = e.target.result;
 
-            const wb = XLSX.read(bufferArray, { type: "buffer" });
+            const wb = XLSX.read(bufferArray, { type: 'buffer' });
 
             const wsname = wb.SheetNames[0];
 
@@ -436,12 +436,12 @@ const Categories = () => {
             const arrtri = [{}];
             for (const key of Object.keys(da)) {
               if (
-                key !== "_id" &&
-                key != "name" &&
-                key != "description" &&
-                key != "slug" &&
-                key != "imageLink" &&
-                key != "metadata"
+                key !== '_id' &&
+                key != 'name' &&
+                key != 'description' &&
+                key != 'slug' &&
+                key != 'imageLink' &&
+                key != 'metadata'
               ) {
                 arrtri.push({ name: key, value: da[key] });
               }
@@ -451,37 +451,36 @@ const Categories = () => {
             }
             // obj['attributes'] = arrtri;
             arrtri.shift();
-            obj["metadata"] = arrtri;
+            obj['metadata'] = arrtri;
 
             dataCsv.push(obj);
           });
-          console.log("excel To JSON ====>", dataCsv);
+          console.log('excel To JSON ====>', dataCsv);
           uploadExcel(dataCsv);
           return;
         });
       } else {
         uploadFileBtnRef.current.value = null;
-        notifyerorr("uploadError", "Please Select Excel File");
+        notifyerorr('uploadError', 'Please Select Excel File');
       }
     } else {
       uploadFileBtnRef.current.value = null;
-      notifyerorr("fileNotSelected", "Please select a file");
+      notifyerorr('fileNotSelected', 'Please select a file');
     }
   };
 
   const passwordConfirmationRef = useRef(null);
 
   return (
-    <div className="container mx-auto">
-      <ToastContainer />
-      <div className="w-full flex justify-between items-center px-6">
+    <div className="container mx-auto max-w-[95%]">
+      <div className="w-full flex justify-between items-center flex-wrap">
         <Header category="Page" title="Categories" />
 
         <form
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className="mx-2 md:w-auto w-full"
+          className="w-full md:max-w-[370px]"
         >
           <label
             htmlFor="default-search"
@@ -490,86 +489,43 @@ const Categories = () => {
             Search
           </label>
           <div className="relative">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                ></path>
-              </svg>
-            </div>
             <input
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
               type="search"
               id="default-search"
-              className="block p-3 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-3 pl-6 pr-14 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search Category"
             />
             <button
               type="submit"
-              className="text-white absolute right-2 bottom-[5px] bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              style={{
+                background: currentColor,
+              }}
+              className="text-white absolute right-2 bottom-[5px] focus:ring-4 focus:outline-none hover:bg-light-gray font-medium rounded-lg text-sm px-3 py-2"
             >
-              Search
+              <div className="flex items-center pointer-events-none ">
+                <svg
+                  className="w-5 h-5 text-gray-100 "
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  ></path>
+                </svg>
+              </div>
             </button>
           </div>
         </form>
-
-        {user?.role == "admin" && (
-          <>
-            <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px] ">
-              <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
-                {!uploadCategoriesIsLoading ? (
-                  "Upload excel sheet"
-                ) : (
-                  <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
-                    Uploading File...
-                  </button>
-                )}
-              </p>
-              <input
-                onChange={(e) => handleFile(e)}
-                type="file"
-                disabled={uploadCategoriesIsLoading}
-                ref={uploadFileBtnRef}
-                className="block text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer"
-              />
-            </div>
-
-            <button
-              onClick={exportToCSV}
-              style={{
-                background: currentColor,
-              }}
-              type="button"
-              className="text-white btn border-0 mx-2 btn-sm"
-            >
-              <svg className="fill-current w-4 h-4 mr-2" viewBox="0 0 20 20">
-                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
-              </svg>
-              <span>Download</span>
-            </button>
-            <label
-              style={{
-                background: currentColor,
-              }}
-              htmlFor="my-modal-3"
-              className="text-white btn border-0 mx-2 btn-sm"
-            >
-              Add Category
-            </label>
-          </>
-        )}
       </div>
+
       {/* ----------Form Model Start---------- */}
       <input
         ref={categoryFormModelRef}
@@ -594,7 +550,7 @@ const Categories = () => {
                 : submitCategoryFormHandler
             }
           >
-            <div className="card-body">
+            <div className="card-body p-0 md:p-6">
               {formOptions.map((item, index) => (
                 <div key={index} className="form-control">
                   <label className="label">
@@ -603,10 +559,10 @@ const Categories = () => {
                   <input
                     name={item.name}
                     onChange={(e) => handleFormData(e)}
-                    type={item.type ? item.type : "text"}
+                    type={item.type ? item.type : 'text'}
                     placeholder={item.placeholder}
                     className="input input-bordered"
-                    value={categoriesFormData[item.name] || ""}
+                    value={categoriesFormData[item.name] || ''}
                   />
                 </div>
               ))}
@@ -635,11 +591,11 @@ const Categories = () => {
                   disabled={addCategoryIsLoading || updateCategoryIsLoading}
                   type="submit"
                   className={`btn btn-primary w-[48%] ${
-                    (addCategoryIsLoading && "loading",
-                    updateCategoryIsLoading && "loading")
+                    (addCategoryIsLoading && 'loading',
+                    updateCategoryIsLoading && 'loading')
                   }`}
                 >
-                  {categoriesFormData._id ? "Update" : "Add"}
+                  {categoriesFormData._id ? 'Update' : 'Add'}
                 </button>
               </div>
             </div>
@@ -667,8 +623,8 @@ const Categories = () => {
           <div className="modal-action">
             <label
               onClick={() => {
-                setDeleteConfirmation("");
-                setPassword("");
+                setDeleteConfirmation('');
+                setPassword('');
               }}
               htmlFor="my-modal"
               className="btn bg-red-600 text-white hover:bg-red-500 border-0"
@@ -685,9 +641,7 @@ const Categories = () => {
           </div>
         </div>
       </div>
-      {/* <label htmlFor="password-model" className="btn modal-button">
-        open modal
-      </label> */}
+
       <input
         type="checkbox"
         ref={passwordConfirmationRef}
@@ -701,7 +655,7 @@ const Categories = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              console.log("deleted");
+              console.log('deleted');
               deleteConfirmation &&
                 deleteSingleCategory({
                   id: deleteConfirmation._id,
@@ -724,8 +678,8 @@ const Categories = () => {
               <label
                 onClick={(e) => {
                   e.preventDefault();
-                  setDeleteConfirmation("");
-                  setPassword("");
+                  setDeleteConfirmation('');
+                  setPassword('');
                   deleteConfirmationRef.current.checked = false;
                   passwordConfirmationRef.current.checked = false;
                 }}
@@ -737,11 +691,11 @@ const Categories = () => {
                 type="submit"
                 // htmlFor="password-model"
                 className={`btn bg-blue-600 text-white hover:bg-blue-500 border-0 ${
-                  deleteCategoryIsLoading && "loading"
+                  deleteCategoryIsLoading && 'loading'
                 }`}
                 disabled={deleteCategoryIsLoading}
               >
-                {!deleteCategoryIsLoading && "Submit"}
+                {!deleteCategoryIsLoading && 'Submit'}
               </button>
             </div>
           </form>
@@ -754,17 +708,68 @@ const Categories = () => {
         </div>
       ) : (
         <>
-          <h1 className="ml-6">
-            <span className="font-bold">Total Items Found: </span>
-            {infiniteCategories?.pages[0]?.data?.totalDocuments}
-          </h1>
+          <div className="w-full md:flex justify-between items-center my-3">
+            <h1 className="text-gray-700 dark:text-gray-300 font-bold text-lg">
+              <span className="font-bold">Total Items Found: </span>
+              {infiniteCategories?.pages[0]?.data?.totalDocuments}
+            </h1>
+
+            {user?.role == 'admin' && (
+              <div className="flex items-center justify-between flex-wrap gap-2 ">
+                <div className="h-max relative w-max text-center md:mt-0 md:mb-0 mt-8 md:max-w-[230px] ">
+                  <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
+                    {!uploadCategoriesIsLoading ? (
+                      'Upload excel sheet'
+                    ) : (
+                      <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
+                        Uploading File...
+                      </button>
+                    )}
+                  </p>
+                  <input
+                    onChange={(e) => handleFile(e)}
+                    type="file"
+                    disabled={uploadCategoriesIsLoading}
+                    ref={uploadFileBtnRef}
+                    className="block text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer"
+                  />
+                </div>
+
+                <button
+                  onClick={exportToCSV}
+                  style={{
+                    background: currentColor,
+                  }}
+                  type="button"
+                  className="text-white btn border-0 btn-sm mt-auto md:w-max w-full"
+                >
+                  <svg
+                    className="fill-current w-4 h-4 mr-2"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                  </svg>
+                  <span>Download</span>
+                </button>
+                <label
+                  style={{
+                    background: currentColor,
+                  }}
+                  htmlFor="my-modal-3"
+                  className="text-white btn border-0 btn-sm mt-auto md:w-max w-full"
+                >
+                  Add Category
+                </label>
+              </div>
+            )}
+          </div>
 
           <div
             ref={divRef}
             onScrollCapture={(e) => handleScroll(e)}
             className="max-h-[650px] overflow-y-auto "
           >
-            <div ref={tableRef} className="flex flex-wrap mx-auto p-6 gap-4 ">
+            <div ref={tableRef} className="flex flex-wrap mx-auto gap-4 ">
               {/* {products ? ( */}
               {infiniteCategories?.pages.length > 0 &&
                 infiniteCategories?.pages.map(
@@ -776,7 +781,7 @@ const Categories = () => {
                         key={item._id}
                         className="w-[200px] flex-grow flex-shrink bg-gray-100 dark:bg-gray-700 group rounded-lg overflow-hidden relative border-1 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
                       >
-                        {user.role === "admin" && (
+                        {user.role === 'admin' && (
                           <>
                             <label
                               htmlFor="my-modal-3"
@@ -806,7 +811,7 @@ const Categories = () => {
                               className={`z-10 flex btn btn-circle modal-button bg-gray-800 text-red-500 text-lg shadow-lg absolute top-2 right-2 ${
                                 deleteCategoryIsLoading &&
                                 deleteConfirmation._id === item._id &&
-                                "loading"
+                                'loading'
                               }`}
                             >
                               {deleteCategoryIsLoading &&
@@ -888,13 +893,13 @@ const Categories = () => {
         </>
       )}
       {/* Locked Categories  */}
-      {lockedInfiniteCategoriesLoading && user.role === "wholeseller" ? (
+      {lockedInfiniteCategoriesLoading && user.role === 'wholeseller' ? (
         <div className="flex justify-center items-center w-full h-[70vh]">
           <Spinner />
         </div>
       ) : (
         <>
-          {user.role === "wholeseller" && (
+          {user.role === 'wholeseller' && (
             <>
               <h1 className="ml-6">
                 <span className="font-bold">Other Categories: </span>
@@ -906,10 +911,7 @@ const Categories = () => {
                 onScrollCapture={(e) => handleScroll(e)}
                 className="max-h-[650px] overflow-y-auto "
               >
-                <div
-                  ref={tableRef}
-                  className="flex flex-wrap mx-auto p-6 gap-4 "
-                >
+                <div ref={tableRef} className="flex flex-wrap mx-auto gap-4">
                   {/* {products ? ( */}
                   {lockedInfiniteCategories?.pages.length > 0 &&
                     lockedInfiniteCategories?.pages.map(

@@ -4,8 +4,8 @@ import { useQuery } from 'react-query';
 import { userRequest } from '../../requestMethods';
 import moment from 'moment';
 import Spinner from '../../components/shared/spinner/Spinner';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { Header } from '../../components';
 
 const OrdersPage = () => {
   const getAllOrdersApi = async () => {
@@ -75,9 +75,9 @@ const OrdersPage = () => {
   // console.log('ordersData ===>', ordersData);
 
   return (
-    <div className="container mx-auto h-max px-6">
+    <div className="container mx-auto h-max max-w-[95%]">
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-semibold  ">Orders</h1>
+        <Header category="Page" title="Orders" />
         <button
           onClick={() => {
             navigate('/confirmOrder');

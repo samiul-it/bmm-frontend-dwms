@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { employeesData, employeesGrid } from "../data/dummy";
-import { Header } from "../components";
-import * as xlsx from "xlsx";
-import FileSaver from "file-saver";
-import { useMutation, useQuery } from "react-query";
-import WholesellersTable from "./WholesellersTable/WholesellersTable";
-import Loading from "./Loading";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { userRequest } from "../requestMethods";
+import React, { useEffect, useRef, useState } from 'react';
+import { employeesData, employeesGrid } from '../data/dummy';
+import { Header } from '../components';
+import * as xlsx from 'xlsx';
+import FileSaver from 'file-saver';
+import { useMutation, useQuery } from 'react-query';
+import WholesellersTable from './WholesellersTable/WholesellersTable';
+import Loading from './Loading';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { userRequest } from '../requestMethods';
 
 export const DropDown = (props) => {
   const options = props?.options?.length > 0 && [
@@ -70,7 +70,7 @@ const Wholesellers = () => {
     isLoading,
     data: wholesellersList,
     refetch,
-  } = useQuery("wholesellers", () => userRequest.get("/wholesellers/"));
+  } = useQuery('wholesellers', () => userRequest.get('/wholesellers/'));
 
   const {
     isLoading: categoryLoading,
@@ -92,10 +92,10 @@ const Wholesellers = () => {
 
   const resetFormData = () => {
     setWholesellerFormData({
-      name: "",
-      phone: "",
-      email: "",
-      password: "",
+      name: '',
+      phone: '',
+      email: '',
+      password: '',
       catagories: [],
       _id: '',
       place: '',
@@ -118,8 +118,8 @@ const Wholesellers = () => {
   // File Data Collection
 
   const fileType = [
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-excel",
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
   ];
 
   const fileSubmit = (e) => {
@@ -129,7 +129,7 @@ const Wholesellers = () => {
       let json;
       reader.onload = (e) => {
         const data = e.target.result;
-        const workbook = xlsx.read(data, { type: "array" });
+        const workbook = xlsx.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         json = xlsx.utils.sheet_to_json(worksheet);
@@ -144,7 +144,7 @@ const Wholesellers = () => {
   const updateToDb = () => {
     console.log(fileData);
     userRequest
-      .post("/wholesellers/uploadxls", fileData)
+      .post('/wholesellers/uploadxls', fileData)
       .then(function (response) {
         console.log(response);
         refetch();
@@ -183,11 +183,11 @@ const Wholesellers = () => {
 
     const wb = {
       Sheets: { wholesellers: wholesellers1 },
-      SheetNames: ["wholesellers"],
+      SheetNames: ['wholesellers'],
     };
-    const excelBuffer = xlsx.write(wb, { bookType: "xlsx", type: "array" });
+    const excelBuffer = xlsx.write(wb, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, "wholesellers" + ".xlsx");
+    FileSaver.saveAs(data, 'wholesellers' + '.xlsx');
   };
 
   //Wholesellers infromations Form Handler
@@ -197,11 +197,11 @@ const Wholesellers = () => {
     const { name, phone, email, place, address } = wholesellerFormData;
 
     userRequest
-      .post("/wholesellers/create", {
+      .post('/wholesellers/create', {
         name: name,
         phone: phone,
         email: email,
-        password: "1234",
+        password: '1234',
         catagories: categoryIds,
         place,
         address,
@@ -209,12 +209,12 @@ const Wholesellers = () => {
       .then(function (response) {
         console.log(response);
         refetch();
-        toast.success("Wholeseller Created!");
+        toast.success('Wholeseller Created!');
         modalRef.current.checked = false;
       })
       .catch(function (error) {
         console.log(error);
-        toast.error("Faild to Create wholeseller");
+        toast.error('Faild to Create wholeseller');
       });
   };
 
@@ -229,12 +229,12 @@ const Wholesellers = () => {
       .then(function (response) {
         console.log(response);
         refetch();
-        toast.success("Wholeseller Updated!");
+        toast.success('Wholeseller Updated!');
         modalRef.current.checked = false;
       })
       .catch(function (error) {
         console.log(error);
-        toast.error("Faild to Update wholeseller");
+        toast.error('Faild to Update wholeseller');
       });
   };
 
@@ -258,7 +258,7 @@ const Wholesellers = () => {
   }
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <div className="container mx-auto max-w-[95%]">
       <Header category="Page" title="Wholesellers" />
       {/* File Upload  */}
       <div className="flex items-center	m-3 ">
@@ -429,7 +429,7 @@ const Wholesellers = () => {
 
                 <div className="form-control mt-6">
                   <button type="submit" className="btn btn-primary">
-                    {wholesellerFormData._id ? "update" : "Submit"}
+                    {wholesellerFormData._id ? 'update' : 'Submit'}
                   </button>
                 </div>
               </form>
