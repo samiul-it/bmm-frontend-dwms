@@ -86,12 +86,13 @@ const Homepage = () => {
   };
 
   return (
-    <div className="container mx-auto px-6">
-      <div className="flex items-center justify-between px-6">
-        <Header category="Page" title="Data Visialization" />
+    <div className="container mx-auto w-max-[95%]">
+      <Header category="Page" title="Data Visialization" />
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Statistics</h3>
         <DateFilter state={state} setState={setState} />
       </div>
-      <h3>Our Statistics(1)</h3>
+
       <div>
         <div>
           <h3>Total Sale vs Day</h3>

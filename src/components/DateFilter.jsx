@@ -12,7 +12,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 function DateFilter({ state, setState }) {
   const getDate = (d) => {
-    return moment(d).format('Do MMMM YYYY');
+    return moment(d).format('Do MMM YYYY');
     //   var date = new Date(str),
     //     mnth = ('0' + (date.getMonth() + 1)).slice(-2),
     //     day = ('0' + date.getDate()).slice(-2);

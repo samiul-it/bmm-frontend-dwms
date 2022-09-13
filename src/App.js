@@ -26,7 +26,8 @@ import { userRequest } from './requestMethods';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
 import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
 // import { SocketContext } from './contexts/socketContext';
-import CategoryRequest from "./pages/CategoryRequest/CategoryRequest";
+import CategoryRequest from './pages/CategoryRequest/CategoryRequest';
+import ActivityLogs from './pages/ActivityLogs/ActivityLogs';
 
 const App = () => {
   // const socketIO = useContext(SocketContext);
@@ -44,13 +45,13 @@ const App = () => {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    const currentThemeColor = localStorage.getItem("colorMode");
-    const currentThemeMode = localStorage.getItem("themeMode");
+    const currentThemeColor = localStorage.getItem('colorMode');
+    const currentThemeMode = localStorage.getItem('themeMode');
     if (currentThemeColor && currentThemeMode) {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    user?.token && user?.token !== "" && getUser(dispatch);
+    user?.token && user?.token !== '' && getUser(dispatch);
   }, [user?.token, dispatch]);
 
   useEffect(() => {
@@ -85,7 +86,17 @@ const App = () => {
 
   const messageListener = (message) => {
     refetchNotifications();
-    console.log('isFetching ===>', isFetching);
+    // console.log('isFetching ===>', isFetching);
+    Notification.requestPermission().then((perm) => {
+      console.log(perm);
+      if (perm === 'granted' && document.visibilityState === 'hidden') {
+        new Notification('New Notification', {
+          body: message?.message,
+          tag: 'notification',
+          requireInteraction: true,
+        });
+      }
+    });
     toast?.success(message?.message);
   };
 
@@ -104,7 +115,7 @@ const App = () => {
             <button
               type="button"
               onClick={() => setThemeSettings(true)}
-              style={{ background: currentColor, borderRadius: "50%" }}
+              style={{ background: currentColor, borderRadius: '50%' }}
               className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
             >
               <FiSettings />
@@ -123,21 +134,21 @@ const App = () => {
               )}
             </div>
           ) : (
-            ""
+            ''
           )}
           <div
             className={
               activeMenu && user?.token
-                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full  "
-                : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
+                ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full overflow-hidden'
+                : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2 '
             }
           >
             {user?.token ? (
-              <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+              <div className="bg-main-bg dark:bg-main-dark-bg navbar w-full ">
                 <Navbar notificationData={notificationData} />
               </div>
             ) : (
-              ""
+              ''
             )}
             <>
               {themeSettings && <ThemeSettings />}
@@ -165,7 +176,7 @@ const App = () => {
                     path="/category-request"
                     element={<CategoryRequest></CategoryRequest>}
                   >
-                    {" "}
+                    {' '}
                   </Route>
 
                   <Route
@@ -200,6 +211,8 @@ const App = () => {
                   />
                 </Route>
 
+                <Route path="/activity-logs" element={<ActivityLogs />} />
+
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </>
@@ -207,7 +220,7 @@ const App = () => {
           </div>
         </div>
       </BrowserRouter>
-      <ToastContainer />
+      <ToastContainer autoClose={2500} draggable />
     </div>
   );
 };

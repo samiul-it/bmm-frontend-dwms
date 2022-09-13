@@ -142,7 +142,7 @@ const OrderDetails = () => {
   };
 
   return (
-    <div className="container mx-auto px-6 ">
+    <div className="container mx-auto max-w-[95%]">
       <header className="">
         <h3 className="flex items-center font-bold dark:text-gray-200">
           <button onClick={() => navigate(-1)} className="p-2 text-2xl ">
