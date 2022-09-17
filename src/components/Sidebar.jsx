@@ -34,11 +34,6 @@ const Sidebar = () => {
           route: '/OrdersPage',
           icon: <AiOutlineShoppingCart />,
         },
-        {
-          name: 'category requests',
-          route: '/category-request',
-          icon: <AiFillDiff />,
-        },
       ],
     },
   ];
@@ -61,6 +56,11 @@ const Sidebar = () => {
           name: "Activity Log's",
           route: '/activity-logs',
           icon: <IoMdDocument />,
+        },
+        {
+          name: 'category requests',
+          route: '/category-request',
+          icon: <AiFillDiff />,
         },
       ],
     });

@@ -172,12 +172,6 @@ const App = () => {
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
                   {/* User Profile Details  */}
-                  <Route
-                    path="/category-request"
-                    element={<CategoryRequest></CategoryRequest>}
-                  >
-                    {' '}
-                  </Route>
 
                   <Route
                     path="/user-details"
@@ -208,6 +202,12 @@ const App = () => {
                   <Route
                     path="/wholesellers-details/:id"
                     element={<WholesellersDetails></WholesellersDetails>}
+                  />
+
+                  {/* Category Request Admin---> */}
+                  <Route
+                    path="/category-request"
+                    element={<CategoryRequest />}
                   />
                 </Route>
 

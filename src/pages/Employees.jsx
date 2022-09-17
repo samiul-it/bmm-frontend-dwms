@@ -26,7 +26,7 @@ const Employees = () => {
     isLoading,
     data: employeesList,
     refetch,
-  } = useQuery('employees', () => userRequest.get('/user'));
+  } = useQuery('employees', async () => await userRequest.get('/user'));
 
   if (isLoading) {
     return <Loading></Loading>;

@@ -156,15 +156,9 @@ const OrdersPage = () => {
                               </div>
                             </td>
                             <td>
-                              {moment(order.createdAt)
-                                .format('MMMM Do YYYY, h:mm:ss a')
-                                .includes('am')
-                                ? moment(order.createdAt)
-                                    .format('MMMM Do YYYY, h:mm:ss a')
-                                    .replace('am', 'AM')
-                                : moment(order.createdAt)
-                                    .format('MMMM Do YYYY, h:mm:ss a')
-                                    .replace('pm', 'PM')}
+                              {moment(order.createdAt).format(
+                                'Do MMM YYYY, h:mm A'
+                              )}
                             </td>
                             <td>₹{order?.total_cost}/-</td>
                             <td>

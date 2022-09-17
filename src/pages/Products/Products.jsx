@@ -16,6 +16,8 @@ import Spinner from '../../components/shared/spinner/Spinner';
 import CreateSelect from '../../components/shared/CreateSelect/CreateSelect';
 
 const Products = () => {
+  const { orders } = useSelector((state) => state.ordersState);
+  const user = useSelector((state) => state?.user?.currentUser?.user);
   const { category_name, id } = useParams();
   const { currentColor } = useStateContext();
   const dispatch = useDispatch();
@@ -425,9 +427,16 @@ const Products = () => {
         <td>
           <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
         </td>
-        <td>
-          <div className="bg-slate-600 rounded-lg w-[70%] h-[25px]"></div>
-        </td>
+        {user?.role == 'admin' && (
+          <td>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+          </td>
+        )}
+        {user?.role == 'admin' && (
+          <td>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+          </td>
+        )}
       </tr>
     );
   });
@@ -466,8 +475,6 @@ const Products = () => {
 
     dispatch(addAndRemoveOrder(product));
   };
-  const { orders } = useSelector((state) => state.ordersState);
-  const user = useSelector((state) => state.user.currentUser.user);
 
   return (
     <div className="container mx-auto max-w-[95%] relative">
@@ -492,7 +499,7 @@ const Products = () => {
               }}
               type="search"
               id="default-search"
-              className="block p-3 pl-6 pr-14 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-3 pr-14 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search Products"
             />
             <button
@@ -733,7 +740,8 @@ const Products = () => {
                   <th>Wholesale</th>
                   <th>Retail</th>
                   <th>Mrp</th>
-                  <th></th>
+                  {user?.role == 'admin' && <th></th>}
+                  {user?.role == 'admin' && <th></th>}
                 </tr>
               </thead>
               <tbody>
@@ -767,68 +775,67 @@ const Products = () => {
                           <td>₹{item.price_wholesale}/-</td>
                           <td>₹{item.price_retail}/-</td>
                           <td>₹{item.mrp}/-</td>
-                          <td>
-                            <div className="flex justify-end">
-                              {user?.role === 'admin' && (
-                                <label
-                                  htmlFor="my-modal-3"
-                                  onClick={(e) => {
-                                    // console.log(item);
-                                    setProductFormData({
-                                      product_name: item?.product_name,
-                                      product_desc: item?.product_desc,
-                                      slug: item?.slug,
-                                      price_wholesale: item?.price_wholesale,
-                                      price_retail: item?.price_retail,
-                                      mrp: item?.mrp,
-                                      _id: item?._id,
-                                    });
-                                    setTags({
-                                      ...tags,
-                                      value: item?.metadata
-                                        ? item?.metadata?.map((t) => {
-                                            return { label: t, value: t };
-                                          })
-                                        : [],
-                                    });
-                                    // e.preventDefault();
-                                    // setDeleteConfirmation(item);
-                                  }}
-                                  className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-blue-500 shadow-lg mx-2 ${
-                                    updateSingleProductIsLoading && 'loading'
-                                  }`}
-                                >
-                                  {!updateSingleProductIsLoading && 'Update '}
-                                  &nbsp;
-                                  {!updateSingleProductIsLoading && <FiEdit />}
-                                </label>
-                              )}
-                              {user?.role == 'admin' && (
-                                <label
-                                  htmlFor="my-modal"
-                                  onClick={(e) => {
-                                    // e.preventDefault();
-                                    setDeleteConfirmation(item);
-                                  }}
-                                  className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
-                                    deleteProductIsLoading &&
-                                    deleteConfirmation?._id === item?._id &&
-                                    'loading'
-                                  }`}
-                                >
-                                  &nbsp;
-                                  {deleteProductIsLoading &&
-                                  deleteConfirmation?._id ===
-                                    item?._id ? null : (
-                                    <span className="flex">
-                                      Delete &nbsp;
-                                      <FiTrash2 />
-                                    </span>
-                                  )}
-                                </label>
-                              )}
-                            </div>
-                          </td>
+                          {user?.role == 'admin' && (
+                            <td className="w-[100px] p-0">
+                              <label
+                                htmlFor="my-modal-3"
+                                onClick={(e) => {
+                                  // console.log(item);
+                                  setProductFormData({
+                                    product_name: item?.product_name,
+                                    product_desc: item?.product_desc,
+                                    slug: item?.slug,
+                                    price_wholesale: item?.price_wholesale,
+                                    price_retail: item?.price_retail,
+                                    mrp: item?.mrp,
+                                    _id: item?._id,
+                                  });
+                                  setTags({
+                                    ...tags,
+                                    value: item?.metadata
+                                      ? item?.metadata?.map((t) => {
+                                          return { label: t, value: t };
+                                        })
+                                      : [],
+                                  });
+                                  // e.preventDefault();
+                                  // setDeleteConfirmation(item);
+                                }}
+                                className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-blue-500 shadow-lg mx-2 ${
+                                  updateSingleProductIsLoading && 'loading'
+                                }`}
+                              >
+                                {!updateSingleProductIsLoading && 'Update '}
+                                &nbsp;
+                                {!updateSingleProductIsLoading && <FiEdit />}
+                              </label>
+                            </td>
+                          )}
+                          {user?.role == 'admin' && (
+                            <td className="w-[150px] p-0 ">
+                              <label
+                                htmlFor="my-modal"
+                                onClick={(e) => {
+                                  // e.preventDefault();
+                                  setDeleteConfirmation(item);
+                                }}
+                                className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
+                                  deleteProductIsLoading &&
+                                  deleteConfirmation?._id === item?._id &&
+                                  'loading'
+                                }`}
+                              >
+                                &nbsp;
+                                {deleteProductIsLoading &&
+                                deleteConfirmation?._id === item?._id ? null : (
+                                  <span className="flex">
+                                    Delete &nbsp;
+                                    <FiTrash2 />
+                                  </span>
+                                )}
+                              </label>
+                            </td>
+                          )}
                         </tr>
                       ))
                   )}
@@ -857,7 +864,9 @@ const Products = () => {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>You have Scrolled through all the data!</span>
+                <span className="font-semibold">
+                  You have Scrolled through all the data!
+                </span>
               </div>
             </div>
           </div>
@@ -878,7 +887,7 @@ const Products = () => {
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
-                <span>!Items Not Found</span>
+                <span className="font-semibold">!Items Not Found</span>
               </div>
             </div>
           </div>

@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { FiShoppingCart } from 'react-icons/fi';
-import { BsChatLeft } from 'react-icons/bs';
-import { RiNotification3Line } from 'react-icons/ri';
+import { RiMessage2Line, RiNotification3Line } from 'react-icons/ri';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-
-import avatar from '../data/avatar.jpg';
 import { Cart, Chat, Notification, UserProfile } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import { useSelector } from 'react-redux';
+import Select from 'react-select';
+import { useMutation, useQuery } from 'react-query';
+import { userRequest } from '../requestMethods';
 
 const NavButton = ({
   title,
@@ -50,6 +50,9 @@ const Navbar = ({ notificationData }) => {
     setScreenSize,
     screenSize,
   } = useStateContext();
+  const [selectedCategory, setSelectedCategory] = useState({});
+  const [message, setMessage] = useState('');
+  const wholesellerMessageModalRef = useRef();
   const { user } = useSelector((state) => state?.user?.currentUser);
   const cartItems = useSelector((state) => state?.ordersState?.orders);
   const notifications = notificationData?.data;
@@ -77,9 +80,52 @@ const Navbar = ({ notificationData }) => {
     (m) => m.isSeen === false
   ).length;
 
+  const isUserAllowed = () => {
+    if (user?.role === 'admin' || user?.role === 'employee') {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const closeMessageModal = () => {
+    setSelectedCategory({});
+    setMessage('');
+    wholesellerMessageModalRef.current.checked = false;
+  };
+
+  const { isLoading: categoryLoading, data: categoryData } = useQuery(
+    'categoriesList',
+    async () => await userRequest.get('/category').then((res) => res?.data),
+    {
+      enabled: isUserAllowed(),
+    }
+  );
+
+  const options = categoryData?.map((item) => {
+    return {
+      value: item._id,
+      label: item.name,
+    };
+  });
+
+  const { isLoading: isMSGSendLoading, mutateAsync: sendMessage } = useMutation(
+    async () =>
+      await userRequest.post('/wholesellers/sendNotificationByCategoty', {
+        categoryId: selectedCategory?.value,
+        message,
+      }),
+    {
+      onSuccess: () => {
+        closeMessageModal();
+      },
+      enabled: isUserAllowed(),
+    }
+  );
+
   return (
     <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative ">
-      <div>
+      <div className="flex items-center gap-2">
         <NavButton
           title="Menu"
           customFunc={handleActiveMenu}
@@ -111,10 +157,21 @@ const Navbar = ({ notificationData }) => {
           color={currentColor}
           icon={<RiNotification3Line />}
         />
+        {isUserAllowed() && (
+          <label
+            htmlFor="wholesellerMessageModal"
+            className="btn btn-circle bg-inherit hover:bg-white border-none"
+          >
+            <RiMessage2Line
+              className="text-xl"
+              style={{ color: currentColor }}
+            />
+          </label>
+        )}
       </div>
 
       <div
-        className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
+        className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg ml-2"
         onClick={() => handleClick('userProfile')}
       >
         {/* <img
@@ -145,6 +202,74 @@ const Navbar = ({ notificationData }) => {
       {isClicked.chat && <Chat />}
       {isClicked.notification && <Notification notifications={notifications} />}
       {isClicked.userProfile && <UserProfile />}
+
+      <input
+        ref={wholesellerMessageModalRef}
+        type="checkbox"
+        id="wholesellerMessageModal"
+        className="modal-toggle"
+      />
+      <div className="modal">
+        <div className="modal-box relative">
+          <label
+            onClick={closeMessageModal}
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+          >
+            ✕
+          </label>
+          <h3 className="text-lg font-bold">Send Message</h3>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (selectedCategory?.value && isUserAllowed()) {
+                sendMessage();
+              }
+            }}
+            className="py-4"
+          >
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Select Category</span>
+              </label>{' '}
+              <Select
+                value={selectedCategory}
+                required
+                onChange={setSelectedCategory}
+                options={options}
+                isDisabled={categoryLoading}
+                isLoading={categoryLoading}
+              />
+              <p className="text-red-500 text-md font-semibold">
+                {!selectedCategory?.value && 'Please select a category'}
+              </p>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Message</span>
+              </label>
+              <textarea
+                required
+                name="message"
+                value={message}
+                className="textarea textarea-bordered"
+                placeholder="Type Message..."
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
+            <div className="modal-action">
+              <button
+                tpye="submit"
+                htmlFor="wholesellerMessageModal"
+                className={`btn ${isMSGSendLoading && 'loading'}`}
+                disabled={isMSGSendLoading}
+              >
+                Send
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

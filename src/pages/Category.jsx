@@ -21,7 +21,6 @@ const Categories = () => {
   const [categoriesFormData, setCategoriesFormData] = React.useState({
     name: '',
     description: '',
-    slug: '',
     imageLink: '',
     _id: '',
   });
@@ -75,6 +74,9 @@ const Categories = () => {
         categoryFormModelRef.current.checked = false;
         resetFormData();
       },
+      onError: ({ response }) => {
+        toast.error(response?.data?.message);
+      },
     });
 
   const updateCategoryApiCall = async (data) => {
@@ -114,7 +116,7 @@ const Categories = () => {
     data: categoryData,
     isLoading: categoryIsLoading,
     refetch: categoryRefetch,
-  } = useQuery(['categories'], () => userRequest.get('/category'));
+  } = useQuery(['categories'], async () => await userRequest.get('/category'));
 
   //Locked Categories for wholeseller api
   const lockedCategories = async ({ pageParam = 1 }) => {
@@ -374,13 +376,13 @@ const Categories = () => {
       value: categoriesFormData.category_name,
     },
 
-    {
-      name: 'slug',
-      label: 'Slug',
-      type: 'text',
-      placeholder: 'Enter Unique Slug',
-      value: categoriesFormData.slug,
-    },
+    // {
+    //   name: 'slug',
+    //   label: 'Slug',
+    //   type: 'text',
+    //   placeholder: 'Enter Unique Slug',
+    //   value: categoriesFormData.slug,
+    // },
     {
       name: 'imageLink',
       label: 'Image Link',
@@ -715,8 +717,8 @@ const Categories = () => {
             </h1>
 
             {user?.role == 'admin' && (
-              <div className="flex items-center justify-between flex-wrap gap-2 ">
-                <div className="h-max relative w-max text-center md:mt-0 md:mb-0 mt-8 md:max-w-[230px] ">
+              <div className="flex items-center justify-between flex-wrap gap-2 md:w-max w-full">
+                <div className="h-max relative text-center md:mt-0 md:mb-0 mt-8 md:max-w-[230px] w-full ">
                   <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
                     {!uploadCategoriesIsLoading ? (
                       'Upload excel sheet'
@@ -741,7 +743,7 @@ const Categories = () => {
                     background: currentColor,
                   }}
                   type="button"
-                  className="text-white btn border-0 btn-sm mt-auto md:w-max w-full"
+                  className="text-white btn border-0 btn-sm mt-auto md:w-max flex-grow"
                 >
                   <svg
                     className="fill-current w-4 h-4 mr-2"
@@ -756,7 +758,7 @@ const Categories = () => {
                     background: currentColor,
                   }}
                   htmlFor="my-modal-3"
-                  className="text-white btn border-0 btn-sm mt-auto md:w-max w-full"
+                  className="text-white btn border-0 btn-sm mt-auto md:w-max flex-grow"
                 >
                   Add Category
                 </label>
@@ -862,7 +864,9 @@ const Categories = () => {
                           />
                         </svg>
 
-                        <span>Your Categories Loaded</span>
+                        <span className="font-semibold">
+                          Your Categories Loaded
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -883,7 +887,7 @@ const Categories = () => {
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           ></path>
                         </svg>
-                        <span>!Items Not Found</span>
+                        <span className="font-semibold">!Items Not Found</span>
                       </div>
                     </div>
                   </div>
@@ -981,7 +985,9 @@ const Categories = () => {
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                               ></path>
                             </svg>
-                            <span>!Items Not Found</span>
+                            <span className="font-semibold">
+                              !Items Not Found
+                            </span>
                           </div>
                         </div>
                       </div>

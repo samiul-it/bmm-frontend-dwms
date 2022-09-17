@@ -15,6 +15,34 @@ import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import EmptyCartIMG from '../../assets/empty-cart.png';
 
+export const DropDown = (props) => {
+  const options = props?.options?.length > 0 && [
+    { label: 'Select All', value: 'all' },
+    ...props?.options,
+  ];
+
+  return (
+    <div className={`react-select-wrapper ${props?.multi ? 'multi' : ''}`}>
+      <Select
+        classNamePrefix="select"
+        name="catagory"
+        options={options}
+        isMulti
+        value={props?.value ? props?.value : null}
+        onChange={(selected) => {
+          props?.multi &&
+          selected.length &&
+          selected.find((option) => option.value === 'all')
+            ? props.handleChange(options.slice(1))
+            : !props.multi
+            ? props.handleChange((selected && selected.value) || null)
+            : props.handleChange(selected);
+        }}
+      />
+    </div>
+  );
+};
+
 const ConfirmOrder = () => {
   const { orders } = useSelector((state) => state.ordersState);
   const dispatch = useDispatch();
@@ -197,7 +225,7 @@ const ConfirmOrder = () => {
                             {item?.product?.product_name}
                           </span>
                           <span className="font-bold text-gray-700 dark:text-gray-300 text-xs">
-                            Category: {item.product.product_category}
+                            Category: {item?.product?.product_category}
                           </span>
 
                           <span className="font-semibold text-gray-500 dark:text-gray-300 text-xs">
@@ -275,7 +303,9 @@ const ConfirmOrder = () => {
                 <span className="font-semibold text-sm uppercase">
                   Items {orders.length}
                 </span>
-                <span className="font-semibold text-sm">₹{MainTotal}</span>
+                <span className="font-semibold text-sm">
+                  ₹{MainTotal.toFixed(2)}
+                </span>
               </div>
 
               <form
@@ -290,10 +320,23 @@ const ConfirmOrder = () => {
               >
                 {isUserAllowed() && (
                   <>
-                    <Select
+                    {/* <Select
                       isMulti
                       defaultValue={wholesalers}
                       onChange={setWholesalers}
+                      options={options}
+                      required
+                      isDisabled={
+                        isWholesellersListLoading || orders?.length < 1
+                      }
+                      isLoading={isWholesellersListLoading}
+                    /> */}
+
+                    <DropDown
+                      value={wholesalers}
+                      handleChange={setWholesalers}
+                      multi={true}
+                      isMulti
                       options={options}
                       required
                       isDisabled={
@@ -311,9 +354,11 @@ const ConfirmOrder = () => {
                 )}
 
                 <div className="border-t mt-8">
-                  <div className="flex font-semibold justify-between py-6 text-sm uppercase">
+                  <div className="flex justify-between py-6 text-lg font-semibold">
                     <span>Total cost</span>
-                    <span>{MainTotal}</span>
+                    <span className="text-2xl underline">
+                      ₹{MainTotal.toFixed(2)}/-
+                    </span>
                   </div>
                   <button
                     disabled={orders.length > 0 ? false : true}

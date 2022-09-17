@@ -32,7 +32,7 @@ const ActivityLogs = () => {
                 <tr>
                   <th></th>
                   <th>Activity</th>
-                  <th>User Id</th>
+                  {/* <th>User Id</th> */}
                   <th>Date</th>
                   <th>Time</th>
                 </tr>
@@ -53,12 +53,12 @@ const ActivityLogs = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="w-[300px]">
+                      {/* <td className="w-[300px]">
                         <span className="badge">
                           <span className="select-none">#</span>
                           {log?.userId}
                         </span>
-                      </td>
+                      </td> */}
                       <td>{moment(log?.createdAt).format('DD/MM/YYYY')}</td>
                       <td>{moment(log?.createdAt).format('hh:mm A')}</td>
                     </tr>

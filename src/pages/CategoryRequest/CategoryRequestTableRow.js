@@ -1,8 +1,8 @@
-import React from "react";
-import { FaPen } from "react-icons/fa";
-import { userRequest } from "../../requestMethods";
-import { toast } from "react-toastify";
-import { useQuery } from "react-query";
+import React from 'react';
+import { FaPen } from 'react-icons/fa';
+import { userRequest } from '../../requestMethods';
+import { toast } from 'react-toastify';
+import { useQuery } from 'react-query';
 
 const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
   //   console.log(requestItem);
@@ -13,14 +13,16 @@ const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
     data: wholesellerDetails,
     isFetching,
     refetch: wholesellerDetailsRefetch,
-  } = useQuery("wholesellerDetails", () =>
-    userRequest.get(`/wholesellers/id/${requestItem.wholesellerId}`)
+  } = useQuery(
+    'wholesellerDetails',
+    async () =>
+      await userRequest.get(`/wholesellers/id/${requestItem.wholesellerId}`)
   );
 
   // console.log(wholesellerDetails?.data?.name);
 
   const handleDeleteCategoryReq = (id) => {
-    const confirmDelete = window.confirm("Are you Sure?");
+    const confirmDelete = window.confirm('Are you Sure?');
     if (confirmDelete) {
       const url = `/categoryrequest/${id}`;
       userRequest.delete(url);
@@ -37,13 +39,13 @@ const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
         // console.log(response);
         refetch();
         handleDeleteCategoryReq(elementId);
-        toast.success("Categories Updated!");
+        toast.success('Categories Updated!');
         refetch();
         wholesellerDetailsRefetch();
       })
       .catch(function (error) {
         console.log(error);
-        toast.error("Faild to Update Category");
+        toast.error('Faild to Update Category');
       });
   };
   return (
