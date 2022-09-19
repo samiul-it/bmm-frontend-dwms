@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { useMutation, useQuery } from 'react-query';
 import { userRequest } from '../requestMethods';
+import { toast } from 'react-toastify';
+import { DropDown } from './shared/MultipleSelect/MultipleSelect';
 
 const NavButton = ({
   title,
@@ -50,7 +52,8 @@ const Navbar = ({ notificationData }) => {
     setScreenSize,
     screenSize,
   } = useStateContext();
-  const [selectedCategory, setSelectedCategory] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedWholesellers, setSelectedWholesellers] = useState([]);
   const [message, setMessage] = useState('');
   const wholesellerMessageModalRef = useRef();
   const { user } = useSelector((state) => state?.user?.currentUser);
@@ -74,6 +77,10 @@ const Navbar = ({ notificationData }) => {
     }
   }, [screenSize]);
 
+  useEffect(() => {
+    getWholesllersByCategories();
+  }, [selectedCategory]);
+
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
   const unseenMsgCount = notifications?.messages?.filter(
@@ -89,7 +96,7 @@ const Navbar = ({ notificationData }) => {
   };
 
   const closeMessageModal = () => {
-    setSelectedCategory({});
+    setSelectedCategory([]);
     setMessage('');
     wholesellerMessageModalRef.current.checked = false;
   };
@@ -102,26 +109,67 @@ const Navbar = ({ notificationData }) => {
     }
   );
 
-  const options = categoryData?.map((item) => {
-    return {
-      value: item._id,
-      label: item.name,
-    };
-  });
+  const { isLoading: wholesellersListIsLoading, data: wholesellersList } =
+    useQuery(
+      'wholesellersList1',
+      async () =>
+        await userRequest.get('/wholesellers').then((res) => res?.data),
+      {
+        enabled: isUserAllowed(),
+      }
+    );
+
+  const options = (array) => {
+    return array?.map((item) => {
+      return {
+        value: item._id,
+        label: item.name,
+      };
+    });
+  };
 
   const { isLoading: isMSGSendLoading, mutateAsync: sendMessage } = useMutation(
     async () =>
       await userRequest.post('/wholesellers/sendNotificationByCategoty', {
-        categoryId: selectedCategory?.value,
+        wholesellersList: selectedWholesellers?.map((ws) => ws?.value),
         message,
       }),
     {
       onSuccess: () => {
         closeMessageModal();
+        toast.success('Notification sent successfully');
       },
       enabled: isUserAllowed(),
     }
   );
+
+  const {
+    isLoading: getWholesllersByCategoriesISLoading,
+    mutateAsync: getWholesllersByCategories,
+  } = useMutation(
+    async () =>
+      await userRequest
+        .post('/wholesellers/findWholesellerByCategoryId', {
+          id: selectedCategory.map((category) => category?.value),
+        })
+        .then((res) => res?.data),
+    {
+      enabled: isUserAllowed(),
+      onSuccess: (res) => {
+        setSelectedWholesellers(options(res));
+      },
+    }
+  );
+
+  function handleChange(values) {
+    setSelectedCategory(values);
+  }
+  function handleWSSelectChange(values) {
+    setSelectedWholesellers(values);
+    if (values?.length === 0) {
+      setSelectedCategory([]);
+    }
+  }
 
   return (
     <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative ">
@@ -221,7 +269,7 @@ const Navbar = ({ notificationData }) => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (selectedCategory?.value && isUserAllowed()) {
+              if (selectedWholesellers?.length !== 0 && isUserAllowed()) {
                 sendMessage();
               }
             }}
@@ -231,16 +279,49 @@ const Navbar = ({ notificationData }) => {
               <label className="label">
                 <span className="label-text">Select Category</span>
               </label>{' '}
-              <Select
+              <DropDown
                 value={selectedCategory}
-                required
-                onChange={setSelectedCategory}
-                options={options}
-                isDisabled={categoryLoading}
-                isLoading={categoryLoading}
+                options={options(categoryData)}
+                handleChange={handleChange}
+                multi={true}
+                isDisabled={
+                  categoryLoading ||
+                  wholesellersListIsLoading ||
+                  getWholesllersByCategoriesISLoading
+                }
+                isLoading={
+                  categoryLoading ||
+                  wholesellersListIsLoading ||
+                  getWholesllersByCategoriesISLoading
+                }
+              />
+              {/* <p className="text-red-500 text-md font-semibold">
+                {selectedCategory.length === 0 && 'Select a category'}
+              </p> */}
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Select Wholeseller's</span>
+              </label>{' '}
+              <DropDown
+                value={selectedWholesellers}
+                options={options(wholesellersList)}
+                handleChange={handleWSSelectChange}
+                multi={true}
+                isDisabled={
+                  categoryLoading ||
+                  wholesellersListIsLoading ||
+                  getWholesllersByCategoriesISLoading
+                }
+                isLoading={
+                  categoryLoading ||
+                  wholesellersListIsLoading ||
+                  getWholesllersByCategoriesISLoading
+                }
               />
               <p className="text-red-500 text-md font-semibold">
-                {!selectedCategory?.value && 'Please select a category'}
+                {selectedWholesellers.length === 0 && '*Select a wholeseller'}
               </p>
             </div>
 
