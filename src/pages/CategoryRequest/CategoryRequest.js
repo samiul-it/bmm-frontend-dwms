@@ -14,14 +14,19 @@ const CategoryRequest = () => {
     data: requests,
     isFetching,
     refetch,
-  } = useQuery('requests', () => userRequest.get('/categoryrequest'));
+  } = useQuery(
+    'requests',
+    async () => await userRequest.get('/categoryrequest')
+  );
 
   const {
     isLoading: wholesellerRequestsLoading,
     data: wholesellerRequests,
     refetch: wholesellerRequestsFetch,
-  } = useQuery('wholesellerRequests', () =>
-    userRequest.get(`/categoryrequest/wholeseller/${user?._id}`)
+  } = useQuery(
+    'wholesellerRequests',
+    async () =>
+      await userRequest.get(`/categoryrequest/wholeseller/${user?._id}`)
   );
 
   //Delete Category Request Wholeseller

@@ -9,6 +9,7 @@ import Loading from './Loading';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { userRequest } from '../requestMethods';
+import Spinner from '../components/shared/spinner/Spinner';
 
 export const DropDown = (props) => {
   const options = props?.options?.length > 0 && [
@@ -67,10 +68,13 @@ const Wholesellers = () => {
   // Fetching Wholesellers Data
 
   const {
-    isLoading,
+    isLoading: isWholesellersListLoading,
     data: wholesellersList,
     refetch,
-  } = useQuery('wholesellers', () => userRequest.get('/wholesellers/'));
+  } = useQuery(
+    'wholesellers',
+    async () => await userRequest.get('/wholesellers/')
+  );
 
   const {
     isLoading: categoryLoading,
@@ -78,7 +82,7 @@ const Wholesellers = () => {
     data: categoryData,
     isFetching: categoryFetching,
     refetch: categoryRefetch,
-  } = useQuery('category', () => userRequest.get('/category'));
+  } = useQuery('category', async () => await userRequest.get('/category'));
 
   const categoryIds =
     typeof selectedOption === 'object' &&
@@ -153,12 +157,6 @@ const Wholesellers = () => {
         console.log(error);
       });
   };
-
-  //Data Loading
-
-  if (isLoading) {
-    return <Loading></Loading>;
-  }
 
   //Exporting or Dowloading Data
 
@@ -260,120 +258,126 @@ const Wholesellers = () => {
   return (
     <div className="container mx-auto max-w-[95%]">
       <Header category="Page" title="Wholesellers" />
-      {/* File Upload  */}
-      <div className="flex items-center	m-3 ">
-        <input
-          onChange={fileSubmit}
-          type="file"
-          className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#07406b]"
-        />
+      {isWholesellersListLoading ? (
+        <div className="flex justify-center items-center w-full h-[70vh]">
+          <Spinner />
+        </div>
+      ) : (
+        <>
+          {/* File Upload  */}
+          <div className="flex items-center	m-3 ">
+            <input
+              onChange={fileSubmit}
+              type="file"
+              className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#07406b]"
+            />
 
-        <button
-          className="btn  btn-sm rounded-full ml-2 mr-2 bg-[#1a97f5] border-0 text-slate-50 "
-          onClick={updateToDb}
-        >
-          Update Database
-        </button>
+            <button
+              className="btn  btn-sm rounded-full ml-2 mr-2 bg-[#1a97f5] border-0 text-slate-50 "
+              onClick={updateToDb}
+            >
+              Update Database
+            </button>
 
-        {/* Adding Wholeseller  */}
+            {/* Adding Wholeseller  */}
 
-        <label
-          htmlFor="my-modal-3"
-          className="btn  btn-sm rounded-full  bg-[#1a97f5] border-0 text-slate-50"
-        >
-          Add Wholeseller
-        </label>
-
-        <input
-          ref={modalRef}
-          type="checkbox"
-          id="my-modal-3"
-          className="modal-toggle"
-        />
-        <div className="modal">
-          <div className="modal-box relative">
             <label
               htmlFor="my-modal-3"
-              className="btn btn-sm btn-circle absolute right-2 top-2"
-              onClick={(e) => {
-                e.preventDefault();
-                (modalRef.current.checked = false), resetFormData();
-              }}
+              className="btn  btn-sm rounded-full  bg-[#1a97f5] border-0 text-slate-50"
             >
-              ✕
+              Add Wholeseller
             </label>
-            <h3 className="font-bold text-lg">Enter Wholeseller Details</h3>
 
-            <div className="card-body">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  wholesellerFormData._id
-                    ? updateWholesellerApi()
-                    : handleWholesellerInfo(e);
-                }}
-              >
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Wholesellers Name</span>
-                  </label>
-                  <input
-                    // ref={nameRef}
-                    onChange={(e) => {
-                      setWholesellerFormData({
-                        ...wholesellerFormData,
-                        name: e.target.value,
-                      });
-                    }}
-                    value={wholesellerFormData.name}
-                    type="text"
-                    placeholder="Name"
-                    className="input input-bordered"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Email</span>
-                  </label>
-                  <input
-                    // ref={emailRef}
-                    onChange={(e) => {
-                      setWholesellerFormData({
-                        ...wholesellerFormData,
-                        email: e.target.value,
-                      });
-                    }}
-                    disabled={wholesellerFormData._id ? true : false}
-                    value={wholesellerFormData.email}
-                    type="email"
-                    placeholder="Email"
-                    className="input input-bordered"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Contact</span>
-                  </label>
-                  <input
-                    // ref={phoneRef}
-                    onChange={(e) => {
-                      setWholesellerFormData({
-                        ...wholesellerFormData,
-                        phone: e.target.value,
-                      });
-                    }}
-                    value={wholesellerFormData.phone}
-                    type="number"
-                    disabled={wholesellerFormData._id ? true : false}
-                    placeholder="Phone"
-                    className="input input-bordered"
-                  />
-                </div>
-                {/* <div className="form-control"> */}
-                <label className="label">
-                  <span className="label-text">Catagory</span>
+            <input
+              ref={modalRef}
+              type="checkbox"
+              id="my-modal-3"
+              className="modal-toggle"
+            />
+            <div className="modal">
+              <div className="modal-box relative">
+                <label
+                  htmlFor="my-modal-3"
+                  className="btn btn-sm btn-circle absolute right-2 top-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    (modalRef.current.checked = false), resetFormData();
+                  }}
+                >
+                  ✕
                 </label>
-                {/* <Select
+                <h3 className="font-bold text-lg">Enter Wholeseller Details</h3>
+
+                <div className="card-body">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      wholesellerFormData._id
+                        ? updateWholesellerApi()
+                        : handleWholesellerInfo(e);
+                    }}
+                  >
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Wholesellers Name</span>
+                      </label>
+                      <input
+                        // ref={nameRef}
+                        onChange={(e) => {
+                          setWholesellerFormData({
+                            ...wholesellerFormData,
+                            name: e.target.value,
+                          });
+                        }}
+                        value={wholesellerFormData.name}
+                        type="text"
+                        placeholder="Name"
+                        className="input input-bordered"
+                      />
+                    </div>
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Email</span>
+                      </label>
+                      <input
+                        // ref={emailRef}
+                        onChange={(e) => {
+                          setWholesellerFormData({
+                            ...wholesellerFormData,
+                            email: e.target.value,
+                          });
+                        }}
+                        disabled={wholesellerFormData._id ? true : false}
+                        value={wholesellerFormData.email}
+                        type="email"
+                        placeholder="Email"
+                        className="input input-bordered"
+                      />
+                    </div>
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Contact</span>
+                      </label>
+                      <input
+                        // ref={phoneRef}
+                        onChange={(e) => {
+                          setWholesellerFormData({
+                            ...wholesellerFormData,
+                            phone: e.target.value,
+                          });
+                        }}
+                        value={wholesellerFormData.phone}
+                        type="number"
+                        disabled={wholesellerFormData._id ? true : false}
+                        placeholder="Phone"
+                        className="input input-bordered"
+                      />
+                    </div>
+                    {/* <div className="form-control"> */}
+                    <label className="label">
+                      <span className="label-text">Catagory</span>
+                    </label>
+                    {/* <Select
                   className="block w-full rounded shadow leading-tight focus:outline-none focus:shadow-outline"
                   value={selectedOption}
                   isMulti
@@ -382,87 +386,87 @@ const Wholesellers = () => {
                   options={catagories}
                   classNamePrefix="select"
                 /> */}
-                <DropDown
-                  value={selectedOption}
-                  options={catagories}
-                  handleChange={handleChange}
-                  multi={true}
-                />
-                {/* </div> */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Place</span>
-                  </label>
-                  <input
-                    // ref={phoneRef}
-                    onChange={(e) => {
-                      setWholesellerFormData({
-                        ...wholesellerFormData,
-                        place: e.target.value,
-                      });
-                    }}
-                    value={wholesellerFormData.place}
-                    type="text"
-                    // disabled={wholesellerFormData._id ? true : false}
-                    placeholder="Place"
-                    className="input input-bordered"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Address</span>
-                  </label>
-                  <textarea
-                    onChange={(e) => {
-                      setWholesellerFormData({
-                        ...wholesellerFormData,
-                        address: e.target.value,
-                      });
-                    }}
-                    value={wholesellerFormData.address}
-                    type="address"
-                    // disabled={wholesellerFormData._id ? true : false}
-                    placeholder="Address"
-                    className="textarea textarea-bordered"
-                  />
-                </div>
+                    <DropDown
+                      value={selectedOption}
+                      options={catagories}
+                      handleChange={handleChange}
+                      multi={true}
+                    />
+                    {/* </div> */}
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Place</span>
+                      </label>
+                      <input
+                        // ref={phoneRef}
+                        onChange={(e) => {
+                          setWholesellerFormData({
+                            ...wholesellerFormData,
+                            place: e.target.value,
+                          });
+                        }}
+                        value={wholesellerFormData.place}
+                        type="text"
+                        // disabled={wholesellerFormData._id ? true : false}
+                        placeholder="Place"
+                        className="input input-bordered"
+                      />
+                    </div>
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text">Address</span>
+                      </label>
+                      <textarea
+                        onChange={(e) => {
+                          setWholesellerFormData({
+                            ...wholesellerFormData,
+                            address: e.target.value,
+                          });
+                        }}
+                        value={wholesellerFormData.address}
+                        type="address"
+                        // disabled={wholesellerFormData._id ? true : false}
+                        placeholder="Address"
+                        className="textarea textarea-bordered"
+                      />
+                    </div>
 
-                <div className="form-control mt-6">
-                  <button type="submit" className="btn btn-primary">
-                    {wholesellerFormData._id ? 'update' : 'Submit'}
-                  </button>
+                    <div className="form-control mt-6">
+                      <button type="submit" className="btn btn-primary">
+                        {wholesellerFormData._id ? 'update' : 'Submit'}
+                      </button>
+                    </div>
+                  </form>
+                  <div className="form-control mt-6">
+                    <button
+                      onClick={() => {
+                        handleModalClose(), resetFormData();
+                      }}
+                      className="btn bg-orange-600"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </form>
-              <div className="form-control mt-6">
-                <button
-                  onClick={() => {
-                    handleModalClose(), resetFormData();
-                  }}
-                  className="btn bg-orange-600"
-                >
-                  Cancel
-                </button>
               </div>
             </div>
+
+            {/* Download Wholesellers List  */}
+            <button
+              className="btn  btn-sm rounded-full ml-2 bg-[#1a97f5] border-0 text-slate-50 "
+              onClick={exportToCSV}
+            >
+              Download
+            </button>
           </div>
-        </div>
-
-        {/* Download Wholesellers List  */}
-        <button
-          className="btn  btn-sm rounded-full ml-2 bg-[#1a97f5] border-0 text-slate-50 "
-          onClick={exportToCSV}
-        >
-          Download
-        </button>
-      </div>
-
-      {/* Creating Wholesellers Table and Passing Data  */}
-
-      <WholesellersTable
-        updateHandler={updateHandler}
-        wholesellersList={wholesellersList?.data}
-        refetch={refetch}
-      ></WholesellersTable>
+          {/* Creating Wholesellers Table and Passing Data  */}
+          <WholesellersTable
+            updateHandler={updateHandler}
+            wholesellersList={wholesellersList?.data}
+            refetch={refetch}
+          ></WholesellersTable>
+        </>
+      )}
     </div>
   );
 };

@@ -1,20 +1,20 @@
-import React, { useRef, useState } from "react";
-import { useEffect } from "react";
-import { BsFillPencilFill } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { useStateContext } from "../../contexts/ContextProvider";
-import { getUser } from "../../redux/apiCalls";
-import { userRequest } from "../../requestMethods";
-import Header from "./../../components/Header";
-import Select from "react-select";
-import { useQuery } from "react-query";
+import React, { useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { BsFillPencilFill } from 'react-icons/bs';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { useStateContext } from '../../contexts/ContextProvider';
+import { getUser } from '../../redux/apiCalls';
+import { userRequest } from '../../requestMethods';
+import Header from './../../components/Header';
+import Select from 'react-select';
+import { useQuery } from 'react-query';
 
 const UserProfileDetails = () => {
   const { user } = useSelector((state) => state.user.currentUser);
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const passModalRef = useRef();
   const categoryModalRef = useRef();
   const { currentColor } = useStateContext();
@@ -33,13 +33,13 @@ const UserProfileDetails = () => {
     data: categoryData,
     isFetching: categoryFetching,
     refetch: categoryRefetch,
-  } = useQuery("category", () => userRequest.get("/category"));
+  } = useQuery('category', async () => await userRequest.get('/category'));
 
   const handleModalToggle = () => {
     passModalRef.current.checked = false;
-    setPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    setPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
   };
 
   const handleModalClose = () => {
@@ -61,7 +61,7 @@ const UserProfileDetails = () => {
     e.preventDefault();
     // console.log(password, newPassword, confirmPassword);
     if (newPassword === confirmPassword) {
-      if (user.role == "wholeseller") {
+      if (user.role == 'wholeseller') {
         setIsLoading(true);
         userRequest
           .put(`/wholesellers/reset-pass/${user._id}`, {
@@ -71,12 +71,12 @@ const UserProfileDetails = () => {
           .then(function (response) {
             // console.log(response);
             handleModalToggle();
-            toast.success("Password Changed Successfully");
+            toast.success('Password Changed Successfully');
             setIsLoading(false);
           })
           .catch(function (error) {
             // console.log(error);
-            toast.error("Failed to Change Password");
+            toast.error('Failed to Change Password');
             setIsLoading(false);
           });
       } else {
@@ -89,12 +89,12 @@ const UserProfileDetails = () => {
           .then(function (response) {
             // console.log(response);
             handleModalToggle();
-            toast.success("Password Changed Successfully");
+            toast.success('Password Changed Successfully');
             setIsLoading(false);
           })
           .catch(function (error) {
             // console.log(error);
-            toast.error("Failed to Change Password");
+            toast.error('Failed to Change Password');
             setIsLoading(false);
           });
       }
@@ -137,12 +137,12 @@ const UserProfileDetails = () => {
         // console.log(response);
         categoryRefetch();
         handleModalClose();
-        toast.success("New Category Request Sent");
+        toast.success('New Category Request Sent');
         // modalRef.current.checked = false;
       })
       .catch(function (error) {
         console.log(error);
-        toast.error("Faild to Send Category Request");
+        toast.error('Faild to Send Category Request');
       });
   };
 
@@ -153,20 +153,20 @@ const UserProfileDetails = () => {
   const updateUserDetailsHandler = (e) => {
     e.preventDefault();
     // console.log(userDetails);
-    if (userDetails.role == "wholeseller") {
+    if (userDetails.role == 'wholeseller') {
       setIsLoading(true);
       userRequest
         .put(`/wholesellers/${userDetails._id}`, userDetails)
         .then(function (response) {
           // console.log(response);
           closeUserDetailsModal();
-          toast.success("User Details Updated Successfully");
+          toast.success('User Details Updated Successfully');
           getUser(dispatch);
           setIsLoading(false);
         })
         .catch(function (error) {
           // console.log(error);
-          toast.error("Failed to Update User Details");
+          toast.error('Failed to Update User Details');
           setIsLoading(false);
         })
         .finally(function () {
@@ -180,13 +180,13 @@ const UserProfileDetails = () => {
         .then(function (response) {
           // console.log(response);
           closeUserDetailsModal();
-          toast.success("User Details Updated Successfully");
+          toast.success('User Details Updated Successfully');
           getUser(dispatch);
           setIsLoading(false);
         })
         .catch(function (error) {
           // console.log(error);
-          toast.error("Failed to Update User Details");
+          toast.error('Failed to Update User Details');
           setIsLoading(false);
         })
         .finally(function () {
@@ -224,12 +224,12 @@ const UserProfileDetails = () => {
               <strong>Username:</strong> <span>{user.name}</span>
             </h4>
             <h4 className=" my-2  w-max">
-              {" "}
+              {' '}
               <strong>Email:</strong> {user.email} <span></span>
             </h4>
             {/* <h4 className="">Role: {user.role}</h4> */}
             <h4 className=" my-2 w-max">
-              {" "}
+              {' '}
               <strong>Phone:</strong> +91 {user.phone}
             </h4>
 
@@ -249,7 +249,7 @@ const UserProfileDetails = () => {
             <div className="flex items-center my-2 w-max">
               <strong>Categories:</strong>
               <div className="max-w-80">
-                {user.role !== "admin" ? (
+                {user.role !== 'admin' ? (
                   user?.catagories.map((cat, i) => (
                     <span key={i} className="badge badge-primary mx-1">
                       {cat?.categoryName}
@@ -260,7 +260,7 @@ const UserProfileDetails = () => {
                 )}
               </div>
 
-              {user?.role == "wholeseller" && (
+              {user?.role == 'wholeseller' && (
                 <label
                   htmlFor="my-modal-3"
                   className="btn modal-button btn-warning btn-xs my-4 mr-auto"
@@ -339,7 +339,7 @@ const UserProfileDetails = () => {
                   type="submit"
                   // htmlFor="password-model"
                   className={
-                    "btn bg-blue-600 text-white hover:bg-blue-500 border-0"
+                    'btn bg-blue-600 text-white hover:bg-blue-500 border-0'
                   }
                 >
                   Submit
@@ -440,7 +440,7 @@ const UserProfileDetails = () => {
                   disabled={isLoading}
                   type="submit"
                   className={
-                    "btn bg-blue-600 text-white hover:bg-blue-500 border-0"
+                    'btn bg-blue-600 text-white hover:bg-blue-500 border-0'
                   }
                 >
                   Submit
