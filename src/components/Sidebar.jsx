@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { SiShopware } from 'react-icons/si';
-import { MdOutlineCancel } from 'react-icons/md';
+import { MdAdminPanelSettings, MdOutlineCancel } from 'react-icons/md';
 
 import { useStateContext } from '../contexts/ContextProvider';
 import { useSelector } from 'react-redux';
@@ -50,7 +50,7 @@ const Sidebar = () => {
         {
           name: 'employees',
           route: '/employees',
-          icon: <IoMdContacts />,
+          icon: <MdAdminPanelSettings />,
         },
         {
           name: "Activity Log's",

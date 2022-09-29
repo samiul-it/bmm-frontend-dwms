@@ -42,7 +42,7 @@ const NavButton = ({
   </button>
 );
 
-const Navbar = ({ notificationData }) => {
+const Navbar = ({ notificationData, refetchNotifications }) => {
   const {
     currentColor,
     activeMenu,
@@ -80,6 +80,10 @@ const Navbar = ({ notificationData }) => {
   useEffect(() => {
     getWholesllersByCategories();
   }, [selectedCategory]);
+
+  useEffect(() => {
+    refetchNotifications();
+  }, [isClicked?.notification]);
 
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
@@ -248,7 +252,12 @@ const Navbar = ({ notificationData }) => {
 
       {isClicked.cart && <Cart />}
       {isClicked.chat && <Chat />}
-      {isClicked.notification && <Notification notifications={notifications} />}
+      {isClicked.notification && (
+        <Notification
+          unseenMsgCount={unseenMsgCount}
+          notifications={notifications}
+        />
+      )}
       {isClicked.userProfile && <UserProfile />}
 
       <input

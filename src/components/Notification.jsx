@@ -4,13 +4,24 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { Button } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import moment from 'moment';
+import { userRequest } from '../requestMethods';
 
-const Notification = ({ notifications }) => {
+const Notification = ({ notifications, unseenMsgCount }) => {
   const { currentColor } = useStateContext();
 
-  const unseenMsgCount = notifications?.messages?.filter(
-    (m) => m.isSeen === false
-  ).length;
+  // const unseenMsgCount = notifications?.messages?.filter(
+  //   (m) => m.isSeen === false
+  // ).length;
+
+  useEffect(() => {
+    return () => {
+      if (unseenMsgCount >= 0) {
+        userRequest.put('notification/updateIsSeen').then((res) => {
+          console.log(res);
+        });
+      }
+    };
+  }, [unseenMsgCount]);
 
   return (
     <div className="nav-item absolute left-5 md:right-40 top-16 bg-white dark:bg-[#42464D] p-8 rounded-lg w-96">
@@ -19,12 +30,10 @@ const Notification = ({ notifications }) => {
           <p className="font-semibold text-lg dark:text-gray-200">
             Notifications
           </p>
-          <button
-            type="button"
-            className="text-white text-xs rounded p-1 px-2 bg-orange-theme "
-          >
+
+          <h1 className="text-sm text-gray-500 font-semibold">
             {unseenMsgCount} New
-          </button>
+          </h1>
         </div>
         <Button
           icon={<MdOutlineCancel />}
@@ -39,8 +48,13 @@ const Notification = ({ notifications }) => {
           ?.map((item, index) => (
             <div
               key={index}
-              className="flex items-center leading-8 gap-5 p-3 relative border-b border-color"
+              className="flex items-center leading-8 gap-5 p-3 relative border-b border-color "
             >
+              {!item?.isSeen && (
+                <span className="text-blue-500 absolute top-1 right-1 font-bold text-xs">
+                  New
+                </span>
+              )}
               <div>
                 <p className="text-gray-500 dark:text-gray-400 font-semibold">
                   {item?.message}
@@ -53,7 +67,7 @@ const Notification = ({ notifications }) => {
           ))
           ?.reverse()}
       </div>
-      <div className="mt-5">
+      {/* <div className="mt-5">
         <Button
           color="white"
           bgColor={currentColor}
@@ -61,7 +75,7 @@ const Notification = ({ notifications }) => {
           borderRadius="10px"
           width="full"
         />
-      </div>
+      </div> */}
     </div>
   );
 };

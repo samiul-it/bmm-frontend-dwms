@@ -146,7 +146,10 @@ const App = () => {
           >
             {user?.token ? (
               <div className="bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-                <Navbar notificationData={notificationData} />
+                <Navbar
+                  notificationData={notificationData}
+                  refetchNotifications={refetchNotifications}
+                />
               </div>
             ) : (
               ''

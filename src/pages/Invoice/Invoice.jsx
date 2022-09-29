@@ -1,9 +1,9 @@
 import moment from 'moment';
 import React, { useRef } from 'react';
-import { FiDownload } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload } from 'react-icons/fi';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { userRequest } from '../../requestMethods';
 import ReactToPrint from 'react-to-print';
 import './invoice.css';
@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 const Invoice = () => {
   const { orderId } = useParams();
   const user = useSelector((state) => state?.user?.currentUser?.user);
+  const navigate = useNavigate();
   const componentRef = useRef();
   const {
     data: orderDetails,
@@ -47,7 +48,14 @@ const Invoice = () => {
 
   return (
     <div className="container mx-auto max-w-[95%]">
-      <div className="flex justify-end ">
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 font-semibold flex items-center"
+        >
+          <FiArrowLeft className="text-2xl" />{' '}
+          <span className="text-lg ml-2 underline">Go Back</span>
+        </button>
         <ReactToPrint
           trigger={() => (
             <button className="btn btn-sm btn-white m-b-10 p-l-5">
@@ -133,7 +141,7 @@ const Invoice = () => {
                   <tbody>
                     {orderDetails?.products?.map((item, i) => {
                       return (
-                        <tr key={i} className="hover">
+                        <tr key={i}>
                           <td>{i + 1}</td>
                           <td>{item?.product?.product_name}</td>
                           <td>
