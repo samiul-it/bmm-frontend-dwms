@@ -5,16 +5,20 @@ import { userRequest } from "../../requestMethods";
 import Loading from "../Loading";
 import CategoryRequestTableRow from "./CategoryRequestTableRow";
 import { useSelector } from "react-redux";
+import { useStateContext } from "../../contexts/ContextProvider";
 
 const CategoryRequest = () => {
   const user = useSelector((state) => state?.user?.currentUser?.user);
+  const { currentColor } = useStateContext();
   const {
-    isLoading,
+    isLoading: requestLoading,
     error,
     data: requests,
     isFetching,
-    refetch,
+    refetch: requestRefetch,
   } = useQuery("requests", () => userRequest.get("/categoryrequest"));
+
+  // console.log(requests?.data);
 
   const {
     isLoading: wholesellerRequestsLoading,
@@ -24,27 +28,24 @@ const CategoryRequest = () => {
     userRequest.get(`/categoryrequest/wholeseller/${user?._id}`)
   );
 
-  //Delete Category Request Wholeseller 
-  const handleDeleteCategoryReq = (id) => {
-    const confirmDelete = window.confirm("Are you Sure?");
-    if (confirmDelete) {
-      const url = `/categoryrequest/${id}`;
-      userRequest.delete(url);
-    }
-    refetch();
-  };
-
-  // console.log(wholesellerRequests);
-
-  if (isLoading) {
+  if (requestLoading) {
     return <Loading></Loading>;
   }
 
-  // console.log(requests);
+  //Delete Category Request Wholeseller
+  const handleDeleteCategoryReq = async (id) => {
+    const confirmDelete = window.confirm("Are you Sure?");
+    console.log(confirmDelete);
+    if (confirmDelete) {
+      const url = `/categoryrequest/${id}`;
+      await userRequest.delete(url);
+      wholesellerRequestsFetch();
+    }
+  };
 
   return (
     <div>
-      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+      <div className="w-full  px-6">
         <Header category="Page" title="Category Requests" />
 
         {user?.role == "admin" && (
@@ -67,9 +68,34 @@ const CategoryRequest = () => {
                     key={requestItem._id}
                     requestItem={requestItem}
                     index={index}
-                    refetch={refetch}
+                    requestRefetch={requestRefetch}
+                    requests={requests}
                   ></CategoryRequestTableRow>
                 ))}
+                {requests?.data?.length > 0 ? (
+                  <tr>
+                    <td></td>
+                    <td className="text-green-600 ">
+                      Total Active Requests:
+                      {requests?.data?.length}
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td className="text-orange-600"> No Requests!</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -103,8 +129,15 @@ const CategoryRequest = () => {
                     <td>{wholesellerRequests?.data?.status}</td>
                     <td>
                       <button
-                        onClick={()=>handleDeleteCategoryReq(wholesellerRequests?.data?._id)}
+                        onClick={() =>
+                          handleDeleteCategoryReq(
+                            wholesellerRequests?.data?._id
+                          )
+                        }
                         className="btn btn-primary btn-sm"
+                        style={{
+                          backgroundColor: currentColor,
+                        }}
                       >
                         Delete
                       </button>

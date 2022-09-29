@@ -14,6 +14,7 @@ import { useStateContext } from "../contexts/ContextProvider";
 import Spinner from "../components/shared/spinner/Spinner";
 import { AiFillLock } from "react-icons/ai";
 import Select from "react-select";
+import Loading from "./Loading";
 
 const Categories = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
@@ -257,6 +258,9 @@ const Categories = () => {
     // if (e.target.value === '') {
     //   refetchInfiniteProducts();
     // }
+
+    // console.log(e.target.value);
+
     refetchInfiniteCategories();
   };
 
@@ -515,6 +519,7 @@ const Categories = () => {
               className="block p-3 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search Category"
             />
+
             <button
               type="submit"
               className="text-white absolute right-2 bottom-[5px] bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

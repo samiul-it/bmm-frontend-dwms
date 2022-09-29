@@ -6,6 +6,7 @@ import moment from 'moment';
 import Spinner from '../../components/shared/spinner/Spinner';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Header } from '../../components';
 
 const OrdersPage = () => {
   const getAllOrdersApi = async () => {
@@ -77,10 +78,11 @@ const OrdersPage = () => {
   return (
     <div className="container mx-auto h-max px-6">
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-semibold  ">Orders</h1>
+        <Header category="Page" title="Orders" />
+        
         <button
           onClick={() => {
-            navigate('/confirmOrder');
+            navigate("/confirmOrder");
           }}
           className="btn btn-primary btn-sm capitalize"
         >
@@ -157,14 +159,14 @@ const OrdersPage = () => {
                             </td>
                             <td>
                               {moment(order.createdAt)
-                                .format('MMMM Do YYYY, h:mm:ss a')
-                                .includes('am')
+                                .format("MMMM Do YYYY, h:mm:ss a")
+                                .includes("am")
                                 ? moment(order.createdAt)
-                                    .format('MMMM Do YYYY, h:mm:ss a')
-                                    .replace('am', 'AM')
+                                    .format("MMMM Do YYYY, h:mm:ss a")
+                                    .replace("am", "AM")
                                 : moment(order.createdAt)
-                                    .format('MMMM Do YYYY, h:mm:ss a')
-                                    .replace('pm', 'PM')}
+                                    .format("MMMM Do YYYY, h:mm:ss a")
+                                    .replace("pm", "PM")}
                             </td>
                             <td>₹{order?.total_cost}/-</td>
                             <td>

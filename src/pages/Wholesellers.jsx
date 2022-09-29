@@ -9,6 +9,7 @@ import Loading from "./Loading";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { userRequest } from "../requestMethods";
+import { useStateContext } from "../contexts/ContextProvider";
 
 export const DropDown = (props) => {
   const options = props?.options?.length > 0 && [
@@ -51,6 +52,7 @@ const Wholesellers = () => {
   });
   const [fileData, setFileData] = useState([]);
   const [selectedOption, setSelectedOption] = useState();
+  const { currentColor } = useStateContext();
 
   const modalRef = useRef();
 
@@ -258,7 +260,7 @@ const Wholesellers = () => {
   }
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <div className="w-full  px-6">
       <Header category="Page" title="Wholesellers" />
       {/* File Upload  */}
       <div className="flex items-center	m-3 ">
@@ -269,6 +271,9 @@ const Wholesellers = () => {
         />
 
         <button
+          style={{
+            background: currentColor,
+          }}
           className="btn  btn-sm rounded-full ml-2 mr-2 bg-[#1a97f5] border-0 text-slate-50 "
           onClick={updateToDb}
         >
@@ -280,6 +285,9 @@ const Wholesellers = () => {
         <label
           htmlFor="my-modal-3"
           className="btn  btn-sm rounded-full  bg-[#1a97f5] border-0 text-slate-50"
+          style={{
+            background: currentColor,
+          }}
         >
           Add Wholeseller
         </label>
@@ -451,6 +459,9 @@ const Wholesellers = () => {
         <button
           className="btn  btn-sm rounded-full ml-2 bg-[#1a97f5] border-0 text-slate-50 "
           onClick={exportToCSV}
+          style={{
+            background: currentColor,
+          }}
         >
           Download
         </button>

@@ -1,59 +1,81 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaPen } from "react-icons/fa";
 import { userRequest } from "../../requestMethods";
 import { toast } from "react-toastify";
 import { useQuery } from "react-query";
+import Loading from "../Loading";
+import { useStateContext } from "../../contexts/ContextProvider";
 
-const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
-  //   console.log(requestItem);
+const CategoryRequestTableRow = ({
+  requestItem,
+  index,
+  requestRefetch,
 
-  const {
-    isLoading: wholesellerDetailsLoading,
-    error,
-    data: wholesellerDetails,
-    isFetching,
-    refetch: wholesellerDetailsRefetch,
-  } = useQuery("wholesellerDetails", () =>
-    userRequest.get(`/wholesellers/id/${requestItem.wholesellerId}`)
-  );
+  requests,
+}) => {
+  // console.log(requestItem);
 
-  // console.log(wholesellerDetails?.data?.name);
+  const { currentColor } = useStateContext();
 
-  const handleDeleteCategoryReq = (id) => {
+  const [wholesellerDetails, setWholesellerDetails] = useState([]);
+
+  useEffect(() => {
+    userRequest
+      .get(`/wholesellers/id/${requestItem?.wholesellerId}`)
+      .then(function (response) {
+        // console.log(response);
+        setWholesellerDetails(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, [requestItem?.wholesellerId]);
+
+  const handleDeleteCategoryReqDirect = (id) => {
+    const url = `/categoryrequest/${id}`;
+    return userRequest.delete(url);
+  };
+
+  const handleDeleteCategoryReq = async (id) => {
     const confirmDelete = window.confirm("Are you Sure?");
     if (confirmDelete) {
       const url = `/categoryrequest/${id}`;
-      userRequest.delete(url);
+      await userRequest.delete(url);
+      requestRefetch();
     }
   };
 
   const handleCategoryUpdate = (wholesellerId, newCategories, elementId) => {
     // console.log("Clicked", wholesellerId, newCategories);
-    userRequest
-      .put(`/wholesellers/${wholesellerId}`, {
-        catagories: newCategories,
-      })
-      .then(function (response) {
-        // console.log(response);
-        refetch();
-        handleDeleteCategoryReq(elementId);
-        toast.success("Categories Updated!");
-        refetch();
-        wholesellerDetailsRefetch();
-      })
-      .catch(function (error) {
-        console.log(error);
-        toast.error("Faild to Update Category");
-      });
+
+    const confirmDelete = window.confirm("Are you Sure?");
+    if (confirmDelete) {
+      userRequest
+        .put(`/wholesellers/${wholesellerId}`, {
+          catagories: newCategories,
+        })
+        .then(function (response) {
+          console.log(response);
+          return handleDeleteCategoryReqDirect(elementId);
+        })
+        .then(function (response) {
+          requestRefetch();
+          toast.success("Categories Updated!");
+        })
+        .catch(function (error) {
+          console.log(error);
+          toast.error("Faild to Update Category");
+        });
+    }
   };
   return (
     <>
       <tr>
         <th>{index + 1}</th>
-        <td>{wholesellerDetails?.data?.name}</td>
+        <td className="link">{wholesellerDetails?.data?.name}</td>
         <td>{wholesellerDetails?.data?.email}</td>
         <td>
-          {requestItem.categories.map((ct, index) => (
+          {requestItem?.categories?.map((ct, index) => (
             <p key={index} className="badge  badge-info gap-2">
               {ct.categoryName}
             </p>
@@ -70,7 +92,10 @@ const CategoryRequestTableRow = ({ requestItem, index, refetch }) => {
                   requestItem._id
                 )
               }
-              className="btn btn-active btn-secondary btn-sm"
+              className="btn btn-primary btn-sm"
+              style={{
+                backgroundColor: currentColor,
+              }}
             >
               Approve
             </button>
