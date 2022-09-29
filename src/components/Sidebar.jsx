@@ -30,7 +30,7 @@ const Sidebar = () => {
           icon: <BiCategory />,
         },
         {
-          name: 'OrdersPage',
+          name: 'Orders',
           route: '/OrdersPage',
           icon: <AiOutlineShoppingCart />,
         },

@@ -27,13 +27,10 @@ const UserProfileDetails = () => {
   console.log(selectedOption);
 
   // Available Categories Fetch
-  const {
-    isLoading: categoryLoading,
-    error: categoryError,
-    data: categoryData,
-    isFetching: categoryFetching,
-    refetch: categoryRefetch,
-  } = useQuery('category', async () => await userRequest.get('/category'));
+  const { data: categoryData, refetch: categoryRefetch } = useQuery(
+    'category',
+    async () => await userRequest.get('/category')
+  );
 
   const handleModalToggle = () => {
     passModalRef.current.checked = false;
@@ -249,8 +246,10 @@ const UserProfileDetails = () => {
             <div className="flex items-center my-2 w-max">
               <strong>Categories:</strong>
               <div className="max-w-80">
-                {user.role !== 'admin' ? (
-                  user?.catagories.map((cat, i) => (
+                {user.role !== 'admin' && user.role !== 'employee' ? (
+                  user?.catagories &&
+                  user?.catagories.length > 0 &&
+                  user?.catagories?.map((cat, i) => (
                     <span key={i} className="badge badge-primary mx-1">
                       {cat?.categoryName}
                     </span>

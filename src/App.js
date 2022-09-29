@@ -28,6 +28,7 @@ import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
 // import { SocketContext } from './contexts/socketContext';
 import CategoryRequest from './pages/CategoryRequest/CategoryRequest';
 import ActivityLogs from './pages/ActivityLogs/ActivityLogs';
+import Invoice from './pages/Invoice/Invoice';
 
 const App = () => {
   // const socketIO = useContext(SocketContext);
@@ -163,6 +164,10 @@ const App = () => {
                 {/* Create wholeseller  */}
 
                 <Route path="/signup" element={<SignUp></SignUp>}></Route>
+                <Route
+                  path="/invoice/:orderId"
+                  element={<Invoice></Invoice>}
+                ></Route>
 
                 {/* -------------Protected Routes Normal------------- */}
                 <Route element={<ProtectedRoutes isAdminRoute={false} />}>
