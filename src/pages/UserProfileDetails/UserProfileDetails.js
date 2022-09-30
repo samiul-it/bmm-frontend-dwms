@@ -24,7 +24,7 @@ const UserProfileDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
-  console.log(selectedOption);
+  // console.log(selectedOption);
 
   // Available Categories Fetch
   const { data: categoryData, refetch: categoryRefetch } = useQuery(
@@ -117,7 +117,7 @@ const UserProfileDetails = () => {
   });
 
   //New Category Request
-  console.log(categoryIds);
+  // console.log(categoryIds);
 
   const handleCategoryRequest = (e) => {
     e.preventDefault();
@@ -230,14 +230,14 @@ const UserProfileDetails = () => {
               <strong>Phone:</strong> +91 {user.phone}
             </h4>
 
-            {user?.role !== 'admin' && (
+            {user?.role !== "admin" && (
               <>
                 <h4 className=" my-2 w-max">
-                  {' '}
+                  {" "}
                   <strong>Place:</strong> {user?.place}
                 </h4>
                 <h4 className=" my-2 w-max">
-                  {' '}
+                  {" "}
                   <strong>Address:</strong> {user?.address}
                 </h4>
               </>
@@ -279,6 +279,9 @@ const UserProfileDetails = () => {
           <label
             htmlFor="password-modal"
             className="btn btn-primary btn-sm my-4 mr-auto"
+            style={{
+              background: currentColor,
+            }}
           >
             Chnage Password
           </label>
@@ -414,7 +417,7 @@ const UserProfileDetails = () => {
                   value={userDetails.place}
                   required
                 />
-              </div>{' '}
+              </div>{" "}
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Address</span>

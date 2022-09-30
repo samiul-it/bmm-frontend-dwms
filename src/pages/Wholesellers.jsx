@@ -10,6 +10,7 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { userRequest } from '../requestMethods';
 import Spinner from '../components/shared/spinner/Spinner';
+import { useStateContext } from "../contexts/ContextProvider";
 
 export const DropDown = (props) => {
   const options = props?.options?.length > 0 && [
@@ -52,6 +53,7 @@ const Wholesellers = () => {
   });
   const [fileData, setFileData] = useState([]);
   const [selectedOption, setSelectedOption] = useState();
+  const { currentColor } = useStateContext();
 
   const modalRef = useRef();
 

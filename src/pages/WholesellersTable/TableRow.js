@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { userRequest } from '../../requestMethods';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
   const handleDeleteItem = (id) => {
@@ -12,6 +13,8 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
       userRequest.delete(url);
     }
   };
+
+  // console.log(wholeseller?.catagories);
 
   return (
     <>
@@ -45,9 +48,13 @@ const TableRow = ({ wholeseller, index, refetch, updateHandler }) => {
         </td>
         <td>
           {wholeseller?.catagories.map((category, i) => (
-            <span key={i} className="badge mr-1">
+            <Link
+              to={`/categories/${category.categoryName}/${category.categoryId}`}
+              key={i}
+              className="badge mr-1 link hover:text-sky-500"
+            >
               {category.categoryName}
-            </span>
+            </Link>
           ))}
         </td>
       </tr>

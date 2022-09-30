@@ -179,6 +179,11 @@ const App = () => {
                   <Route path="/wholesellers" element={<Wholesellers />} />
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
+
+                  <Route
+                    path="/category-request"
+                    element={<CategoryRequest />}
+                  />
                   {/* User Profile Details  */}
 
                   <Route
@@ -213,10 +218,6 @@ const App = () => {
                   />
 
                   {/* Category Request Admin---> */}
-                  <Route
-                    path="/category-request"
-                    element={<CategoryRequest />}
-                  />
                 </Route>
 
                 <Route path="/activity-logs" element={<ActivityLogs />} />
