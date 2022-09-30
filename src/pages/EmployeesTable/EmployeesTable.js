@@ -1,5 +1,5 @@
-import React from "react";
-import EmployeesTableRow from "./EmployeesTableRow";
+import React from 'react';
+import EmployeesTableRow from './EmployeesTableRow';
 
 const EmployeesTable = ({ employeesList, refetch }) => {
   return (
@@ -12,8 +12,8 @@ const EmployeesTable = ({ employeesList, refetch }) => {
               <th>Name</th>
               <th>Phone</th>
               <th>Email</th>
-              <th>Action</th>
               <th>Role</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>

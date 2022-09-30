@@ -31,7 +31,7 @@ const Employees = () => {
     isLoading,
     data: employeesList,
     refetch,
-  } = useQuery("employees", () => userRequest.get("/user"));
+  } = useQuery('employees', async () => await userRequest.get('/user'));
 
   if (isLoading) {
     return <Loading></Loading>;
@@ -93,116 +93,108 @@ const Employees = () => {
   ];
 
   return (
-    <div className="container mx-auto">
-      <div className="w-full  px-6">
-        <Header category="Page" title="Employees" />
+    <div className="container mx-auto max-w-[95%]">
+      <Header category="Page" title="Employees" />
 
-        <label
-          style={{
-            background: currentColor,
-          }}
-          htmlFor="my-modal-3"
-          className="btn mb-2  btn-sm rounded-full  bg-[#1a97f5] border-0 text-slate-50"
-        >
-          Add Employee
-        </label>
+      <label
+        htmlFor="my-modal-3"
+        className="btn mb-2  btn-sm rounded-full  bg-[#1a97f5] border-0 text-slate-50"
+      >
+        Add Employee
+      </label>
 
-        <input
-          ref={modalRef}
-          type="checkbox"
-          id="my-modal-3"
-          className="modal-toggle"
-        />
-        <div className="modal">
-          <div className="modal-box relative">
-            <label
-              onClick={handleModalClose}
-              className="btn btn-sm btn-circle absolute right-2 top-2"
-            >
-              ✕
-            </label>
-            <h3 className="font-bold text-lg">Enter Employee Details</h3>
+      <input
+        ref={modalRef}
+        type="checkbox"
+        id="my-modal-3"
+        className="modal-toggle"
+      />
+      <div className="modal">
+        <div className="modal-box relative">
+          <label
+            onClick={handleModalClose}
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+          >
+            ✕
+          </label>
+          <h3 className="font-bold text-lg">Enter Employee Details</h3>
 
-            <div className="card-body">
-              <form onSubmit={handleAdminCreation}>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Employees Name</span>
-                  </label>
-                  <input
-                    name="name"
-                    onChange={FormDataHandler}
-                    value={formData?.name}
-                    type="text"
-                    placeholder="Name"
-                    className="input input-bordered"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Email</span>
-                  </label>
-                  <input
-                    name="email"
-                    onChange={FormDataHandler}
-                    value={formData?.email}
-                    type="email"
-                    placeholder="Email"
-                    className="input input-bordered"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Contact</span>
-                  </label>
-                  <input
-                    name="phone"
-                    onChange={FormDataHandler}
-                    value={formData?.phone}
-                    type="number"
-                    placeholder="Phone"
-                    className="input input-bordered"
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Role</span>
-                  </label>
-
-                  <Select
-                    value={role}
-                    onChange={setRole}
-                    options={options}
-                    required
-                  />
-                </div>
-
-                <div className="form-control mt-6">
-                  <input
-                    type="submit"
-                    value="Confirm"
-                    className="btn btn-primary"
-                  />
-                </div>
-              </form>
-              <div className="form-control mt-6">
-                <button
-                  onClick={handleModalClose}
-                  className="btn bg-orange-600"
-                >
-                  Cancel
-                </button>
+          <div className="card-body">
+            <form onSubmit={handleAdminCreation}>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Employees Name</span>
+                </label>
+                <input
+                  name="name"
+                  onChange={FormDataHandler}
+                  value={formData?.name}
+                  type="text"
+                  placeholder="Name"
+                  className="input input-bordered"
+                />
               </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Email</span>
+                </label>
+                <input
+                  name="email"
+                  onChange={FormDataHandler}
+                  value={formData?.email}
+                  type="email"
+                  placeholder="Email"
+                  className="input input-bordered"
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Contact</span>
+                </label>
+                <input
+                  name="phone"
+                  onChange={FormDataHandler}
+                  value={formData?.phone}
+                  type="number"
+                  placeholder="Phone"
+                  className="input input-bordered"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Role</span>
+                </label>
+
+                <Select
+                  value={role}
+                  onChange={setRole}
+                  options={options}
+                  required
+                />
+              </div>
+
+              <div className="form-control mt-6">
+                <input
+                  type="submit"
+                  value="Confirm"
+                  className="btn btn-primary"
+                />
+              </div>
+            </form>
+            <div className="form-control mt-6">
+              <button onClick={handleModalClose} className="btn bg-orange-600">
+                Cancel
+              </button>
             </div>
           </div>
         </div>
-
-        <EmployeesTable
-          employeesList={employeesList?.data}
-          refetch={refetch}
-        ></EmployeesTable>
       </div>
+
+      <EmployeesTable
+        employeesList={employeesList?.data}
+        refetch={refetch}
+      ></EmployeesTable>
     </div>
   );
 };

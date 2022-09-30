@@ -20,9 +20,9 @@ import { useQuery } from 'react-query';
 import Header from './../../components/Header';
 import { userRequest } from '../../requestMethods';
 import DateFilter from '../../components/DateFilter';
-import moment from 'moment';
 import { addDays } from 'date-fns';
 import { useStateContext } from '../../contexts/ContextProvider';
+import Spinner from '../../components/shared/spinner/Spinner';
 
 const Homepage = () => {
   // function convert(str) {
@@ -44,16 +44,16 @@ const Homepage = () => {
 
   const {
     isLoading,
-    error,
     data: graphData,
-    isFetching,
     refetch: refetchGraphData,
-  } = useQuery('graphData', () =>
-    userRequest.get(
-      `/orders/getGraphData?startDate=${new Date(
-        state[0].startDate
-      ).toUTCString()}&endDate=${new Date(state[0].endDate).toUTCString()}`
-    )
+  } = useQuery(
+    'graphData',
+    async () =>
+      await userRequest.get(
+        `/orders/getGraphData?startDate=${new Date(
+          state[0].startDate
+        ).toUTCString()}&endDate=${new Date(state[0].endDate).toUTCString()}`
+      )
   );
 
   React.useEffect(() => {
@@ -86,42 +86,55 @@ const Homepage = () => {
   };
 
   return (
-    <div className="container mx-auto px-6">
-      <div className="flex items-center justify-between px-6">
-        <Header category="Page" title="Data Visialization" />
-        <DateFilter state={state} setState={setState} />
-      </div>
-      <h3>Our Statistics(1)</h3>
-      <div>
-        <div>
-          <h3>Total Sale vs Day</h3>
-          <ResponsiveContainer width="100%" aspect={3}>
-            <AreaChart
-              width={400}
-              height={300}
-              data={graphData?.data.map((d) => {
-                return {
-                  ...d,
-                  _id: formatDate(d._id),
-                };
-              })}
-              margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-            >
-              <Area
-                type="monotone"
-                dataKey="totalSale"
-                stroke={`${currentColor}`}
-                fill={`${currentColor}`}
-              />
-              <Area type="monotone" dataKey="totalOrders" />
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={`_id`} />
-              <YAxis />
-              <Tooltip />
-            </AreaChart>
-          </ResponsiveContainer>
+    <div className="container mx-auto max-w-[95%]">
+      <Header category="Page" title="Data Visialization" />
+      {isLoading ? (
+        <div className="flex justify-center items-center w-full h-[70vh]">
+          <Spinner />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Statistics</h3>
+            <DateFilter state={state} setState={setState} />
+          </div>
+          <div>
+            <div>
+              <h3>Total Sale vs Day</h3>
+              <ResponsiveContainer width="100%" height="100%" aspect={3}>
+                <AreaChart
+                  width={500}
+                  height={400}
+                  data={graphData?.data?.map((d) => {
+                    return {
+                      ...d,
+                      _id: formatDate(d?._id),
+                    };
+                  })}
+                  margin={{
+                    top: 10,
+                    right: 0,
+                    left: 30,
+                    bottom: 0,
+                  }}
+                >
+                  <Area
+                    type="monotone"
+                    dataKey="totalSale"
+                    stroke={`${currentColor}`}
+                    fill={`${currentColor}`}
+                  />
+                  <Area type="monotone" dataKey="totalOrders" />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey={`_id`} />
+                  <YAxis />
+                  <Tooltip />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -4,8 +4,7 @@ import { useQuery } from 'react-query';
 import { userRequest } from '../../requestMethods';
 import moment from 'moment';
 import Spinner from '../../components/shared/spinner/Spinner';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '../../components';
 
 const OrdersPage = () => {
@@ -76,10 +75,9 @@ const OrdersPage = () => {
   // console.log('ordersData ===>', ordersData);
 
   return (
-    <div className="container mx-auto h-max px-6">
+    <div className="container mx-auto h-max max-w-[95%]">
       <div className="flex justify-between mb-4">
         <Header category="Page" title="Orders" />
-        
         <button
           onClick={() => {
             navigate("/confirmOrder");
@@ -158,15 +156,9 @@ const OrdersPage = () => {
                               </div>
                             </td>
                             <td>
-                              {moment(order.createdAt)
-                                .format("MMMM Do YYYY, h:mm:ss a")
-                                .includes("am")
-                                ? moment(order.createdAt)
-                                    .format("MMMM Do YYYY, h:mm:ss a")
-                                    .replace("am", "AM")
-                                : moment(order.createdAt)
-                                    .format("MMMM Do YYYY, h:mm:ss a")
-                                    .replace("pm", "PM")}
+                              {moment(order.createdAt).format(
+                                'Do MMM YYYY, h:mm A'
+                              )}
                             </td>
                             <td>₹{order?.total_cost}/-</td>
                             <td>

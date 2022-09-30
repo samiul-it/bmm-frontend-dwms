@@ -1,12 +1,14 @@
-import React from "react";
-import { userRequest } from "../../requestMethods";
+import React from 'react';
+import { FiTrash2 } from 'react-icons/fi';
+import { userRequest } from '../../requestMethods';
 
 const EmployeesTableRow = ({ employee, index, refetch }) => {
   const handleDeleteAdmin = (id) => {
-    const confirmDelete = window.confirm("Are you Sure?");
+    const confirmDelete = window.confirm('Are you Sure?');
     if (confirmDelete) {
       const url = `http://localhost:5000/user/${id}`;
-      userRequest.delete(url)
+      userRequest
+        .delete(url)
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
@@ -22,28 +24,16 @@ const EmployeesTableRow = ({ employee, index, refetch }) => {
         <td>{employee.name}</td>
         <td>{employee.phone}</td>
         <td>{employee.email}</td>
-        <td>
+        <td>{employee?.role}</td>
+        <td className="w-[200px]">
           <button
             onClick={() => handleDeleteAdmin(employee._id)}
-            className="btn btn-xs btn-circle btn-outline"
+            className="flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <FiTrash2 />
+            &nbsp; Delete
           </button>
         </td>
-        <td>{employee?.role}</td>
       </tr>
     </>
   );

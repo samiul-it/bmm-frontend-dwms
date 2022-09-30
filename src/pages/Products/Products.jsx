@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import * as FileSaver from 'file-saver';
 // import { Header } from '../../../components';
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { userRequest } from '../../requestMethods';
@@ -16,6 +16,8 @@ import Spinner from '../../components/shared/spinner/Spinner';
 import CreateSelect from '../../components/shared/CreateSelect/CreateSelect';
 
 const Products = () => {
+  const { orders } = useSelector((state) => state.ordersState);
+  const user = useSelector((state) => state?.user?.currentUser?.user);
   const { category_name, id } = useParams();
   const { currentColor } = useStateContext();
   const dispatch = useDispatch();
@@ -274,27 +276,6 @@ const Products = () => {
       placeholder: 'Enter Slug',
       value: productFormData.slug,
     },
-    // {
-    //   name: 'subcategory',
-    //   label: 'Subcategory',
-    //   type: 'text',
-    //   placeholder: 'Enter Subcategory',
-    //   value: productFormData.subcategory,
-    // },
-    // {
-    //   name: 'category',
-    //   label: 'Category',
-    //   type: 'text',
-    //   placeholder: 'Enter Category',
-    //   value: productFormData.category,
-    // },
-    // {
-    //   name: 'attributes',
-    //   label: 'Attributes',
-    //   type: 'text',
-    //   placeholder: 'Enter Attributes',
-    //   value: productFormData.attributes,
-    // },
     {
       name: 'price_wholesale',
       label: 'Price Wholesale',
@@ -316,13 +297,6 @@ const Products = () => {
       placeholder: 'Enter MRP',
       value: productFormData.mrp,
     },
-    // {
-    //   name: 'product_desc',
-    //   label: 'Product Description',
-    //   type: 'textarea',
-    //   placeholder: 'Enter Product Description',
-    //   value: productFormData.product_desc,
-    // },
   ];
 
   const handleFile = (f) => {
@@ -355,7 +329,6 @@ const Products = () => {
           };
         });
         promise.then((d) => {
-          console.log(d[0]);
           // const arr = d.map((e) => e.product_name);
           // let unique = arr.filter((item, i, ar) => ar.indexOf(item) === i);
           const dataCsv = [];
@@ -454,9 +427,16 @@ const Products = () => {
         <td>
           <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
         </td>
-        <td>
-          <div className="bg-slate-600 rounded-lg w-[70%] h-[25px]"></div>
-        </td>
+        {user?.role == 'admin' && (
+          <td>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+          </td>
+        )}
+        {user?.role == 'admin' && (
+          <td>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+          </td>
+        )}
       </tr>
     );
   });
@@ -495,19 +475,16 @@ const Products = () => {
 
     dispatch(addAndRemoveOrder(product));
   };
-  const { orders } = useSelector((state) => state.ordersState);
-  const user = useSelector((state) => state.user.currentUser.user);
 
   return (
-    <div className="container mx-auto relative overflow-hidden px-6">
-      <ToastContainer />
-      <div className="w-full flex justify-between flex-wrap items-center ">
+    <div className="container mx-auto max-w-[95%] relative">
+      <div className="w-full flex justify-between flex-wrap md:flex-nowrap items-center ">
         <Header category="Products" title={category_name} />
         <form
           onSubmit={(e) => {
             searchHandler(e);
           }}
-          className="md:w-auto w-full mx-2"
+          className="w-full md:max-w-[370px]"
         >
           <label
             htmlFor="default-search"
@@ -516,29 +493,13 @@ const Products = () => {
             Search
           </label>
           <div className="relative">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none ">
-              <svg
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                ></path>
-              </svg>
-            </div>
             <input
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
               type="search"
               id="default-search"
-              className="block p-3 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-3 pr-14 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search Products"
             />
             <button
@@ -548,60 +509,25 @@ const Products = () => {
               }}
               className="text-white absolute right-2 bottom-[5px] focus:ring-4 focus:outline-none hover:bg-light-gray font-medium rounded-lg text-sm px-3 py-2"
             >
-              Search
+              <div className="flex items-center pointer-events-none ">
+                <svg
+                  className="w-5 h-5 text-gray-100 "
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  ></path>
+                </svg>
+              </div>
             </button>
           </div>
         </form>
-
-        {user?.role == 'admin' && (
-          <>
-            <div className="h-max relative w-full text-center md:mt-0 md:mb-0 mb-4 mt-8 md:max-w-[230px]">
-              <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
-                {!uploadProductsIsLoading ? (
-                  'Upload excel sheet'
-                ) : (
-                  <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
-                    Uploading File...
-                  </button>
-                )}
-              </p>
-              <input
-                onChange={(e) => handleFile(e)}
-                type="file"
-                disabled={uploadProductsIsLoading}
-                className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer "
-                ref={uploadFileBtnRef}
-              />
-            </div>
-
-            <button
-              onClick={getAllProductsByCatId}
-              style={{
-                background: currentColor,
-              }}
-              disabled={allProductsByCatIdIsLoading}
-              type="button"
-              className={`text-white bg-[${currentColor}] btn border-0 mx-2 btn-sm ${
-                allProductsByCatIdIsLoading && 'loading'
-              } `}
-            >
-              <svg className="fill-current w-4 h-4 mr-2" viewBox="0 0 20 20">
-                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
-              </svg>
-              <span>Download</span>
-            </button>
-
-            <label
-              htmlFor="my-modal-3"
-              style={{
-                background: currentColor,
-              }}
-              className="btn border-0 text-white mx-2 btn-sm "
-            >
-              Add Product
-            </label>
-          </>
-        )}
       </div>
 
       {/* -----------FormModelStart----------- */}
@@ -629,7 +555,7 @@ const Products = () => {
                 ? updateSingleProductHandler
                 : addSingleProductHandler
             }
-            className="card-body"
+            className="card-body p-0 md:p-6"
           >
             {formOptions.map((item, index) => (
               <div key={index} className="form-control">
@@ -742,15 +668,69 @@ const Products = () => {
         </div>
       ) : (
         <>
-          <h1 className="">
-            <span className="font-bold">Total Items Found: </span>
-            {infiniteProducts?.pages[0]?.data?.totalDocuments}
-          </h1>
+          <div className="w-full flex justify-between items-center my-4 flex-wrap">
+            <h1 className="text-gray-700 dark:text-gray-300 font-bold text-lg ">
+              <span className="">Items Found: </span>"
+              {infiniteProducts?.pages[0]?.data?.totalDocuments}"
+            </h1>
+            {user?.role == 'admin' && (
+              <div className="relative flex flex-wrap gap-2 md:w-max w-full">
+                <div className="h-max relative text-center md:mt-0 md:mb-0 mt-8 md:max-w-[230px] w-full">
+                  <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
+                    {!uploadProductsIsLoading ? (
+                      'Upload excel sheet'
+                    ) : (
+                      <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
+                        Uploading File...
+                      </button>
+                    )}
+                  </p>
+                  <input
+                    onChange={(e) => handleFile(e)}
+                    type="file"
+                    disabled={uploadProductsIsLoading}
+                    className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer "
+                    ref={uploadFileBtnRef}
+                  />
+                </div>
+
+                <button
+                  onClick={getAllProductsByCatId}
+                  style={{
+                    background: currentColor,
+                  }}
+                  disabled={allProductsByCatIdIsLoading}
+                  type="button"
+                  className={`text-white bg-[${currentColor}] btn border-0 btn-sm md:w-max flex-grow mt-auto  ${
+                    allProductsByCatIdIsLoading && 'loading'
+                  } `}
+                >
+                  <svg
+                    className="fill-current w-4 h-4 mr-2"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+                  </svg>
+                  <span>Download</span>
+                </button>
+
+                <label
+                  htmlFor="my-modal-3"
+                  style={{
+                    background: currentColor,
+                  }}
+                  className="btn border-0 text-white btn-sm md:w-max flex-grow mt-auto "
+                >
+                  Add Product
+                </label>
+              </div>
+            )}
+          </div>
 
           <div
             ref={divRef}
             onScrollCapture={(e) => handleScroll(e)}
-            className="max-h-[650px] overflow-auto rounded-lg"
+            className="max-h-[650px] overflow-auto rounded-lg "
           >
             <table ref={tableRef} className="table w-full">
               <thead className="sticky top-0 left-0">
@@ -760,7 +740,8 @@ const Products = () => {
                   <th>Wholesale</th>
                   <th>Retail</th>
                   <th>Mrp</th>
-                  <th></th>
+                  {user?.role == 'admin' && <th></th>}
+                  {user?.role == 'admin' && <th></th>}
                 </tr>
               </thead>
               <tbody>
@@ -794,68 +775,67 @@ const Products = () => {
                           <td>₹{item.price_wholesale}/-</td>
                           <td>₹{item.price_retail}/-</td>
                           <td>₹{item.mrp}/-</td>
-                          <td>
-                            <div className="flex justify-end">
-                              {user?.role === 'admin' && (
-                                <label
-                                  htmlFor="my-modal-3"
-                                  onClick={(e) => {
-                                    // console.log(item);
-                                    setProductFormData({
-                                      product_name: item?.product_name,
-                                      product_desc: item?.product_desc,
-                                      slug: item?.slug,
-                                      price_wholesale: item?.price_wholesale,
-                                      price_retail: item?.price_retail,
-                                      mrp: item?.mrp,
-                                      _id: item?._id,
-                                    });
-                                    setTags({
-                                      ...tags,
-                                      value: item?.metadata
-                                        ? item?.metadata?.map((t) => {
-                                            return { label: t, value: t };
-                                          })
-                                        : [],
-                                    });
-                                    // e.preventDefault();
-                                    // setDeleteConfirmation(item);
-                                  }}
-                                  className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-blue-500 shadow-lg mx-2 ${
-                                    updateSingleProductIsLoading && 'loading'
-                                  }`}
-                                >
-                                  {!updateSingleProductIsLoading && 'Update '}
-                                  &nbsp;
-                                  {!updateSingleProductIsLoading && <FiEdit />}
-                                </label>
-                              )}
-                              {user?.role == 'admin' && (
-                                <label
-                                  htmlFor="my-modal"
-                                  onClick={(e) => {
-                                    // e.preventDefault();
-                                    setDeleteConfirmation(item);
-                                  }}
-                                  className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
-                                    deleteProductIsLoading &&
-                                    deleteConfirmation?._id === item?._id &&
-                                    'loading'
-                                  }`}
-                                >
-                                  &nbsp;
-                                  {deleteProductIsLoading &&
-                                  deleteConfirmation?._id ===
-                                    item?._id ? null : (
-                                    <span className="flex">
-                                      Delete &nbsp;
-                                      <FiTrash2 />
-                                    </span>
-                                  )}
-                                </label>
-                              )}
-                            </div>
-                          </td>
+                          {user?.role == 'admin' && (
+                            <td className="w-[100px] p-0">
+                              <label
+                                htmlFor="my-modal-3"
+                                onClick={(e) => {
+                                  // console.log(item);
+                                  setProductFormData({
+                                    product_name: item?.product_name,
+                                    product_desc: item?.product_desc,
+                                    slug: item?.slug,
+                                    price_wholesale: item?.price_wholesale,
+                                    price_retail: item?.price_retail,
+                                    mrp: item?.mrp,
+                                    _id: item?._id,
+                                  });
+                                  setTags({
+                                    ...tags,
+                                    value: item?.metadata
+                                      ? item?.metadata?.map((t) => {
+                                          return { label: t, value: t };
+                                        })
+                                      : [],
+                                  });
+                                  // e.preventDefault();
+                                  // setDeleteConfirmation(item);
+                                }}
+                                className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-blue-500 shadow-lg mx-2 ${
+                                  updateSingleProductIsLoading && 'loading'
+                                }`}
+                              >
+                                {!updateSingleProductIsLoading && 'Update '}
+                                &nbsp;
+                                {!updateSingleProductIsLoading && <FiEdit />}
+                              </label>
+                            </td>
+                          )}
+                          {user?.role == 'admin' && (
+                            <td className="w-[150px] p-0 ">
+                              <label
+                                htmlFor="my-modal"
+                                onClick={(e) => {
+                                  // e.preventDefault();
+                                  setDeleteConfirmation(item);
+                                }}
+                                className={`flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2 ${
+                                  deleteProductIsLoading &&
+                                  deleteConfirmation?._id === item?._id &&
+                                  'loading'
+                                }`}
+                              >
+                                &nbsp;
+                                {deleteProductIsLoading &&
+                                deleteConfirmation?._id === item?._id ? null : (
+                                  <span className="flex">
+                                    Delete &nbsp;
+                                    <FiTrash2 />
+                                  </span>
+                                )}
+                              </label>
+                            </td>
+                          )}
                         </tr>
                       ))
                   )}
@@ -884,7 +864,9 @@ const Products = () => {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>You have Scrolled through all the data!</span>
+                <span className="font-semibold">
+                  You have Scrolled through all the data!
+                </span>
               </div>
             </div>
           </div>
@@ -905,7 +887,7 @@ const Products = () => {
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
-                <span>!Items Not Found</span>
+                <span className="font-semibold">!Items Not Found</span>
               </div>
             </div>
           </div>
