@@ -6,7 +6,6 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import { Cart, Chat, Notification, UserProfile } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import { useSelector } from 'react-redux';
-import Select from 'react-select';
 import { useMutation, useQuery } from 'react-query';
 import { userRequest } from '../requestMethods';
 import { toast } from 'react-toastify';
@@ -109,9 +108,16 @@ const Navbar = ({ notificationData, refetchNotifications }) => {
     'categoriesList',
     async () => await userRequest.get('/category').then((res) => res?.data),
     {
-      enabled: isUserAllowed(),
+      enabled: isUserAllowed() && wholesellerMessageModalRef?.current?.checked,
     }
   );
+
+  useEffect(() => {
+    console.log(
+      'wholesellerMessageModalRef',
+      wholesellerMessageModalRef?.current?.checked
+    );
+  }, [wholesellerMessageModalRef?.current?.checked]);
 
   const { isLoading: wholesellersListIsLoading, data: wholesellersList } =
     useQuery(
@@ -119,7 +125,8 @@ const Navbar = ({ notificationData, refetchNotifications }) => {
       async () =>
         await userRequest.get('/wholesellers').then((res) => res?.data),
       {
-        enabled: isUserAllowed(),
+        enabled:
+          isUserAllowed() && wholesellerMessageModalRef?.current?.checked,
       }
     );
 
