@@ -51,14 +51,14 @@ const Notification = ({ notifications, unseenMsgCount }) => {
           ?.map((item, index) => (
             <div
               key={index}
-              className={`flex flex-col leading-8 gap-2 p-2 relative border-b border-color bg-[#F2F1F2] dark:bg-[#515760] rounded-md ${
+              className={`flex flex-col leading-8 p-2 relative border-b border-color bg-[#F2F1F2] dark:bg-[#515760] rounded-md ${
                 item?.link && 'cursor-pointer'
               }`}
               onClick={() => {
                 item?.link && navigate(item?.link);
               }}
             >
-              <div className="absolute top-1 right-2 flex">
+              <div className="flex gap-1 w-max ml-auto">
                 {!item?.isSeen && (
                   <span className="font-bold text-xs text-blue-500">New</span>
                 )}
@@ -70,7 +70,7 @@ const Notification = ({ notifications, unseenMsgCount }) => {
                 )}
               </div>
 
-              <p className="text-gray-500 dark:text-gray-300 font-semibold text-sm mt-1">
+              <p className="text-gray-500 dark:text-gray-300 font-semibold text-sm mb-2">
                 {item?.message}
               </p>
 
