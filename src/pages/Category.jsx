@@ -1024,7 +1024,7 @@ const Categories = () => {
           <form onSubmit={handleCategoryRequest}>
             <div className="py-4">
               <Select
-                className="block w-full input input-bordered    px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                className="block w-full rounded shadow leading-tight focus:outline-none focus:shadow-outline"
                 isMulti
                 onChange={setSelectedOption}
                 defaultValue={userCatagories}
