@@ -5,9 +5,12 @@ import { Button } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import moment from 'moment';
 import { userRequest } from '../requestMethods';
+import { useNavigate } from 'react-router-dom';
+import { FiExternalLink } from 'react-icons/fi';
 
 const Notification = ({ notifications, unseenMsgCount }) => {
   const { currentColor } = useStateContext();
+  const navigate = useNavigate();
 
   // const unseenMsgCount = notifications?.messages?.filter(
   //   (m) => m.isSeen === false
@@ -43,26 +46,37 @@ const Notification = ({ notifications, unseenMsgCount }) => {
           borderRadius="50%"
         />
       </div>
-      <div className="mt-5 max-h-[300px] overflow-y-auto">
+      <div className="mt-5 max-h-[300px] overflow-y-auto flex flex-col gap-2">
         {notifications?.messages
           ?.map((item, index) => (
             <div
               key={index}
-              className="flex items-center leading-8 gap-5 p-3 relative border-b border-color "
+              className={`flex flex-col leading-8 gap-2 p-2 relative border-b border-color bg-[#F2F1F2] dark:bg-[#515760] rounded-md ${
+                item?.link && 'cursor-pointer'
+              }`}
+              onClick={() => {
+                item?.link && navigate(item?.link);
+              }}
             >
-              {!item?.isSeen && (
-                <span className="text-blue-500 absolute top-1 right-1 font-bold text-xs">
-                  New
-                </span>
-              )}
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 font-semibold">
-                  {item?.message}
-                </p>
-                <p className="absolute right-1 bottom-1 text-gray-400 font-bold text-xs">
-                  {moment(item?.cretedAt).format('DD MMM YYYY, h:mm A')}
-                </p>
+              <div className="absolute top-1 right-2 flex">
+                {!item?.isSeen && (
+                  <span className="font-bold text-xs text-blue-500">New</span>
+                )}
+                {item?.link && (
+                  <span className="text-md text-gray-700 dark:text-gray-300">
+                    {' '}
+                    <FiExternalLink />{' '}
+                  </span>
+                )}
               </div>
+
+              <p className="text-gray-500 dark:text-gray-300 font-semibold text-sm mt-1">
+                {item?.message}
+              </p>
+
+              <h3 className=" text-gray-500 dark:text-gray-400 font-semibold text-xs ml-auto w-max">
+                {moment(item?.cretedAt).format('DD MMM YYYY, h:mm A')}
+              </h3>
             </div>
           ))
           ?.reverse()}
