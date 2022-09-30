@@ -62,11 +62,6 @@ const Sidebar = () => {
           route: '/activity-logs',
           icon: <IoMdDocument />,
         },
-        {
-          name: 'category requests',
-          route: '/category-request',
-          icon: <AiFillDiff />,
-        },
       ],
     });
 
