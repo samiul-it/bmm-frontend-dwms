@@ -1,33 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { FiSettings } from "react-icons/fi";
 // import {  } from '@syncfusion/ej2-react-popups';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
-import { Products, Employees } from './pages';
-import './App.css';
-import { useStateContext } from './contexts/ContextProvider';
-import Login from './pages/Login';
-import { useSelector, useDispatch } from 'react-redux';
-import ProtectedRoutes from './ProtectedRoutes';
-import Category from './pages/Category';
-import Wholesellers from './pages/Wholesellers';
-import SignUp from './pages/SignUp/SignUp';
-import WholesellersDetails from './pages/WholesellerDetails/WholesellersDetails';
-import ConfirmOrder from './pages/ConfirmOrder/ConfirmOrder';
-import { getUser } from './redux/apiCalls';
-import OrdersPage from './pages/OrdersPage/OrdersPage';
-import Homepage from './pages/Homepage/Homepage';
-import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
-import io from 'socket.io-client';
-import { useQuery } from 'react-query';
-import { userRequest } from './requestMethods';
-import PageNotFound from './pages/PageNotFound/PageNotFound';
-import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Navbar, Footer, Sidebar, ThemeSettings } from "./components";
+import { Products, Employees } from "./pages";
+import "./App.css";
+import { useStateContext } from "./contexts/ContextProvider";
+import Login from "./pages/Login";
+import { useSelector, useDispatch } from "react-redux";
+import ProtectedRoutes from "./ProtectedRoutes";
+import Category from "./pages/Category";
+import Wholesellers from "./pages/Wholesellers";
+import SignUp from "./pages/SignUp/SignUp";
+import WholesellersDetails from "./pages/WholesellerDetails/WholesellersDetails";
+import ConfirmOrder from "./pages/ConfirmOrder/ConfirmOrder";
+import { getUser } from "./redux/apiCalls";
+import OrdersPage from "./pages/OrdersPage/OrdersPage";
+import Homepage from "./pages/Homepage/Homepage";
+import UserProfileDetails from "./pages/UserProfileDetails/UserProfileDetails";
+import io from "socket.io-client";
+import { useQuery } from "react-query";
+import { userRequest } from "./requestMethods";
+import PageNotFound from "./pages/PageNotFound/PageNotFound";
+import OrderDetails from "./pages/OrderDetailsPage/OrderDetails";
 // import { SocketContext } from './contexts/socketContext';
-import CategoryRequest from './pages/CategoryRequest/CategoryRequest';
-import ActivityLogs from './pages/ActivityLogs/ActivityLogs';
+import CategoryRequest from "./pages/CategoryRequest/CategoryRequest";
+import ActivityLogs from "./pages/ActivityLogs/ActivityLogs";
 
 const App = () => {
   // const socketIO = useContext(SocketContext);
@@ -45,13 +45,13 @@ const App = () => {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    const currentThemeColor = localStorage.getItem('colorMode');
-    const currentThemeMode = localStorage.getItem('themeMode');
+    const currentThemeColor = localStorage.getItem("colorMode");
+    const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    user?.token && user?.token !== '' && getUser(dispatch);
+    user?.token && user?.token !== "" && getUser(dispatch);
   }, [user?.token, dispatch]);
 
   useEffect(() => {
@@ -75,9 +75,9 @@ const App = () => {
     data: notificationData,
     refetch: refetchNotifications,
     isFetching,
-  } = useQuery('notificationList', () => userRequest.get('/notification'), {
+  } = useQuery("notificationList", () => userRequest.get("/notification"), {
     enabled:
-      user?.token !== undefined && user?.token !== null && user?.token !== '',
+      user?.token !== undefined && user?.token !== null && user?.token !== "",
 
     onError: (err) => {
       console.error(err.response);
@@ -89,10 +89,10 @@ const App = () => {
     // console.log('isFetching ===>', isFetching);
     Notification.requestPermission().then((perm) => {
       console.log(perm);
-      if (perm === 'granted' && document.visibilityState === 'hidden') {
-        new Notification('New Notification', {
+      if (perm === "granted" && document.visibilityState === "hidden") {
+        new Notification("New Notification", {
           body: message?.message,
-          tag: 'notification',
+          tag: "notification",
           requireInteraction: true,
         });
       }
@@ -101,21 +101,21 @@ const App = () => {
   };
 
   useEffect(() => {
-    socket?.emit('connection', user?.user);
-    socket?.on('notification', messageListener);
+    socket?.emit("connection", user?.user);
+    socket?.on("notification", messageListener);
 
     return () => socket?.disconnect();
   }, [socket]);
 
   return (
-    <div className={currentMode === 'Dark' ? 'dark' : ''}>
+    <div className={currentMode === "Dark" ? "dark" : ""}>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
-          <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
+          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
             <button
               type="button"
               onClick={() => setThemeSettings(true)}
-              style={{ background: currentColor, borderRadius: '50%' }}
+              style={{ background: currentColor, borderRadius: "50%" }}
               className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
             >
               <FiSettings />
@@ -134,13 +134,13 @@ const App = () => {
               )}
             </div>
           ) : (
-            ''
+            ""
           )}
           <div
             className={
               activeMenu && user?.token
-                ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full overflow-hidden'
-                : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2 '
+                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full overflow-hidden"
+                : "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2 "
             }
           >
             {user?.token ? (
@@ -148,7 +148,7 @@ const App = () => {
                 <Navbar notificationData={notificationData} />
               </div>
             ) : (
-              ''
+              ""
             )}
             <>
               {themeSettings && <ThemeSettings />}
@@ -171,6 +171,11 @@ const App = () => {
                   <Route path="/wholesellers" element={<Wholesellers />} />
                   {/* Homepage  */}
                   <Route path="/" element={<Homepage />} />
+
+                  <Route
+                    path="/category-request"
+                    element={<CategoryRequest />}
+                  />
                   {/* User Profile Details  */}
 
                   <Route
@@ -205,10 +210,6 @@ const App = () => {
                   />
 
                   {/* Category Request Admin---> */}
-                  <Route
-                    path="/category-request"
-                    element={<CategoryRequest />}
-                  />
                 </Route>
 
                 <Route path="/activity-logs" element={<ActivityLogs />} />

@@ -1,20 +1,25 @@
-import React, { useRef, useState } from 'react';
-import Header from './../components/Header';
-import { useQuery } from 'react-query';
-import EmployeesTable from './EmployeesTable/EmployeesTable';
-import Loading from './Loading';
-import { toast } from 'react-toastify';
-import { userRequest } from '../requestMethods';
-import Select from 'react-select';
+import React, { useRef, useState } from "react";
+import Header from "./../components/Header";
+import { useQuery } from "react-query";
+import EmployeesTable from "./EmployeesTable/EmployeesTable";
+import Loading from "./Loading";
+import { toast } from "react-toastify";
+import { userRequest } from "../requestMethods";
+import Select from "react-select";
+import { useStateContext } from "../contexts/ContextProvider";
+
+
+
 
 const Employees = () => {
   const modalRef = useRef();
+  const { currentColor } = useStateContext();
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
+    name: "",
+    phone: "",
+    email: "",
   });
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState("");
 
   const FormDataHandler = (e) => {
     console.log(formData);
@@ -35,55 +40,55 @@ const Employees = () => {
   const handleModalClose = () => {
     modalRef.current.checked = false;
     setFormData({
-      name: '',
-      phone: '',
-      email: '',
+      name: "",
+      phone: "",
+      email: "",
     });
-    setRole('');
-    setRole('');
+    setRole("");
+    setRole("");
   };
 
   const handleAdminCreation = (e) => {
     e.preventDefault();
 
     userRequest
-      .post('/user/create', {
+      .post("/user/create", {
         ...formData,
         role: role?.value,
-        password: '1234',
+        password: "1234",
       })
       .then(function (response) {
         // console.log(response);
         refetch();
-        toast.success('Employee Created!');
+        toast.success("Employee Created!");
         modalRef.current.checked = false;
         setFormData({
-          name: '',
-          phone: '',
-          email: '',
+          name: "",
+          phone: "",
+          email: "",
         });
-        setRole('');
+        setRole("");
       })
       .catch(function (error) {
         setFormData({
-          name: '',
-          phone: '',
-          email: '',
+          name: "",
+          phone: "",
+          email: "",
         });
-        setRole('');
+        setRole("");
         // console.log(error);
-        toast.error('Faild to Create Employee');
+        toast.error("Faild to Create Employee");
       });
   };
 
   const options = [
     {
-      value: 'admin',
-      label: 'Admin',
+      value: "admin",
+      label: "Admin",
     },
     {
-      value: 'employee',
-      label: 'Employee',
+      value: "employee",
+      label: "Employee",
     },
   ];
 

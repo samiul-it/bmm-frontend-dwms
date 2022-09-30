@@ -80,7 +80,7 @@ const OrdersPage = () => {
         <Header category="Page" title="Orders" />
         <button
           onClick={() => {
-            navigate('/confirmOrder');
+            navigate("/confirmOrder");
           }}
           className="btn btn-primary btn-sm capitalize"
         >
