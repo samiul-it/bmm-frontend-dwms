@@ -688,6 +688,7 @@ const Products = () => {
                   <input
                     onChange={(e) => handleFile(e)}
                     type="file"
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     disabled={uploadProductsIsLoading}
                     className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer "
                     ref={uploadFileBtnRef}

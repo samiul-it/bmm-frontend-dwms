@@ -1,18 +1,27 @@
 import React, { useRef, useState } from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload, FiTrash } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { useMutation, useQuery } from 'react-query';
-import { userRequest } from '../../requestMethods';
+import { publicRequest, userRequest } from '../../requestMethods';
 import Spinner from '../../components/shared/spinner/Spinner';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { BsFillPencilFill } from 'react-icons/bs';
 import { FaFileInvoice } from 'react-icons/fa';
+import { saveAs } from 'file-saver';
+// import ImageKit from 'imagekit';
+
+// var imagekit = new ImageKit({
+//   publicKey: 'public_YWhtb0662wdexzUYmQS6hNIQsmQ=',
+//   privateKey: 'private_M2bBZ2xf6bISvuehveLcfZO2iww=',
+//   urlEndpoint: 'https://ik.imagekit.io/bmm/',
+// });
 
 const OrderDetails = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const [invoiceFile, setInvoiceFile] = useState(null);
   const user = useSelector((state) => state.user.currentUser.user);
   const confirmStatusUpdateModalRef = useRef();
   const [selectedStatus, setSelectedStaus] = useState({});
@@ -22,6 +31,9 @@ const OrderDetails = () => {
     deliveryAddress: false,
     customerAndOrderDetails: false,
   });
+  const [deleteImageId, setDeleteImageId] = useState(null);
+  const confirmDeleteInvoiceImageRef = useRef();
+  const uploadFileBtnRef = useRef();
 
   const {
     data: orderDetailsData,
@@ -35,6 +47,7 @@ const OrderDetails = () => {
         .get(`/orders/getOrderByOrderId/${orderId}`)
         .then((res) => res.data),
     {
+      refetchOnWindowFocus: false,
       enabled: orderId ? true : false,
       onSuccess: (res) => {
         setOrderDetails(res);
@@ -100,8 +113,8 @@ const OrderDetails = () => {
     mutateAsync: updateOrderDetails,
     isLoading: updateOrderDetailsIsLoading,
   } = useMutation(
-    () =>
-      userRequest.put(
+    async () =>
+      await userRequest.put(
         `orders/updateOrderDetails/${orderDetails?._id}`,
         orderDetails
       ),
@@ -111,11 +124,13 @@ const OrderDetails = () => {
         refetchOrderDetails();
         setIsEditModeOn({
           deliveryAddress: false,
+          deliveryAddress: false,
         });
       },
       onError: (err) => {
         setIsEditModeOn({
           deliveryAddress: false,
+          customerAndOrderDetails: false,
         });
         console.log('Order Update Error ==>', err.response.data);
       },
@@ -136,6 +151,85 @@ const OrderDetails = () => {
     confirmOrderDtailsUpdateModalRef.current.checked = true;
   };
 
+  const uplaodInvoiceApi = async () => {
+    const formData = new FormData();
+    formData.append('file', invoiceFile);
+    formData.append(
+      'upload_preset',
+      process.env.REACT_APP_CLODINARY_UPLOAD_PRESET
+    );
+    formData.append('folder', 'bmm');
+    formData.append('timestamp', 'bmm');
+
+    await publicRequest
+      .post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        formData
+      )
+      .then(async (res) => {
+        console.log('cloudinary image uploaded ✅ ====>', res);
+
+        setOrderDetails({
+          ...orderDetails,
+          images: [
+            ...orderDetails?.images,
+            {
+              public_id: res?.data?.public_id,
+              image_url: res?.data?.secure_url,
+            },
+          ],
+        });
+        await updateOrderDetails();
+        setInvoiceFile(null);
+        uploadFileBtnRef.current.value = null;
+      })
+      .catch((err) => {
+        setInvoiceFile(null);
+        uploadFileBtnRef.current.value = null;
+        console.log('Error ===>', err.response);
+        toast.error('Something Went Uploading file!');
+      });
+  };
+
+  const { mutateAsync: UplaodInvoice, isLoading: uplaodInvoiceIsLoading } =
+    useMutation(uplaodInvoiceApi, {
+      onSuccess: () => {
+        toast.success('Image Uploaded Sucessfully ✅');
+      },
+    });
+  // console.log('orderDetails', orderDetails?.images);
+
+  const downloadImage = (image_url, public_id) => {
+    saveAs(image_url, `invoice_${orderId}_${public_id}`); // Put your image url here.
+  };
+
+  const { mutateAsync: deleteImage, isLoading: deleteImageisLoading } =
+    useMutation(async (public_id) => await deleteImageAPI(public_id), {
+      onSuccess: () => {
+        setDeleteImageId(null);
+      },
+      onError: (err) => {
+        setDeleteImageId(null);
+        console.log(err.response);
+        toast.error('something went Wrong');
+      },
+    });
+
+  const deleteImageAPI = async (public_id) => {
+    await userRequest
+      .delete(`/orders/deleteImgae?public_id=${public_id}`)
+      .then(async (res) => {
+        setOrderDetails({
+          ...orderDetails,
+          images: orderDetails?.images?.filter(
+            (inv) => inv?.public_id !== public_id
+          ),
+        });
+
+        await updateOrderDetails();
+      });
+  };
+
   return (
     <div className="container mx-auto max-w-[95%]">
       <header className="flex justify-between items-center">
@@ -147,7 +241,7 @@ const OrderDetails = () => {
         </h3>
       </header>
 
-      {isLoadingOrderDetails || isFetchingOrderDetails ? (
+      {isLoadingOrderDetails ? (
         <div className="flex justify-center items-center w-full h-[70vh]">
           <Spinner />
         </div>
@@ -155,7 +249,7 @@ const OrderDetails = () => {
         <>
           <hr className="my-2" />
 
-          <div className="flex items-center justify-between gap-6 my-4 ">
+          <div className="flex items-center justify-between gap-6 my-4 flex-wrap">
             <div className="font-semibold text-lg dark:text-gray-200">
               Order Number {'  '}
               <span className="text-red-500">
@@ -163,13 +257,44 @@ const OrderDetails = () => {
                 {orderDetails?.orderId}
               </span>
             </div>
+            <div className="flex items-center gap-7 flex-wrap">
+              <Link to={`/invoice/${orderId}`} className="btn btn-sm btn-white">
+                Generate Invoice &nbsp; <FaFileInvoice />
+              </Link>
 
-            <Link
-              to={`/invoice/${orderId}`}
-              className="btn btn-sm btn-white m-b-10 p-l-5"
-            >
-              get Invoice &nbsp; <FaFileInvoice />
-            </Link>
+              {user?.role === 'admin' && (
+                <div className="flex flex-wrap sm:flex-nowrap  ">
+                  <div className="h-max relative text-center mt-2 md:mt-0 md:max-w-[300px] w-full flex flex-wrap">
+                    <p className="block text-sm font-medium text-gray-900 dark:text-gray-300 absolute -top-6">
+                      {!uplaodInvoiceIsLoading ? (
+                        'Upload invoice img/pdf*'
+                      ) : (
+                        <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-red-500 btn-sm -mt-2 max-w-max max-h-max">
+                          Uploading File...
+                        </button>
+                      )}
+                    </p>
+                    <input
+                      onChange={(e) => setInvoiceFile(e.target.files[0])}
+                      type="file"
+                      accept="image/*, application/pdf"
+                      // disabled={uploadProductsIsLoading}
+                      className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer "
+                      ref={uploadFileBtnRef}
+                    />
+                  </div>
+                  <span
+                    disabled={!invoiceFile || uplaodInvoiceIsLoading}
+                    onClick={() => {
+                      user?.role === 'admin' && UplaodInvoice();
+                    }}
+                    className="btn btn-sm btn-dark sm:w-max w-full mt-2 sm:mt-0"
+                  >
+                    Upload
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex lg:flex-row flex-col gap-4 relative">
@@ -400,6 +525,53 @@ const OrderDetails = () => {
                   </div>
                 )}
               </form>
+
+              <div className="flex gap-4 flex-wrap">
+                {orderDetailsData?.images &&
+                  orderDetailsData?.images.length > 0 &&
+                  orderDetailsData?.images?.map((inv) => {
+                    return (
+                      <div
+                        key={inv?.public_id}
+                        className="max-w-[49%] lg:max-w-[32%] min-h-[350px] relative flex-grow flex-shrink bg-base-100 shadow-xl image-full rounded-2xl overflow-hidden"
+                      >
+                        {deleteImageisLoading &&
+                          deleteImageId === inv?.public_id && (
+                            <>
+                              <div className="absolute w-full h-full top-0 left-0 bg-black opacity-80 z-10" />
+                              <div className="absolute w-full h-full top-0 left-0 flex justify-center items-center">
+                                <Spinner />
+                              </div>
+                            </>
+                          )}
+                        <img
+                          className="w-full h-full object-cover"
+                          src={inv?.image_url}
+                          alt={inv?.public_id}
+                        />
+                        {user?.role === 'admin' && (
+                          <button
+                            onClick={() => {
+                              setDeleteImageId(inv?.public_id);
+                              confirmDeleteInvoiceImageRef.current.checked = true;
+                            }}
+                            className="btn btn-circle absolute top-5 right-5"
+                          >
+                            <FiTrash />
+                          </button>
+                        )}
+                        <button
+                          onClick={() =>
+                            downloadImage(inv?.image_url, inv?.public_id)
+                          }
+                          className="btn btn-sm absolute bottom-5 right-5"
+                        >
+                          Downlaod &nbsp; <FiDownload />
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
 
             <div className="flex flex-col gap-4 lg:w-[30%]">
@@ -730,7 +902,9 @@ const OrderDetails = () => {
               <div className="modal-action">
                 <label
                   htmlFor="updateOrderDetailsModal"
-                  onClick={() => setOrderDetailsModal({})}
+                  onClick={() => {
+                    setOrderDetailsModal({});
+                  }}
                   className="btn bg-red-600 text-white hover:bg-red-500 border-0"
                 >
                   Cancel
@@ -740,6 +914,41 @@ const OrderDetails = () => {
                     updateOrderDetails();
                   }}
                   htmlFor="updateOrderDetailsModal"
+                  className="btn bg-blue-600 text-white hover:bg-blue-500 border-0"
+                >
+                  Confirm
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <input
+            ref={confirmDeleteInvoiceImageRef}
+            type="checkbox"
+            id="deleteInvoiceImage"
+            className="modal-toggle"
+          />
+          <div className="modal">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Delete Invoice Image</h3>
+              <p className="py-4">
+                Are Your sure you want to Delete Invoice Image?
+              </p>
+              <div className="modal-action">
+                <label
+                  htmlFor="deleteInvoiceImage"
+                  onClick={() => {
+                    setDeleteImageId(null);
+                  }}
+                  className="btn bg-red-600 text-white hover:bg-red-500 border-0"
+                >
+                  Cancel
+                </label>
+                <label
+                  onClick={() => {
+                    user?.role === 'admin' && deleteImage(deleteImageId);
+                  }}
+                  htmlFor="deleteInvoiceImage"
                   className="btn bg-blue-600 text-white hover:bg-blue-500 border-0"
                 >
                   Confirm
