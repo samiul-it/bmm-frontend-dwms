@@ -52,7 +52,7 @@ const App = () => {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    user?.token && user?.token !== '' && getUser(dispatch);
+    user?.token && getUser(dispatch);
   }, [user?.token, dispatch]);
 
   useEffect(() => {

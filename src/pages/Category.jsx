@@ -14,7 +14,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 import Spinner from '../components/shared/spinner/Spinner';
 import { AiFillLock } from 'react-icons/ai';
 import Select from 'react-select';
-import Loading from "./Loading";
+import Loading from './Loading';
 
 const Categories = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
@@ -239,17 +239,17 @@ const Categories = () => {
       <div className="w-[200px] flex-grow flex-shrink bg-white group rounded-lg overflow-hidden relative">
         <div className="mx-auto overflow-hidden">
           <img
-            className="max-h-[220px] w-full object-cover group-hover:scale-[120%] transition duration-200 ease-out"
+            className="max-h-[220px] w-full object-cover group-hover:scale-[120%] transition duration-200 ease-out animate-pulse"
             // src="https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg"
             src={emptyImage}
             alt="loading"
           />
         </div>
         <div className="flex flex-col p-2 h-[60%]">
-          <span className=" h-5 w-1/2 my-2  bg-gray-300 rounded-md"></span>
-          <span className=" h-5 w-3/4 my-2  bg-gray-300 rounded-md"></span>
-          <span className=" h-5 w-full  my-2  bg-gray-300 rounded-md"></span>
-          <span className=" h-5 w-full my-2  bg-gray-300 rounded-md"></span>
+          <span className=" h-5 w-1/2 my-2  bg-gray-300 rounded-md animate-pulse"></span>
+          <span className=" h-5 w-3/4 my-2  bg-gray-300 rounded-md animate-pulse"></span>
+          <span className=" h-5 w-full  my-2  bg-gray-300 rounded-md animate-pulse"></span>
+          <span className=" h-5 w-full my-2  bg-gray-300 rounded-md animate-pulse"></span>
         </div>
       </div>
     );
@@ -728,7 +728,7 @@ const Categories = () => {
                     {!uploadCategoriesIsLoading ? (
                       'Upload excel sheet'
                     ) : (
-                      <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
+                      <button className="btn loading text-red-500 no-animation bg-inherit border-0 p-0 m-0 btn-sm -mt-2 max-w-max max-h-max">
                         Uploading File...
                       </button>
                     )}
@@ -736,6 +736,7 @@ const Categories = () => {
                   <input
                     onChange={(e) => handleFile(e)}
                     type="file"
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     disabled={uploadCategoriesIsLoading}
                     ref={uploadFileBtnRef}
                     className="block text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer"

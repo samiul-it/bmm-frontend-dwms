@@ -416,25 +416,25 @@ const Products = () => {
       <tr key={i}>
         <td></td>
         <td>
-          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
+          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px] animate-pulse"></div>
         </td>
         <td>
-          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
+          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px] animate-pulse"></div>
         </td>
         <td>
-          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
+          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px] animate-pulse"></div>
         </td>
         <td>
-          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px]"></div>
+          <div className="bg-slate-600 rounded-lg w-[90%] h-[25px] animate-pulse"></div>
         </td>
         {user?.role == 'admin' && (
           <td>
-            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px] animate-pulse"></div>
           </td>
         )}
         {user?.role == 'admin' && (
           <td>
-            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px]"></div>
+            <div className="bg-slate-600 rounded-lg w-[100%] h-[25px] animate-pulse"></div>
           </td>
         )}
       </tr>
@@ -680,7 +680,7 @@ const Products = () => {
                     {!uploadProductsIsLoading ? (
                       'Upload excel sheet'
                     ) : (
-                      <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-gray-900 dark:text-gray-300 btn-sm -mt-2 max-w-max max-h-max">
+                      <button className="btn loading no-animation bg-inherit border-0 p-0 m-0 text-red-500 btn-sm -mt-2 max-w-max max-h-max">
                         Uploading File...
                       </button>
                     )}
@@ -688,6 +688,7 @@ const Products = () => {
                   <input
                     onChange={(e) => handleFile(e)}
                     type="file"
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     disabled={uploadProductsIsLoading}
                     className="block w-max text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1a97f5] file:text-gray-200 hover:file:bg-[#0173ca] hover:cursor-pointer "
                     ref={uploadFileBtnRef}
