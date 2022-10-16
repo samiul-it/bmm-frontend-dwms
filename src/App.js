@@ -4,12 +4,14 @@ import { FiSettings } from 'react-icons/fi';
 // import {  } from '@syncfusion/ej2-react-popups';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSelector, useDispatch } from 'react-redux';
+import io from 'socket.io-client';
+import { useQuery } from 'react-query';
 import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
 import { Products, Employees } from './pages';
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Login from './pages/Login';
-import { useSelector, useDispatch } from 'react-redux';
 import ProtectedRoutes from './ProtectedRoutes';
 import Category from './pages/Category';
 import Wholesellers from './pages/Wholesellers';
@@ -20,8 +22,6 @@ import { getUser } from './redux/apiCalls';
 import OrdersPage from './pages/OrdersPage/OrdersPage';
 import Homepage from './pages/Homepage/Homepage';
 import UserProfileDetails from './pages/UserProfileDetails/UserProfileDetails';
-import io from 'socket.io-client';
-import { useQuery } from 'react-query';
 import { userRequest } from './requestMethods';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
 import OrderDetails from './pages/OrderDetailsPage/OrderDetails';
@@ -72,18 +72,18 @@ const App = () => {
     }
   }, [user?.user?._id]);
 
-  const {
-    data: notificationData,
-    refetch: refetchNotifications,
-    isFetching,
-  } = useQuery('notificationList', () => userRequest.get('/notification'), {
-    enabled:
-      user?.token !== undefined && user?.token !== null && user?.token !== '',
+  const { data: notificationData, refetch: refetchNotifications } = useQuery(
+    'notificationList',
+    () => userRequest.get('/notification'),
+    {
+      enabled:
+        user?.token !== undefined && user?.token !== null && user?.token !== '',
 
-    onError: (err) => {
-      console.error(err.response);
-    },
-  });
+      onError: (err) => {
+        console.error(err.response);
+      },
+    }
+  );
 
   const messageListener = (message) => {
     refetchNotifications();
@@ -91,7 +91,7 @@ const App = () => {
     Notification.requestPermission().then((perm) => {
       console.log(perm);
       if (perm === 'granted' && document.visibilityState === 'hidden') {
-        new Notification('New Notification', {
+        Notification('New Notification', {
           body: message?.message,
           tag: 'notification',
           requireInteraction: true,
@@ -154,77 +154,63 @@ const App = () => {
             ) : (
               ''
             )}
-            <>
-              {themeSettings && <ThemeSettings />}
+            {themeSettings && <ThemeSettings />}
 
-              <Routes>
-                {/* Login  */}
+            <Routes>
+              {/* Login  */}
+              <Route
+                path="/login"
+                element={user?.token ? <Navigate to="/" /> : <Login />}
+              />
+
+              {/* Create wholeseller  */}
+
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/invoice/:orderId" element={<Invoice />} />
+
+              {/* -------------Protected Routes Normal------------- */}
+              <Route element={<ProtectedRoutes isAdminRoute={false} />}>
+                {/* dashboard  */}
+                {/* Wholeseller  */}
+                <Route path="/wholesellers" element={<Wholesellers />} />
+                {/* Homepage  */}
+                <Route path="/" element={<Homepage />} />
+
+                <Route path="/category-request" element={<CategoryRequest />} />
+                {/* User Profile Details  */}
+
+                <Route path="/user-details" element={<UserProfileDetails />} />
+                <Route path="/categories/" element={<Category />} />
                 <Route
-                  path="/login"
-                  element={user?.token ? <Navigate to="/" /> : <Login />}
+                  path="/categories/:category_name/:id"
+                  element={<Products />}
+                />
+                <Route path="/confirmOrder" element={<ConfirmOrder />} />
+                <Route path="/OrdersPage" element={<OrdersPage />} />
+                <Route
+                  path="/OrderDetails/:orderId"
+                  element={<OrderDetails />}
+                />
+              </Route>
+
+              {/* ---------------------Admin Routes--------------------- */}
+              <Route element={<ProtectedRoutes isAdminRoute />}>
+                <Route path="/wholesellers" element={<Wholesellers />} />
+                {/* // Employees or Backend Users */}
+                <Route path="/employees" element={<Employees />} />
+                {/* Wholesellers Details  */}
+                <Route
+                  path="/wholesellers-details/:id"
+                  element={<WholesellersDetails />}
                 />
 
-                {/* Create wholeseller  */}
+                {/* Category Request Admin---> */}
+              </Route>
 
-                <Route path="/signup" element={<SignUp></SignUp>}></Route>
-                <Route
-                  path="/invoice/:orderId"
-                  element={<Invoice></Invoice>}
-                ></Route>
+              <Route path="/activity-logs" element={<ActivityLogs />} />
 
-                {/* -------------Protected Routes Normal------------- */}
-                <Route element={<ProtectedRoutes isAdminRoute={false} />}>
-                  {/* dashboard  */}
-                  {/* Wholeseller  */}
-                  <Route path="/wholesellers" element={<Wholesellers />} />
-                  {/* Homepage  */}
-                  <Route path="/" element={<Homepage />} />
-
-                  <Route
-                    path="/category-request"
-                    element={<CategoryRequest />}
-                  />
-                  {/* User Profile Details  */}
-
-                  <Route
-                    path="/user-details"
-                    element={<UserProfileDetails></UserProfileDetails>}
-                  />
-                  <Route path="/categories/" element={<Category />} />
-                  <Route
-                    path="/categories/:category_name/:id"
-                    element={<Products />}
-                  />
-                  <Route path="/confirmOrder" element={<ConfirmOrder />} />
-                  <Route path="/OrdersPage" element={<OrdersPage />} />
-                  <Route
-                    path="/OrderDetails/:orderId"
-                    element={<OrderDetails />}
-                  />
-                </Route>
-
-                {/* ---------------------Admin Routes--------------------- */}
-                <Route element={<ProtectedRoutes isAdminRoute={true} />}>
-                  <Route
-                    path="/wholesellers"
-                    element={<Wholesellers></Wholesellers>}
-                  />
-                  {/* // Employees or Backend Users */}
-                  <Route path="/employees" element={<Employees></Employees>} />
-                  {/* Wholesellers Details  */}
-                  <Route
-                    path="/wholesellers-details/:id"
-                    element={<WholesellersDetails></WholesellersDetails>}
-                  />
-
-                  {/* Category Request Admin---> */}
-                </Route>
-
-                <Route path="/activity-logs" element={<ActivityLogs />} />
-
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
-            </>
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
             {/* {user?.token ? <Footer /> : ''} */}
           </div>
         </div>

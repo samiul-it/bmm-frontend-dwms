@@ -1,14 +1,14 @@
-import React, { useRef, useState } from 'react';
-import { useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+
 import { BsFillPencilFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import Select from 'react-select';
+import { useQuery } from 'react-query';
 import { useStateContext } from '../../contexts/ContextProvider';
 import { getUser } from '../../redux/apiCalls';
 import { userRequest } from '../../requestMethods';
-import Header from './../../components/Header';
-import Select from 'react-select';
-import { useQuery } from 'react-query';
+import Header from '../../components/Header';
 
 const UserProfileDetails = () => {
   const { user } = useSelector((state) => state.user.currentUser);
@@ -29,7 +29,7 @@ const UserProfileDetails = () => {
   // Available Categories Fetch
   const { data: categoryData, refetch: categoryRefetch } = useQuery(
     'category',
-    async () => await userRequest.get('/category')
+    async () => await userRequest.get('/category'),
   );
 
   const handleModalToggle = () => {
@@ -52,7 +52,7 @@ const UserProfileDetails = () => {
     updateUserDetailsModalRef.current.checked = false;
   };
 
-  //Password Chnage
+  // Password Chnage
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
@@ -62,16 +62,16 @@ const UserProfileDetails = () => {
         setIsLoading(true);
         userRequest
           .put(`/wholesellers/reset-pass/${user._id}`, {
-            password: password,
-            newPassword: newPassword,
+            password,
+            newPassword,
           })
-          .then(function (response) {
+          .then((response) => {
             // console.log(response);
             handleModalToggle();
             toast.success('Password Changed Successfully');
             setIsLoading(false);
           })
-          .catch(function (error) {
+          .catch((error) => {
             // console.log(error);
             toast.error('Failed to Change Password');
             setIsLoading(false);
@@ -80,16 +80,16 @@ const UserProfileDetails = () => {
         setIsLoading(true);
         userRequest
           .put(`/user/reset-pass/${user._id}`, {
-            password: password,
-            newPassword: newPassword,
+            password,
+            newPassword,
           })
-          .then(function (response) {
+          .then((response) => {
             // console.log(response);
             handleModalToggle();
             toast.success('Password Changed Successfully');
             setIsLoading(false);
           })
-          .catch(function (error) {
+          .catch((error) => {
             // console.log(error);
             toast.error('Failed to Change Password');
             setIsLoading(false);
@@ -100,23 +100,17 @@ const UserProfileDetails = () => {
     }
   };
 
-  //User Categories
+  // User Categories
 
-  const userCatagories = user?.catagories?.map((cd) => {
-    return { value: cd.categoryId, label: cd.categoryName };
-  });
+  const userCatagories = user?.catagories?.map((cd) => ({ value: cd.categoryId, label: cd.categoryName }));
 
-  //Available Categoires
+  // Available Categoires
 
-  const availableCatagories = categoryData?.data?.map((cd) => {
-    return { value: cd._id, label: cd.name };
-  });
+  const availableCatagories = categoryData?.data?.map((cd) => ({ value: cd._id, label: cd.name }));
 
-  const categoryIds = selectedOption?.map((e) => {
-    return { categoryId: e.value, categoryName: e.label };
-  });
+  const categoryIds = selectedOption?.map((e) => ({ categoryId: e.value, categoryName: e.label }));
 
-  //New Category Request
+  // New Category Request
   // console.log(categoryIds);
 
   const handleCategoryRequest = (e) => {
@@ -126,18 +120,18 @@ const UserProfileDetails = () => {
     // console.log(selectedOption);
 
     userRequest
-      .put(`categoryrequest/create`, {
+      .put('categoryrequest/create', {
         wholesellerId: user._id,
         categories: categoryIds,
       })
-      .then(function (response) {
+      .then((response) => {
         // console.log(response);
         categoryRefetch();
         handleModalClose();
         toast.success('New Category Request Sent');
         // modalRef.current.checked = false;
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
         toast.error('Faild to Send Category Request');
       });
@@ -154,19 +148,19 @@ const UserProfileDetails = () => {
       setIsLoading(true);
       userRequest
         .put(`/wholesellers/${userDetails._id}`, userDetails)
-        .then(function (response) {
+        .then((response) => {
           // console.log(response);
           closeUserDetailsModal();
           toast.success('User Details Updated Successfully');
           getUser(dispatch);
           setIsLoading(false);
         })
-        .catch(function (error) {
+        .catch((error) => {
           // console.log(error);
           toast.error('Failed to Update User Details');
           setIsLoading(false);
         })
-        .finally(function () {
+        .finally(() => {
           setIsLoading(false);
           setUserDetails(user);
         });
@@ -174,19 +168,19 @@ const UserProfileDetails = () => {
       setIsLoading(true);
       userRequest
         .put(`/user/${userDetails._id}`, userDetails)
-        .then(function (response) {
+        .then((response) => {
           // console.log(response);
           closeUserDetailsModal();
           toast.success('User Details Updated Successfully');
           getUser(dispatch);
           setIsLoading(false);
         })
-        .catch(function (error) {
+        .catch((error) => {
           // console.log(error);
           toast.error('Failed to Update User Details');
           setIsLoading(false);
         })
-        .finally(function () {
+        .finally(() => {
           setUserDetails(user);
           setIsLoading(false);
         });
@@ -222,7 +216,7 @@ const UserProfileDetails = () => {
             </h4>
             <h4 className=" my-2  w-max">
               {' '}
-              <strong>Email:</strong> {user.email} <span></span>
+              <strong>Email:</strong> {user.email} <span />
             </h4>
             {/* <h4 className="">Role: {user.role}</h4> */}
             <h4 className=" my-2 w-max">
@@ -230,14 +224,14 @@ const UserProfileDetails = () => {
               <strong>Phone:</strong> +91 {user.phone}
             </h4>
 
-            {user?.role !== "admin" && (
+            {user?.role !== 'admin' && (
               <>
                 <h4 className=" my-2 w-max">
-                  {" "}
+                  {' '}
                   <strong>Place:</strong> {user?.place}
                 </h4>
                 <h4 className=" my-2 w-max">
-                  {" "}
+                  {' '}
                   <strong>Address:</strong> {user?.address}
                 </h4>
               </>
@@ -247,9 +241,9 @@ const UserProfileDetails = () => {
               <strong>Categories:</strong>
               <div className="max-w-80">
                 {user.role !== 'admin' && user.role !== 'employee' ? (
-                  user?.catagories &&
-                  user?.catagories.length > 0 &&
-                  user?.catagories?.map((cat, i) => (
+                  user?.catagories
+                  && user?.catagories.length > 0
+                  && user?.catagories?.map((cat, i) => (
                     <span key={i} className="badge badge-primary mx-1">
                       {cat?.categoryName}
                     </span>
@@ -340,9 +334,7 @@ const UserProfileDetails = () => {
                   disabled={isLoading}
                   type="submit"
                   // htmlFor="password-model"
-                  className={
-                    'btn bg-blue-600 text-white hover:bg-blue-500 border-0'
-                  }
+                  className="btn bg-blue-600 text-white hover:bg-blue-500 border-0"
                 >
                   Submit
                 </button>
@@ -417,7 +409,7 @@ const UserProfileDetails = () => {
                   value={userDetails.place}
                   required
                 />
-              </div>{" "}
+              </div>{' '}
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Address</span>
@@ -441,9 +433,7 @@ const UserProfileDetails = () => {
                 <button
                   disabled={isLoading}
                   type="submit"
-                  className={
-                    'btn bg-blue-600 text-white hover:bg-blue-500 border-0'
-                  }
+                  className="btn bg-blue-600 text-white hover:bg-blue-500 border-0"
                 >
                   Submit
                 </button>

@@ -159,14 +159,13 @@ const OrderDetails = () => {
       process.env.REACT_APP_CLODINARY_UPLOAD_PRESET
     );
     formData.append('folder', 'bmm');
-    formData.append('timestamp', 'bmm');
 
     await publicRequest
       .post(
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
         formData
       )
-      .then(async (res) => {
+      .then((res) => {
         console.log('cloudinary image uploaded ✅ ====>', res);
 
         setOrderDetails({
@@ -179,7 +178,7 @@ const OrderDetails = () => {
             },
           ],
         });
-        await updateOrderDetails();
+        updateOrderDetails();
         setInvoiceFile(null);
         uploadFileBtnRef.current.value = null;
       })

@@ -1,5 +1,4 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import userReducer from './userRedux';
 import {
   persistStore,
   persistReducer,
@@ -11,6 +10,7 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import userReducer from './userRedux';
 import OrdersSlice from '../Reducers/OrdersSlice';
 import NotificationsSlice from '../Reducers/NotificationSlice';
 
@@ -30,12 +30,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },
+  }),
 });
 
-export let persistor = persistStore(store);
+export const persistor = persistStore(store);

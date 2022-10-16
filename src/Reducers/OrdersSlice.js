@@ -11,7 +11,7 @@ const OrdersSlice = createSlice({
       const { orders } = state;
       const newOrders = [...orders];
       const index = newOrders.findIndex(
-        (item) => item.product._id === order._id
+        (item) => item.product._id === order._id,
       );
 
       if (index === -1) {
@@ -45,7 +45,7 @@ const OrdersSlice = createSlice({
       // console.log(orders);
       const product = action.payload;
       const index = orders.findIndex(
-        (item) => item.product._id === product._id
+        (item) => item.product._id === product._id,
       );
 
       if (index !== -1) {
@@ -65,7 +65,7 @@ const OrdersSlice = createSlice({
       const { orders } = JSON.parse(JSON.stringify(state));
       const product = action.payload;
       const index = orders.findIndex(
-        (item) => item.product._id === product._id
+        (item) => item.product._id === product._id,
       );
 
       if (index !== -1) {
@@ -79,7 +79,7 @@ const OrdersSlice = createSlice({
       const { product, quantity } = action.payload;
       // console.log('ChangeOrderQuantity ====>', product._id, quantity);
       const index = orders.findIndex(
-        (item) => item.product._id === product._id
+        (item) => item.product._id === product._id,
       );
 
       if (index !== -1) {

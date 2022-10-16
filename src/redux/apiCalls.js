@@ -1,5 +1,5 @@
-import { publicRequest, userRequest } from '../requestMethods';
 import { toast } from 'react-toastify';
+import { publicRequest, userRequest } from '../requestMethods';
 import {
   getUserFailure,
   getUserStart,
