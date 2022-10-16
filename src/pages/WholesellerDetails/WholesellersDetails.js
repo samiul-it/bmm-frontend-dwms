@@ -1,7 +1,7 @@
-import React from "react";
-import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
-import Loading from "./../Loading";
+import React from 'react';
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
+import Loading from '../Loading';
 
 const WholesellersDetails = () => {
   const userId = useParams();
@@ -13,14 +13,10 @@ const WholesellersDetails = () => {
     data: wholesellerDetails,
     isFetching,
     refetch,
-  } = useQuery("wholesellerDetails", () =>
-    fetch(`http://localhost:5000/wholesellers/id/${userId.id}`).then((res) =>
-      res.json()
-    )
-  );
+  } = useQuery('wholesellerDetails', () => fetch(`http://localhost:5000/wholesellers/id/${userId.id}`).then((res) => res.json()));
 
   if (isLoading) {
-    return <Loading></Loading>;
+    return <Loading />;
   }
 
   return (

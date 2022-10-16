@@ -25,7 +25,7 @@ userRequest.interceptors.request.use(
       config.headers.Authorization = token;
     }
     return config;
-  }
+  },
   // , (error) => {
   //   return Promise.reject(error);
   // }

@@ -18,24 +18,23 @@ const EmployeesTableRow = ({ employee, index, refetch }) => {
   };
 
   return (
-    <>
-      <tr>
-        <th>{index + 1}</th>
-        <td>{employee.name}</td>
-        <td>{employee.phone}</td>
-        <td>{employee.email}</td>
-        <td>{employee?.role}</td>
-        <td className="w-[200px]">
-          <button
-            onClick={() => handleDeleteAdmin(employee._id)}
-            className="flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2"
-          >
-            <FiTrash2 />
-            &nbsp; Delete
-          </button>
-        </td>
-      </tr>
-    </>
+    <tr>
+      <th>{index + 1}</th>
+      <td>{employee.name}</td>
+      <td>{employee.phone}</td>
+      <td>{employee.email}</td>
+      <td>{employee?.role}</td>
+      <td className="w-[200px]">
+        <button
+          type="button"
+          onClick={() => handleDeleteAdmin(employee._id)}
+          className="flex items-center w-max btn btn-sm modal-button bg-gray-800 text-red-500 shadow-lg mx-2"
+        >
+          <FiTrash2 />
+          &nbsp; Delete
+        </button>
+      </td>
+    </tr>
   );
 };
 

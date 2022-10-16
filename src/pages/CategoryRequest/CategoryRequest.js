@@ -1,11 +1,11 @@
-import React from "react";
-import Header from "../../components/Header";
-import { useQuery } from "react-query";
-import { userRequest } from "../../requestMethods";
-import Loading from "../Loading";
-import CategoryRequestTableRow from "./CategoryRequestTableRow";
-import { useSelector } from "react-redux";
-import { useStateContext } from "../../contexts/ContextProvider";
+import React from 'react';
+import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import Header from '../../components/Header';
+import { userRequest } from '../../requestMethods';
+import Loading from '../Loading';
+import CategoryRequestTableRow from './CategoryRequestTableRow';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 const CategoryRequest = () => {
   const user = useSelector((state) => state?.user?.currentUser?.user);
@@ -16,7 +16,7 @@ const CategoryRequest = () => {
     data: requests,
     isFetching,
     refetch: requestRefetch,
-  } = useQuery("requests", () => userRequest.get("/categoryrequest"));
+  } = useQuery('requests', () => userRequest.get('/categoryrequest'));
 
   // console.log(requests?.data);
 
@@ -24,17 +24,15 @@ const CategoryRequest = () => {
     isLoading: wholesellerRequestsLoading,
     data: wholesellerRequests,
     refetch: wholesellerRequestsFetch,
-  } = useQuery("wholesellerRequests", () =>
-    userRequest.get(`/categoryrequest/wholeseller/${user?._id}`)
-  );
+  } = useQuery('wholesellerRequests', () => userRequest.get(`/categoryrequest/wholeseller/${user?._id}`));
 
   if (requestLoading) {
-    return <Loading></Loading>;
+    return <Loading />;
   }
 
-  //Delete Category Request Wholeseller
+  // Delete Category Request Wholeseller
   const handleDeleteCategoryReq = async (id) => {
-    const confirmDelete = window.confirm("Are you Sure?");
+    const confirmDelete = window.confirm('Are you Sure?');
     console.log(confirmDelete);
     if (confirmDelete) {
       const url = `/categoryrequest/${id}`;
@@ -48,7 +46,7 @@ const CategoryRequest = () => {
       <div className="w-full  px-6">
         <Header category="Page" title="Category Requests" />
 
-        {user?.role == "admin" && (
+        {user?.role == 'admin' && (
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead>
@@ -70,37 +68,37 @@ const CategoryRequest = () => {
                     index={index}
                     requestRefetch={requestRefetch}
                     requests={requests}
-                  ></CategoryRequestTableRow>
+                  />
                 ))}
                 {requests?.data?.length > 0 ? (
                   <tr>
-                    <td></td>
+                    <td />
                     <td className="text-green-600 ">
                       Total Active Requests:
                       {requests?.data?.length}
                     </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
                   </tr>
                 ) : (
                   <tr>
                     <td className="text-orange-600"> No Requests!</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
         )}
-        {user?.role == "wholeseller" && (
+        {user?.role == 'wholeseller' && (
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead>
@@ -123,17 +121,15 @@ const CategoryRequest = () => {
                           <p key={index} className="badge badge-info gap-2">
                             {category.categoryName}
                           </p>
-                        )
+                        ),
                       )}
                     </td>
                     <td>{wholesellerRequests?.data?.status}</td>
                     <td>
                       <button
-                        onClick={() =>
-                          handleDeleteCategoryReq(
-                            wholesellerRequests?.data?._id
-                          )
-                        }
+                        onClick={() => handleDeleteCategoryReq(
+                          wholesellerRequests?.data?._id,
+                        )}
                         className="btn btn-primary btn-sm"
                         style={{
                           backgroundColor: currentColor,
@@ -146,13 +142,13 @@ const CategoryRequest = () => {
                 ) : (
                   <tr>
                     <th>
-                      {" "}
+                      {' '}
                       <p className="text-red-500"> No Requests! </p>
                     </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
+                    <th />
+                    <th />
+                    <th />
+                    <th />
                   </tr>
                 )}
               </tbody>
